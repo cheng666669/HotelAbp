@@ -46,15 +46,15 @@ public class HotelABPHttpApiHostModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
-        //PreConfigure<OpenIddictBuilder>(builder =>
-        //{
-        //    builder.AddValidation(options =>
-        //    {
-        //        options.AddAudiences("HotelABP");
-        //        options.UseLocalServer();
-        //        options.UseAspNetCore();
-        //    });
-        //});
+        PreConfigure<OpenIddictBuilder>(builder =>
+        {
+            builder.AddValidation(options =>
+            {
+                options.AddAudiences("HotelABP");
+                options.UseLocalServer();
+                options.UseAspNetCore();
+            });
+        });
     }
 
     public override void ConfigureServices(ServiceConfigurationContext context)
