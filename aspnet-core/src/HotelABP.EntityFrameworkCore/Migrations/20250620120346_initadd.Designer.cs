@@ -13,7 +13,7 @@ using Volo.Abp.EntityFrameworkCore;
 namespace HotelABP.Migrations
 {
     [DbContext(typeof(HotelABPDbContext))]
-    [Migration("20250620090727_initadd")]
+    [Migration("20250620120346_initadd")]
     partial class initadd
     {
         /// <inheritdoc />
