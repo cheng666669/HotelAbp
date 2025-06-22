@@ -4,6 +4,7 @@ using HotelABP.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace HotelABP.Migrations
 {
     [DbContext(typeof(HotelABPDbContext))]
-    partial class HotelABPDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250621020708_添加客户信息")]
+    partial class 添加客户信息
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -23,90 +26,6 @@ namespace HotelABP.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("HotelABP.Customers.HotelABPCustoimers", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<decimal>("AvailableBalance")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<decimal>("AvailableGiftBalance")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<decimal>("AvailablePoints")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<DateTime?>("Birthday")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<string>("CustomerName")
-                        .IsRequired()
-                        .HasMaxLength(16)
-                        .HasColumnType("varchar(16)");
-
-                    b.Property<string>("CustomerNickName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("CustomerType")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("DeleterId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("DeleterId");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("DeletionTime");
-
-                    b.Property<int?>("Gender")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("GrowthValue")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false)
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("HotelABPCustoimers");
-                });
 
             modelBuilder.Entity("HotelABP.Usertinfo", b =>
                 {

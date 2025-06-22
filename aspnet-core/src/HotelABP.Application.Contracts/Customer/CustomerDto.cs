@@ -1,0 +1,81 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HotelABP.Customer
+{
+    public class CustomerDto
+    {
+        /// <summary>
+        /// 客户类型（0 = 会员，1 = 普通客户）
+        /// </summary>
+        [Required]
+        public int CustomerType { get; set; }
+
+        /// <summary>
+        /// 客户姓名（必填，最多16个字符）
+        /// </summary>
+        [Required(ErrorMessage = "客户姓名是必填项")]
+        [StringLength(16, ErrorMessage = "客户姓名不能超过16个字符")]
+        public string CustomerName { get; set; }
+
+        /// <summary>
+        /// 手机号（必填，格式验证）
+        /// </summary>
+        [Required(ErrorMessage = "手机号是必填项")]
+        [Phone(ErrorMessage = "请输入有效的手机号")]
+        public string PhoneNumber { get; set; }
+
+        /// <summary>
+        /// 性别（0 = 未知，1 = 男，2 = 女；可为空）
+        /// </summary>
+        public int? Gender { get; set; }
+
+        /// <summary>
+        /// 出生日期（可选）
+        /// </summary>
+        [DataType(DataType.Date)]
+        public DateTime? Birthday { get; set; } = DateTime.Now;
+
+        /// <summary>
+        /// 所在城市（可选，最多50个字符）
+        /// </summary>
+        [StringLength(50, ErrorMessage = "城市名称最多50个字符")]
+        public string City { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 详细地址（可选，最多200个字符）
+        /// </summary>
+        [StringLength(200, ErrorMessage = "详细地址最多200个字符")]
+        public string Address { get; set; } = string.Empty;
+
+        //  下面字段不能为 0，设定最小值为 0.01（或 1）
+
+        /// <summary>
+        /// 成长值（必须大于0，最多10亿，仅会员有效）
+        /// </summary>
+        [Range(1, 1000000000, ErrorMessage = "成长值必须大于0且不超过10亿")]
+        public decimal GrowthValue { get; set; } = 1;
+
+        /// <summary>
+        /// 可用充值余额（必须大于0，最多95万，仅会员有效）
+        /// </summary>
+        [Range(0.01, 950000, ErrorMessage = "可用充值余额必须大于0且不超过95万")]
+        public decimal AvailableBalance { get; set; } = 1;
+
+        /// <summary>
+        /// 可用赠送余额（必须大于0，最多95万，仅会员有效）
+        /// </summary>
+        [Range(0.01, 950000, ErrorMessage = "可用赠送余额必须大于0且不超过95万")]
+        public decimal AvailableGiftBalance { get; set; } = 1;
+
+        /// <summary>
+        /// 可用积分（必须大于0，最多10亿，仅会员有效）
+        /// </summary>
+        [Range(1, 1000000000, ErrorMessage = "积分必须大于0且不超过10亿")]
+        public decimal AvailablePoints { get; set; } = 1;
+    }
+}

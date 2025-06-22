@@ -4,6 +4,7 @@ using HotelABP.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace HotelABP.Migrations
 {
     [DbContext(typeof(HotelABPDbContext))]
-    partial class HotelABPDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250621024135_添加客户信息1")]
+    partial class 添加客户信息1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,10 +66,6 @@ namespace HotelABP.Migrations
                         .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("varchar(16)");
-
-                    b.Property<string>("CustomerNickName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<int>("CustomerType")
                         .HasColumnType("int");
