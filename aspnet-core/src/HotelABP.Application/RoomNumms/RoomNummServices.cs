@@ -118,6 +118,12 @@ namespace HotelABP.RoomNumms
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
+        /// <summary>
+        /// 条件查询显示页面
+        /// </summary>
+        /// <param name="seach"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public async Task<ApiResult<PageResult<List<RoomNummDto>>>> GetListAsync(Seach seach, GetRoomNummberQuery input)
         {
             var queryable = await _roomNummberRepository.GetQueryableAsync();
