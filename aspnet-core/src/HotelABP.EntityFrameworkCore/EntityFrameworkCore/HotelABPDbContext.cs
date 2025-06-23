@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HotelABP.RoomReserves;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -42,6 +43,7 @@ public class HotelABPDbContext :
 
 
     public DbSet<Usertinfo> Usertinfos { get; set; }
+    public DbSet<ReserveRoom> ReserveRooms { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

@@ -1,4 +1,5 @@
 ﻿using Volo.Abp.AutoMapper;
+using Volo.Abp.Caching;
 using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement;
 
