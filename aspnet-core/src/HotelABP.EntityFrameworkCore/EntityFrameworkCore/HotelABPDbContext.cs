@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HotelABP.RoomNummbers;
+using HotelABP.RoomTypes;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -39,7 +41,14 @@ public class HotelABPDbContext :
     {
 
     }
-
+    /// <summary>
+    /// 房型表
+    /// </summary>
+    public DbSet<RoomType> RoomTypes { get; set; }
+    /// <summary>
+    /// 房号表
+    /// </summary>
+    public DbSet<RoomNummber> RoomNummbers { get; set; }
 
     public DbSet<Usertinfo> Usertinfos { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)

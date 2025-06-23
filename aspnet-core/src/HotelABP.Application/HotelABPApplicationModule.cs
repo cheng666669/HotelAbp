@@ -1,4 +1,5 @@
 ﻿using Volo.Abp.AutoMapper;
+using Volo.Abp.Caching;
 using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement;
 
@@ -17,6 +18,10 @@ public class HotelABPApplicationModule : AbpModule
         Configure<AbpAutoMapperOptions>(options =>
         {
             options.AddMaps<HotelABPApplicationModule>();
+        });
+        Configure<AbpDistributedCacheOptions>(options =>
+        {
+            options.KeyPrefix = "MyApp1";
         });
     }
 }
