@@ -1,25 +1,30 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using HotelABP.EntityFrameworkCore;
+using HotelABP.MultiTenancy;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using HotelABP.EntityFrameworkCore;
-using HotelABP.MultiTenancy;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Validation.AspNetCore;
+using Swashbuckle.AspNetCore.Filters;
+using Swashbuckle.AspNetCore.SwaggerUI;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
+using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
+using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
@@ -75,11 +80,38 @@ public class HotelABPHttpApiHostModule : AbpModule
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
     {
-        context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-        context.Services.Configure<AbpClaimsPrincipalFactoryOptions>(options =>
+        var configuration = context.Services.GetConfiguration();
+
+        context.Services.AddAuthentication(option =>
         {
-            options.IsDynamicClaimsEnabled = true;
-        });
+            option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+                .AddJwtBearer(
+                option =>
+                {
+                    option.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        //是否验证发行人
+                        ValidateIssuer = true,
+                        ValidIssuer = configuration["JwtConfig:Bearer:Issuer"],//发行人
+
+                        //是否验证受众人
+                        ValidateAudience = true,
+                        ValidAudience = configuration["JwtConfig:Bearer:Audience"],//受众人
+
+                        //是否验证密钥
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtConfig:Bearer:SecurityKey"])),
+
+                        ValidateLifetime = true, //验证生命周期
+
+                        RequireExpirationTime = true, //过期时间
+
+                        ClockSkew = TimeSpan.FromSeconds(30)   //平滑过期偏移时间
+                    };
+                }
+            );
     }
 
     private void ConfigureBundles()
@@ -142,19 +174,33 @@ public class HotelABPHttpApiHostModule : AbpModule
 
     private static void ConfigureSwaggerServices(ServiceConfigurationContext context, IConfiguration configuration)
     {
-        context.Services.AddAbpSwaggerGenWithOAuth(
-            configuration["AuthServer:Authority"]!,
-            new Dictionary<string, string>
+        context.Services.AddSwaggerGen(options =>
+        {
+            // Correcting the misplaced code and ensuring proper syntax
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelABP API", Version = "v1" });
+            options.DocInclusionPredicate((docName, description) => true);
+            options.CustomSchemaIds(type => type.FullName);
+
+            // Adding security definitions
+            options.OperationFilter<AddResponseHeadersFilter>();
+            options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+            options.OperationFilter<SecurityRequirementsOperationFilter>();
+
+            options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
             {
-                    {"HotelABP", "HotelABP API"}
-            },
-            options =>
-            {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelABP API", Version = "v1" });
-                options.DocInclusionPredicate((docName, description) => true);
-                options.CustomSchemaIds(type => type.FullName);
+                Description = "JWT授权(数据将在请求头中进行传递)直接在下面框中输入Bearer {token}(注意两者之间是一个空格) \"",
+                Name = "Authorization", // jwt默认的参数名称
+                In = ParameterLocation.Header, // jwt默认存放Authorization信息的位置(请求头中)
+                Type = SecuritySchemeType.ApiKey
             });
+
+            // Including XML comments for Swagger documentation
+            var basePath = AppDomain.CurrentDomain.BaseDirectory;
+            var xmlPath = Path.Combine(basePath, "HotelABP.Application.xml"); // XML file name
+            options.IncludeXmlComments(xmlPath, true); // Ensuring controller comments are included
+        });
     }
+    
 
     private void ConfigureCors(ServiceConfigurationContext context, IConfiguration configuration)
     {
@@ -209,10 +255,9 @@ public class HotelABPHttpApiHostModule : AbpModule
         app.UseAuthorization();
 
         app.UseSwagger();
-        app.UseAbpSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelABP API");
+        app.UseSwaggerUI(c => {
 
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelABP API");
             var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
             c.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
             c.OAuthScopes("HotelABP");
