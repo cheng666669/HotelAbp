@@ -45,8 +45,6 @@ public class HotelABPDbContext :
 
     }
 
-
-    public DbSet<Usertinfo> Usertinfos { get; set; }
     public DbSet<ReserveRoom> ReserveRooms { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
