@@ -10,6 +10,12 @@ namespace HotelABP.Customer
     public class CustomerDto
     {
         /// <summary>
+        /// 客户昵称
+        /// </summary>
+
+        [Required]
+        public string CustomerNickName { get; set; } = string.Empty;
+        /// <summary>
         /// 客户类型（0 = 会员，1 = 普通客户）
         /// </summary>
         [Required]

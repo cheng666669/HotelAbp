@@ -12,5 +12,6 @@ public class HotelABPApplicationAutoMapperProfile : Profile
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
         CreateMap<CustomerDto, HotelABPCustoimers>().ReverseMap();
+        CreateMap<HotelABPCustoimers, GetCustomerDtoList>().ReverseMap();
     }
 }

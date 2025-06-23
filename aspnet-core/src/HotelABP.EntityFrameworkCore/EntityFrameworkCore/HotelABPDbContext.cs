@@ -1,4 +1,6 @@
 ﻿using HotelABP.Customers;
+using HotelABP.Grades;
+using HotelABP.Labels;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -44,6 +46,8 @@ public class HotelABPDbContext :
 
     public DbSet<Usertinfo> Usertinfos { get; set; }
     public DbSet<HotelABPCustoimers> HotelABPCustoimers { get; set; }
+    public DbSet<HotelABPLabels> HotelABPLabels { get; set; }
+    public DbSet<HotelAbpGrades> HotelAbpGrades { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
