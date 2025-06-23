@@ -1,12 +1,13 @@
 ﻿using HotelABP.RoomReserves;
 using Microsoft.EntityFrameworkCore;
+using HotelABP.Users;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
-using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
-using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
+
 
 namespace HotelABP.EntityFrameworkCore;
 
@@ -31,8 +32,11 @@ public class HotelABPDbContext :
      */
 
     //Identity
-
-
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<SysUser> Users { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
+    public DbSet<RolePermission> RolePermissions { get; set; }
     #endregion
 
     public HotelABPDbContext(DbContextOptions<HotelABPDbContext> options)
@@ -44,6 +48,7 @@ public class HotelABPDbContext :
 
     public DbSet<Usertinfo> Usertinfos { get; set; }
     public DbSet<ReserveRoom> ReserveRooms { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
