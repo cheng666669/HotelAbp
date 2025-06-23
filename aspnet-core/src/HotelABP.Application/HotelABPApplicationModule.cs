@@ -2,6 +2,11 @@
 using Lazy.Captcha.Core;
 using Lazy.Captcha.Core.Generator;
 using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp.Caching;
+﻿using Lazy.Captcha.Core;
+using Lazy.Captcha.Core.Generator;
+using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement;
 
@@ -21,7 +26,6 @@ public class HotelABPApplicationModule : AbpModule
         {
             options.AddMaps<HotelABPApplicationModule>();
         });
-
 
             //验证码
             context.Services.AddCaptcha(context.Services.GetConfiguration(), option =>
