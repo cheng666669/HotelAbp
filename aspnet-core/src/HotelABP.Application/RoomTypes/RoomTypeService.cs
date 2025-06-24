@@ -19,6 +19,7 @@ using Volo.Abp.ObjectMapping;
 
 namespace HotelABP.RoomTypes
 {
+    [IgnoreAntiforgeryToken]
     public class RoomTypeService : ApplicationService, IRoomTypeService
     {
         private readonly IRepository<RoomType, Guid> _roomTypeRepository;
@@ -116,7 +117,46 @@ namespace HotelABP.RoomTypes
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [HttpPut]
         public async Task<ApiResult<bool>> DeleteRoomTypeDel(Guid id)
+        {
+            try
+            {
+                var res=await _roomTypeRepository.FindAsync(id);
+                await _roomTypeRepository.DeleteAsync(id);
+                return ApiResult<bool>.Success(true, ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
+            }
+        }
+        /// <summary>
+        /// 批量删除房型
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<bool>> DeleteBatchRoomType(List<Guid> ids)
+        {
+            try
+            {
+                foreach (var id in ids)
+                {
+                    await _roomTypeRepository.DeleteAsync(id);
+                }
+                return ApiResult<bool>.Success(true, ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
+            }
+        }
+        /// <summary>
+        /// 删除房型
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<bool>> DeleteAsync(Guid id)
         {
             try
             {
@@ -133,7 +173,7 @@ namespace HotelABP.RoomTypes
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> DeleteBatchRoomType(List<Guid> ids)
+        public async Task<ApiResult<bool>> DeleteBatchAsync(List<Guid> ids)
         {
             try
             {
