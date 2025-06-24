@@ -8,6 +8,9 @@ using Volo.Abp.Application.Dtos;
 
 namespace HotelABP.Customer
 {
+    /// <summary>
+    /// 客户列表
+    /// </summary>
     public class GetCustomerDto:FullAuditedEntityDto<Guid>
     {
         /// <summary>

@@ -43,7 +43,28 @@ namespace HotelABP.Customer
                 return ApiResult<CustomerDto>.Fail(ex.Message, ResultCode.Error);
             }
         }
+        /// <summary>
+        /// 获取客户类型列表
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustoimerTypeNameAsync()
+        {
+            var list = await _customerTypeRepository.GetQueryableAsync();
+            var result = list.Select(x => new GetCustoimerTypeNameDto
+            {
+                Id = x.Id,
+                CustomerTypeName = x.CustomerTypeName
+            }).ToList();
 
+            return ApiResult<List<GetCustoimerTypeNameDto>>.Success(result, ResultCode.Success);
+        }
+        /// <summary>
+        /// 获取客户列表
+        /// </summary>
+        /// <param name="seach"></param>
+        /// <param name="cudto"></param>
+        /// <returns></returns>
         public async Task<ApiResult<PageResult<GetCustomerDto>>> GetCustomerListAsync(Seach seach, GetCustomerDtoList cudto)
         {
             var list = await _customerRepository.GetQueryableAsync();

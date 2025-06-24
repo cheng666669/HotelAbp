@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace HotelABP.Customer
 {
+    /// <summary>
+    /// 客户列表查询参数
+    /// </summary>
     public class GetCustomerDtoList
     {
         /// <summary>
