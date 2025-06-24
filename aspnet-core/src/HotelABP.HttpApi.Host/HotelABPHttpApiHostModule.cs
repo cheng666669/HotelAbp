@@ -76,6 +76,8 @@ public class HotelABPHttpApiHostModule : AbpModule
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
+
+
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
