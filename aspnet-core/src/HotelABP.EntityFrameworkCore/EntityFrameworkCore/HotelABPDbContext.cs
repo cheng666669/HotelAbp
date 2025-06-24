@@ -1,6 +1,8 @@
 ﻿using HotelABP.Customers;
 using HotelABP.Grades;
 using HotelABP.Labels;
+﻿using HotelABP.RoomNummbers;
+using HotelABP.RoomTypes;
 using Microsoft.EntityFrameworkCore;
 ﻿using HotelABP.Users;
 using Microsoft.EntityFrameworkCore;
@@ -47,7 +49,14 @@ public class HotelABPDbContext :
     {
 
     }
-
+    /// <summary>
+    /// 房型表
+    /// </summary>
+    public DbSet<RoomType> RoomTypes { get; set; }
+    /// <summary>
+    /// 房号表
+    /// </summary>
+    public DbSet<RoomNummber> RoomNummbers { get; set; }
 
     public DbSet<HotelABPCustoimers> HotelABPCustoimers { get; set; }
     public DbSet<HotelABPLabels> HotelABPLabels { get; set; }
