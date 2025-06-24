@@ -1,25 +1,18 @@
 ﻿using HotelABP.EntityFrameworkCore;
-using HotelABP.MultiTenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using OpenIddict.Validation.AspNetCore;
 using Swashbuckle.AspNetCore.Filters;
-using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Volo.Abp;
-using Volo.Abp.Account;
-using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
@@ -28,9 +21,8 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
-using Volo.Abp.Localization;
+using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Modularity;
-using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
@@ -43,23 +35,23 @@ namespace HotelABP;
     typeof(HotelABPApplicationModule),
     typeof(HotelABPEntityFrameworkCoreModule),
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
-    typeof(AbpAccountWebOpenIddictModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(AbpCachingStackExchangeRedisModule)
 )]
 public class HotelABPHttpApiHostModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
-        PreConfigure<OpenIddictBuilder>(builder =>
-        {
-            builder.AddValidation(options =>
-            {
-                options.AddAudiences("HotelABP");
-                options.UseLocalServer();
-                options.UseAspNetCore();
-            });
-        });
+        //PreConfigure<OpenIddictBuilder>(builder =>
+        //{
+        //    builder.AddValidation(options =>
+        //    {
+        //        options.AddAudiences("HotelABP");
+        //        options.UseLocalServer();
+        //        options.UseAspNetCore();
+        //    });
+        //});
     }
 
     public override void ConfigureServices(ServiceConfigurationContext context)
@@ -242,12 +234,12 @@ public class HotelABPHttpApiHostModule : AbpModule
         app.UseRouting();
         app.UseCors();
         app.UseAuthentication();
-        app.UseAbpOpenIddictValidation();
+        //app.UseAbpOpenIddictValidation();
 
-        if (MultiTenancyConsts.IsEnabled)
-        {
-            app.UseMultiTenancy();
-        }
+        //if (MultiTenancyConsts.IsEnabled)
+        //{
+        //    app.UseMultiTenancy();
+        //}
         app.UseUnitOfWork();
         app.UseDynamicClaims();
         app.UseAuthorization();

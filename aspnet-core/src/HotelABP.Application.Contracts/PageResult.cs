@@ -10,7 +10,7 @@ namespace HotelABP
     {
         public int TotleCount { get; set; }
         public int TotlePage { get; set; }
-        public T Data { get; set; }
+        public IList<T> Data { get; set; }
     }
     public class Seach
     {

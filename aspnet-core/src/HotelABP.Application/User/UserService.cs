@@ -66,11 +66,17 @@ namespace HotelABP.User
         {
             try
             {
-                //var Port = new Uri(httpContextAccessor.HttpContext.Request.Headers["Referer"]).Port;
-                //if (!captcha.Validate(httpContextAccessor.HttpContext.Request.Cookies["ValidateCode"], dto.CaptchaCode) && Port == 3000)
-                //{
-                //    return ApiResult<LoginResultDto>.Fail("验证码错误", ResultCode.ValidationError);
-                //}
+                // 新增：判断验证码格式
+                if (!string.IsNullOrEmpty(dto.CaptchaCode) && dto.CaptchaCode.StartsWith("data:image"))
+                {
+                    return ApiResult<LoginResultDto>.Fail("请填写验证码图片上的文字，而不是图片本身", ResultCode.ValidationError);
+                }
+                var Port = new Uri(httpContextAccessor.HttpContext.Request.Headers["Referer"]).Port;
+                var capt = httpContextAccessor.HttpContext.Request.Cookies["ValidateCode"];
+                if (!captcha.Validate(capt, dto.CaptchaCode) && Port == 3000)
+                {
+                    return ApiResult<LoginResultDto>.Fail("验证码错误", ResultCode.ValidationError);
+                }
                 var user = await userRep.FindAsync(x => x.UserName == dto.Username);
                 if (user == null)
                 {

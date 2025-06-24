@@ -10,7 +10,6 @@ namespace HotelABP;
 [DependsOn(
     typeof(HotelABPDomainModule),
     typeof(HotelABPApplicationContractsModule),
-
     typeof(AbpSettingManagementApplicationModule)
     )]
 public class HotelABPApplicationModule : AbpModule

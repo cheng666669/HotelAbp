@@ -9,6 +9,7 @@ namespace HotelABP.Account
 {
     public interface IAccountService:IApplicationService
     {
-        Task<ApiResult> AddAccount();
+        Task<ApiResult> AddAccount(AccountRoleDto dto);
+        Task<ApiResult<PageResult<RoleDto>>> GetRoleList(Seach seach);
     }
 }
