@@ -1,3 +1,6 @@
+﻿using HotelABP.RoomNummbers;
+using HotelABP.RoomTypes;
+using Microsoft.EntityFrameworkCore;
 ﻿using HotelABP.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
@@ -43,7 +46,14 @@ public class HotelABPDbContext :
     {
 
     }
-
+    /// <summary>
+    /// 房型表
+    /// </summary>
+    public DbSet<RoomType> RoomTypes { get; set; }
+    /// <summary>
+    /// 房号表
+    /// </summary>
+    public DbSet<RoomNummber> RoomNummbers { get; set; }
 
     
     protected override void OnModelCreating(ModelBuilder builder)
