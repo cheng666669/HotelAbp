@@ -8,11 +8,11 @@ namespace HotelABP.RoomNummbers
 {
     public interface IRoomNummberService:IApplicationService
     {
-        Task<ApiResult<RoomNummDto>> CreateAsync(CreateUpdataRoomNummDto input);
+        Task<ApiResult<RoomNummDto>> CreateRoomNumAdd(CreateUpdataRoomNummDto input);
 
-        Task<ApiResult<PageResult<List<RoomNummDto>>>> GetListToRoomTypeIdAsync(Seach seach, RoomNummRoomTypeRequestDto input);
-        Task<ApiResult<bool>> DeleteBatchAsync(List<Guid> ids);
-        Task<ApiResult<bool>> UpdateStateToRoomNumAsync(Guid id);
+        Task<ApiResult<PageResult<RoomNummDto>>> GetListToRoomTypeId(Seach seach, RoomNummRoomTypeRequestDto input);
+        Task<ApiResult<bool>> DeleteRoomNumBatch(List<Guid> ids);
+        Task<ApiResult<bool>> UpdateStateToRoomNum(Guid id);
 
     }
 } 

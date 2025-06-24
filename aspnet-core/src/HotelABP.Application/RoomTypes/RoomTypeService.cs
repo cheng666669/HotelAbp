@@ -2,6 +2,7 @@
 using HotelABP.RoomNummbers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
@@ -21,9 +22,9 @@ namespace HotelABP.RoomTypes
     public class RoomTypeService : ApplicationService, IRoomTypeService
     {
         private readonly IRepository<RoomType, Guid> _roomTypeRepository;
-        IDistributedCache<PageResult<List<RoomTypeDto>>> distributedCache;
+        IDistributedCache<PageResult<RoomTypeDto>> distributedCache;
 
-        public RoomTypeService(IRepository<RoomType, Guid> roomTypeRepository, IDistributedCache<PageResult<List<RoomTypeDto>>> distributedCache)
+        public RoomTypeService(IRepository<RoomType, Guid> roomTypeRepository, IDistributedCache<PageResult<RoomTypeDto>> distributedCache)
         {
             _roomTypeRepository = roomTypeRepository;
             this.distributedCache = distributedCache;
@@ -33,7 +34,8 @@ namespace HotelABP.RoomTypes
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult<RoomTypeDto>> CreateAsync(CreateUpdateRoomTypeDto input)
+
+        public async Task<ApiResult<RoomTypeDto>> CreateAdd(CreateUpdateRoomTypeDto input)
         {
             try
             {
@@ -56,9 +58,9 @@ namespace HotelABP.RoomTypes
         /// <param name="seach"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<ApiResult< PageResult<List<RoomTypeDto>>>> GetListAsync(Seach seach, GetRoomTypeDto dto)
+        public async Task<ApiResult<PageResult<RoomTypeDto>>> GetListShow(Seach seach, GetRoomTypeDto dto)
         {
-            string cacheKey = $"RoomType_GetListAsync";
+            string cacheKey = $"RoomType_GetListAsync_{dto.Name}_{seach.PageIndex}_{seach.PageSize}";
             var cache = await distributedCache.GetOrAddAsync(cacheKey, async () =>
             {
                 // 构建查询
@@ -66,9 +68,9 @@ namespace HotelABP.RoomTypes
                 query = query.WhereIf(!string.IsNullOrWhiteSpace(dto.Name), x => x.Name.Contains(dto.Name));
                 var res = query.PageResult(seach.PageIndex, seach.PageSize);
                 var dtos = ObjectMapper.Map<List<RoomType>, List<RoomTypeDto>>(query.ToList());
-                return new PageResult<List<RoomTypeDto>>
+                return new PageResult<RoomTypeDto>
                 {
-                    Data = dtos,
+                    Data = dtos.ToList(),
                     TotleCount = query.Count(),
                     TotlePage = (int)Math.Ceiling(query.Count() / (double)seach.PageSize)
 
@@ -78,7 +80,7 @@ namespace HotelABP.RoomTypes
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
             });
             
-            return ApiResult<PageResult<List<RoomTypeDto>>>.Success(cache, ResultCode.Success);
+            return ApiResult<PageResult<RoomTypeDto>>.Success(cache, ResultCode.Success);
         }
         /// <summary>
         /// 修改房型
@@ -86,7 +88,7 @@ namespace HotelABP.RoomTypes
         /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult<RoomTypeDto>> UpdateAsync(Guid id, CreateUpdateRoomTypeDto input)
+        public async Task<ApiResult<RoomTypeDto>> UpdateRoomType(Guid id, CreateUpdateRoomTypeDto input)
         {
             try
             {
@@ -114,7 +116,7 @@ namespace HotelABP.RoomTypes
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> DeleteAsync(Guid id)
+        public async Task<ApiResult<bool>> DeleteRoomTypeDel(Guid id)
         {
             try
             {
@@ -131,7 +133,7 @@ namespace HotelABP.RoomTypes
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> DeleteBatchAsync(List<Guid> ids)
+        public async Task<ApiResult<bool>> DeleteBatchRoomType(List<Guid> ids)
         {
             try
             {
