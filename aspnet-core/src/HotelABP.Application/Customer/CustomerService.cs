@@ -56,6 +56,7 @@ namespace HotelABP.Customer
                 Id = x.Id,
                 CustomerTypeName = x.CustomerTypeName
             }).ToList();
+            
 
             return ApiResult<List<GetCustoimerTypeNameDto>>.Success(result, ResultCode.Success);
         }
