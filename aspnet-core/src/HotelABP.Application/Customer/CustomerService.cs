@@ -16,10 +16,12 @@ namespace HotelABP.Customer
     public class CustomerService : ApplicationService, ICustomerServices
     {
         private readonly IRepository<HotelABPCustoimers, Guid> _customerRepository;
+        private readonly IRepository<HotelABPCustoimerTypeName, Guid> _customerTypeRepository;
 
-        public CustomerService(IRepository<HotelABPCustoimers, Guid> customerRepository)
+        public CustomerService(IRepository<HotelABPCustoimers, Guid> customerRepository, IRepository<HotelABPCustoimerTypeName, Guid> customerTypeRepository)
         {
             _customerRepository = customerRepository;
+            _customerTypeRepository = customerTypeRepository;
         }
         /// <summary>
         /// 添加客户信息
@@ -42,11 +44,12 @@ namespace HotelABP.Customer
             }
         }
 
-        public async Task<ApiResult<PageResult<List<CustomerDto>> >>GetCustomerListAsync(Seach seach, GetCustomerDtoList cudto)
+        public async Task<ApiResult<PageResult<GetCustomerDto>>> GetCustomerListAsync(Seach seach, GetCustomerDtoList cudto)
         {
-            var list =await _customerRepository.GetQueryableAsync();
+            var list = await _customerRepository.GetQueryableAsync();
+            var types = await _customerTypeRepository.GetQueryableAsync();
             list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerNickName), x => x.CustomerNickName == cudto.CustomerNickName);
-            list = list.WhereIf(cudto.CustomerType >= 0, x => x.CustomerType == cudto.CustomerType);
+            list = list.WhereIf(cudto.CustomerType != null, x => x.CustomerType == cudto.CustomerType);
             list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerName), x => x.CustomerName == cudto.CustomerName);
             list = list.WhereIf(!string.IsNullOrEmpty(cudto.PhoneNumber), x => x.PhoneNumber == cudto.PhoneNumber);
             list = list.WhereIf(cudto.Gender >= 0, x => x.Gender == cudto.Gender);
@@ -54,12 +57,37 @@ namespace HotelABP.Customer
             var endTime = cudto.EndTime?.Date.AddDays(1);
             list = list.WhereIf(cudto.StartTime != null, x => x.Birthday >= cudto.StartTime);
             list = list.WhereIf(cudto.EndTime != null, x => x.Birthday < cudto.EndTime.Value.AddDays(1));
-            var res = list.PageResult(seach.PageIndex, seach.PageSize);
-            var dto = ObjectMapper.Map<List<HotelABPCustoimers>, List<CustomerDto>>(list.ToList());
-            return ApiResult<PageResult<List<CustomerDto>>>.Success(
-                new PageResult<List<CustomerDto>>
+
+            var type = from a in list
+                       join b in types
+                       on a.CustomerType equals b.Id into temp
+                       from b in temp.DefaultIfEmpty()
+                       select new GetCustomerDto
+                       {
+                           Id = a.Id,
+                           CustomerNickName = a.CustomerNickName,
+                           CustomerType = a.CustomerType,
+                           CustomerTypeName = b.CustomerTypeName,
+                           Gender = a.Gender,
+                           CustomerName = a.CustomerName,
+                           PhoneNumber = a.PhoneNumber,
+                           Birthday = a.Birthday,
+                           Address = a.Address,
+                           City = a.City,
+                           GrowthValue = a.GrowthValue,
+                           AvailableBalance = a.AvailableBalance,
+                           AvailableGiftBalance = a.AvailableGiftBalance,
+                           AvailablePoints = a.AvailablePoints
+
+                       };
+
+
+            var res = type.AsQueryable().PageResult(seach.PageIndex, seach.PageSize);
+            
+            return ApiResult<PageResult<GetCustomerDto>>.Success(
+                new PageResult<GetCustomerDto>
             {
-                Data = dto,
+                Data = res.Queryable.ToList(),
                 TotleCount = list.Count(),
                  TotlePage = (int)Math.Ceiling(list.Count() / (double)seach.PageSize)
 

@@ -16,7 +16,7 @@ namespace HotelABP.Customer
         /// <summary>
         /// 客户类型（0 = 会员，1 = 普通客户）
         /// </summary>
-        public int? CustomerType { get; set; }
+        public Guid? CustomerType { get; set; }
 
         /// <summary>
         /// 客户姓名（必填，最多16个字符）

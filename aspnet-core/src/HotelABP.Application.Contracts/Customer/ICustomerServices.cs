@@ -10,6 +10,6 @@ namespace HotelABP.Customer
     public interface ICustomerServices : IApplicationService
     {
         Task<ApiResult<CustomerDto>> AddCustomerAsync (CustomerDto cudto);
-        Task<ApiResult<PageResult<List<CustomerDto>>>> GetCustomerListAsync(Seach seach, GetCustomerDtoList cudto);
+        Task<ApiResult<PageResult<GetCustomerDto>>> GetCustomerListAsync(Seach seach, GetCustomerDtoList cudto);
     }
 }

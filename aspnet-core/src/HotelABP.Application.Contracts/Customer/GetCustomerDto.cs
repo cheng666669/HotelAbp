@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.Application.Dtos;
 
-namespace HotelABP.Customers
+namespace HotelABP.Customer
 {
-    public class HotelABPCustoimers:FullAuditedEntity<Guid>
+    public class GetCustomerDto:FullAuditedEntityDto<Guid>
     {
         /// <summary>
         ///   客户昵称
@@ -44,19 +44,19 @@ namespace HotelABP.Customers
         /// 出生日期（可选）
         /// </summary>
         [DataType(DataType.Date)]
-        public DateTime? Birthday { get; set; }=DateTime.Now;
+        public DateTime? Birthday { get; set; } = DateTime.Now;
 
         /// <summary>
         /// 所在城市（可选，最多50个字符）
         /// </summary>
         [StringLength(50, ErrorMessage = "城市名称最多50个字符")]
-        public string City { get; set; }=string.Empty;
+        public string City { get; set; } = string.Empty;
 
         /// <summary>
         /// 详细地址（可选，最多200个字符）
         /// </summary>
         [StringLength(200, ErrorMessage = "详细地址最多200个字符")]
-        public string Address { get; set; }=string.Empty;
+        public string Address { get; set; } = string.Empty;
 
         //  下面字段不能为 0，设定最小值为 0.01（或 1）
 
@@ -64,13 +64,13 @@ namespace HotelABP.Customers
         /// 成长值（必须大于0，最多10亿，仅会员有效）
         /// </summary>
         [Range(1, 1000000000, ErrorMessage = "成长值必须大于0且不超过10亿")]
-        public decimal GrowthValue { get; set; }=1;
+        public decimal GrowthValue { get; set; } = 1;
 
         /// <summary>
         /// 可用充值余额（必须大于0，最多95万，仅会员有效）
         /// </summary>
         [Range(0.01, 950000, ErrorMessage = "可用充值余额必须大于0且不超过95万")]
-        public decimal AvailableBalance { get; set; }=1;
+        public decimal AvailableBalance { get; set; } = 1;
 
         /// <summary>
         /// 可用赠送余额（必须大于0，最多95万，仅会员有效）
@@ -82,6 +82,11 @@ namespace HotelABP.Customers
         /// 可用积分（必须大于0，最多10亿，仅会员有效）
         /// </summary>
         [Range(1, 1000000000, ErrorMessage = "积分必须大于0且不超过10亿")]
-        public decimal AvailablePoints { get; set; }= 1;
+        public decimal AvailablePoints { get; set; } = 1;
+        /// <summary>
+        /// 客户类型名称
+        /// </summary>
+        public string CustomerTypeName { get; set; } 
+
     }
 }
