@@ -1,6 +1,7 @@
 ﻿using HotelABP.Account;
 using HotelABP.Users;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ using Volo.Abp.Domain.Repositories;
 namespace HotelABP.User
 {
     [Authorize]
+    [IgnoreAntiforgeryToken]
     public class AccountService : ApplicationService, IAccountService
     {
         private readonly IRepository<SysUser> userRep;
@@ -69,6 +71,7 @@ namespace HotelABP.User
                 throw;
             }
         }
+
         /// <summary>
         /// 显示角色列表
         /// </summary>
@@ -108,5 +111,32 @@ namespace HotelABP.User
                 throw;
             }
         }
+
+        /// <summary>
+        /// 删除用户
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        [HttpDelete]
+        public async Task<ApiResult> DelAccount(Guid Id)
+        {
+            try
+            {
+                var res = await userRep.FirstOrDefaultAsync(x=>x.Id == Id);
+                if(res == null)
+                {
+                    return ApiResult.Fail("用户不存在", ResultCode.NotFound);
+                }
+                await userRep.DeleteAsync(res);
+                return ApiResult.Success(ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("删除用户有误" + ex.Message);
+                throw;
+            }
+        }
+
     }
 }
