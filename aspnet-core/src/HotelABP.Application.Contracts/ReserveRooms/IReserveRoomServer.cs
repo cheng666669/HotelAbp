@@ -1,5 +1,6 @@
 ﻿using HotelABP.DTos.ReserveRooms;
 using HotelABP.RoomReserves;
+using HotelABP.RoomTypes;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace HotelABP.ReserveRooms
 {
     public interface IReserveRoomServer:IApplicationService
     {
-        Task<ApiResult> ResuAdd(ReserveRoomDto room);
-        Task<ApiResult<PageResult<ReserveRoomShowDto>>> ReserveRoomShow([FromQuery] SearchTiao search1, [FromQuery] Seach seach);
+        Task<ApiResult> AddReserveRoom(CreateRoom room);
+        Task<ApiResult<PageResult<ReserveRoomShowDto>>> ShowReserveRoom([FromQuery] SearchTiao search1, [FromQuery] Seach seach);
     }
 }

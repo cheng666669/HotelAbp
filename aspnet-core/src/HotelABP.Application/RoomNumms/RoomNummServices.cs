@@ -15,7 +15,7 @@ using Volo.Abp.Linq;
 
 namespace HotelABP.RoomNumms
 {
-    public class RoomNummServices:ApplicationService,IRoomNummberService
+    public class RoomNummServices : ApplicationService, IRoomNummberService
     {
         IRepository<RoomNummber, Guid> _roomNummberRepository;
         IDistributedCache<RoomNummber> _cache;
@@ -29,7 +29,7 @@ namespace HotelABP.RoomNumms
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult<RoomNummDto>> CreateAsync(CreateUpdataRoomNummDto input)
+        public async Task<ApiResult<RoomNummDto>> CreateRoomNummberAdd(CreateUpdataRoomNummDto input)
         {
             var entity=ObjectMapper.Map<CreateUpdataRoomNummDto, RoomNummber>(input);
             var entityDto=await _roomNummberRepository.InsertAsync(entity);
@@ -44,7 +44,7 @@ namespace HotelABP.RoomNumms
         /// <param name="seach"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult <PageResult<List<RoomNummDto>>>> GetListToRoomTypeIdAsync(Seach seach, RoomNummRoomTypeRequestDto input)
+        public async Task<ApiResult <PageResult<RoomNummDto>>> GetListToRoomTypeId(Seach seach, RoomNummRoomTypeRequestDto input)
         {
             var queryable = await _roomNummberRepository.GetQueryableAsync();
 
@@ -54,8 +54,8 @@ namespace HotelABP.RoomNumms
             var res = queryable.PageResult(seach.PageIndex, seach.PageSize);
             var dto=ObjectMapper.Map<List<RoomNummber>, List<RoomNummDto>>(queryable.ToList());
 
-           return ApiResult<PageResult<List<RoomNummDto>>>.Success(
-               new PageResult<List<RoomNummDto>>
+           return ApiResult<PageResult<RoomNummDto>>.Success(
+               new PageResult<RoomNummDto>
                {
                     Data = dto,
                     TotleCount = queryable.Count(),
@@ -69,7 +69,7 @@ namespace HotelABP.RoomNumms
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> DeleteBatchAsync(List<Guid> ids)
+        public async Task<ApiResult<bool>> DeleteBatchRoomNummber(List<Guid> ids)
         {
             foreach (var id in ids)
             {
@@ -82,7 +82,7 @@ namespace HotelABP.RoomNumms
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> UpdateStateToRoomNumAsync(Guid id)
+        public async Task<ApiResult<bool>> UpdateStateToRoomNum(Guid id)
         {
             try
             {
@@ -101,7 +101,7 @@ namespace HotelABP.RoomNumms
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> UpdateStateToZeroBatchAsync(List<Guid> ids)
+        public async Task<ApiResult<bool>> UpdateStateToZeroBatchRoomNummber(List<Guid> ids)
         {
             try
             {
@@ -124,7 +124,7 @@ namespace HotelABP.RoomNumms
         /// <param name="seach"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult<PageResult<List<RoomNummDto>>>> GetListAsync(Seach seach, GetRoomNummberQuery input)
+        public async Task<ApiResult<PageResult<RoomNummDto>>> GetListRoomNummber(Seach seach, GetRoomNummberQuery input)
         {
             var queryable = await _roomNummberRepository.GetQueryableAsync();
             queryable = queryable
@@ -133,8 +133,8 @@ namespace HotelABP.RoomNumms
                 .WhereIf(!string.IsNullOrEmpty(input.RoomNum),x=>x.RoomNum==input.RoomNum);
             var res = queryable.PageResult(seach.PageIndex, seach.PageSize);
             var dto = ObjectMapper.Map<List<RoomNummber>, List<RoomNummDto>>(queryable.ToList());
-            return ApiResult<PageResult<List<RoomNummDto>>>.Success(
-                new PageResult<List<RoomNummDto>>
+            return ApiResult<PageResult<RoomNummDto>>.Success(
+                new PageResult<RoomNummDto>
                 {
                     Data = dto,
                     TotleCount = queryable.Count(),
@@ -143,6 +143,7 @@ namespace HotelABP.RoomNumms
                 },
                 ResultCode.Success);
         }
-            
+
+       
     }
 }

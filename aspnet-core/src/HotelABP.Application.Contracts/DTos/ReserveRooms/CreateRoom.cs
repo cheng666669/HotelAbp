@@ -1,21 +1,13 @@
-﻿using System;
+﻿using HotelABP.RoomTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities.Auditing;
 
-namespace HotelABP.RoomReserves
+namespace HotelABP.DTos.ReserveRooms
 {
-
-    public enum ReserveRoomStatus
-    {
-        NotCheckedIn = 0, // 未入住
-        CheckedIn = 1, // 已入住
-        CheckedOut = 2, // 已离店
-        Cancelled = 3 // 已取消
-    }
-    public class ReserveRoom:FullAuditedAggregateRoot<Guid>
+    public class CreateRoom
     {
         /// <summary>
         /// 客源信息
@@ -50,30 +42,8 @@ namespace HotelABP.RoomReserves
         /// 入住天数
         /// </summary>
         public int Day { get; set; }
-        /// <summary>
-        ///房间类型ID
-        /// </summary>
-        public string? RoomTypeid { get; set; }
-        /// <summary>
-        /// 早餐数量
-        /// </summary>
-        public int? BreakfastNum { get; set; }
-        /// <summary>
-        /// 价格
-        /// </summary>
-        public decimal Price { get; set; }
-       
-        public int Status { get; set; } = 0; // 0:待入住,1:入住中,2:已退房,3:已结算,4:超时未入住5:已取消
-        /// <summary>
-        /// 房间号码
-        /// </summary>
-        public string? RoomNum { get; set; } = "未排房";
-
         public string? Message { get; set; } // 预定备注信息
-        //身份证号
-        public string? IdCard { get; set; }
-        //取消预订备注
-        public string? NoReservRoom { get; set; }
+        public IList<RoomTypeDto> aaa { get; set; } // 房型信息列表
 
     }
 }

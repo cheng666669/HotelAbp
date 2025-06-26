@@ -69,14 +69,15 @@ namespace HotelABP.RoomTypes
         public string? VideoUrl { get; set; }
 
         /// <summary>
-        /// VR 封面图路径
+        /// 房型数量
         /// </summary>
-        public string? VrCoverImageUrl { get; set; }
+        public int RoomTypeCount { get; set; }
 
         /// <summary>
-        /// VR 展示链接
+        /// 房型排序
         /// </summary>
-        public string? VrLink { get; set; }
+        public int Order { get; set; }
+
 
         /// <summary>
         /// 房型介绍（文字说明）

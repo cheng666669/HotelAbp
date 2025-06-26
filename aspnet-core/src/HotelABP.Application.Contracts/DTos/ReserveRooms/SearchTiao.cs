@@ -15,11 +15,11 @@ namespace HotelABP.DTos.ReserveRooms
         /// <summary>
         /// 入住日期
         /// </summary>
-        public DateTime? Sdate { get; set; }
+        public string? Sdate { get; set; }
         /// <summary>
         /// 离店日期
         /// </summary>
-        public DateTime? Edate { get; set; }
+        public string? Edate { get; set; }
 
         public string? Comman { get; set; }
     }

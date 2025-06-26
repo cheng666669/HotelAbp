@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,9 +22,9 @@ namespace HotelABP.RoomTypes
     public class RoomTypeService : ApplicationService, IRoomTypeService
     {
         private readonly IRepository<RoomType, Guid> _roomTypeRepository;
-        IDistributedCache<PageResult<List<RoomTypeDto>>> distributedCache;
+        IDistributedCache<List<RoomTypeDto>> distributedCache;
 
-        public RoomTypeService(IRepository<RoomType, Guid> roomTypeRepository, IDistributedCache<PageResult<List<RoomTypeDto>>> distributedCache)
+        public RoomTypeService(IRepository<RoomType, Guid> roomTypeRepository, IDistributedCache<List<RoomTypeDto>> distributedCache)
         {
             _roomTypeRepository = roomTypeRepository;
             this.distributedCache = distributedCache;
@@ -33,7 +34,7 @@ namespace HotelABP.RoomTypes
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult<RoomTypeDto>> CreateAsync(CreateUpdateRoomTypeDto input)
+        public async Task<ApiResult<RoomTypeDto>> CreateRoomTypeAdd(CreateUpdateRoomTypeDto input)
         {
             try
             {
@@ -56,29 +57,47 @@ namespace HotelABP.RoomTypes
         /// <param name="seach"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<ApiResult< PageResult<List<RoomTypeDto>>>> GetListAsync(Seach seach, GetRoomTypeDto dto)
+        public async Task<ApiResult<PageResult<RoomTypeDto>>> GetListRoomType(Seach seach, GetRoomTypeDto dto)
         {
             string cacheKey = $"RoomType_GetListAsync";
-            var cache = await distributedCache.GetOrAddAsync(cacheKey, async () =>
-            {
-                // 构建查询
-                var query = await _roomTypeRepository.GetQueryableAsync();
-                query = query.WhereIf(!string.IsNullOrWhiteSpace(dto.Name), x => x.Name.Contains(dto.Name));
-                var res = query.PageResult(seach.PageIndex, seach.PageSize);
-                var dtos = ObjectMapper.Map<List<RoomType>, List<RoomTypeDto>>(query.ToList());
-                return new PageResult<List<RoomTypeDto>>
-                {
-                    Data = dtos,
-                    TotleCount = query.Count(),
-                    TotlePage = (int)Math.Ceiling(query.Count() / (double)seach.PageSize)
 
-                };
-            },()=>new DistributedCacheEntryOptions
+            var list = await distributedCache.GetAsync(cacheKey);
+            if (list != null)
+            {
+                list = list.WhereIf(!string.IsNullOrWhiteSpace(dto.Name), x => x.Name.Contains(dto.Name)).ToList();
+                var a = list.AsQueryable().PageResult(seach.PageIndex, seach.PageSize);
+                return ApiResult<PageResult<RoomTypeDto>>.Success(
+                    new PageResult<RoomTypeDto>
+                    {
+                        Data = a.Queryable.ToList(),
+                        TotleCount = a.RowCount,
+                        TotlePage = (int)Math.Ceiling(a.RowCount / (double)seach.PageSize)
+                    }, ResultCode.Success);
+            }
+
+            // 构建查询
+            var query = await _roomTypeRepository.GetQueryableAsync();
+
+            // Map RoomType to RoomTypeDto before caching
+            var roomTypeDtos = ObjectMapper.Map<List<RoomType>, List<RoomTypeDto>>(query.ToList());
+
+            await distributedCache.SetAsync(cacheKey, roomTypeDtos, new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
             });
+
+            query = query.WhereIf(!string.IsNullOrWhiteSpace(dto.Name), x => x.Name.Contains(dto.Name));
             
-            return ApiResult<PageResult<List<RoomTypeDto>>>.Success(cache, ResultCode.Success);
+            var dtos = ObjectMapper.Map<List<RoomType>, List<RoomTypeDto>>(query.ToList());
+            var res = dtos.AsQueryable().PageResult(seach.PageIndex, seach.PageSize);
+
+            return ApiResult<PageResult<RoomTypeDto>>.Success(
+                new PageResult<RoomTypeDto>
+                {
+                    Data = res.Queryable.ToList(),
+                    TotleCount = res.RowCount,
+                    TotlePage = (int)Math.Ceiling(res.RowCount / (double)seach.PageSize)
+                }, ResultCode.Success);
         }
         /// <summary>
         /// 修改房型
@@ -86,7 +105,7 @@ namespace HotelABP.RoomTypes
         /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult<RoomTypeDto>> UpdateAsync(Guid id, CreateUpdateRoomTypeDto input)
+        public async Task<ApiResult<RoomTypeDto>> UpdateRoomType(Guid id, CreateUpdateRoomTypeDto input)
         {
             try
             {
@@ -114,7 +133,7 @@ namespace HotelABP.RoomTypes
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> DeleteAsync(Guid id)
+        public async Task<ApiResult<bool>> DeleteRoomType(Guid id)
         {
             try
             {
@@ -131,7 +150,7 @@ namespace HotelABP.RoomTypes
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> DeleteBatchAsync(List<Guid> ids)
+        public async Task<ApiResult<bool>> DeleteBatchRoomType(List<Guid> ids)
         {
             try
             {
@@ -146,5 +165,7 @@ namespace HotelABP.RoomTypes
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
+
+        
     }
 }
