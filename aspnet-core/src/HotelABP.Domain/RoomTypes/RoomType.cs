@@ -78,7 +78,6 @@ namespace HotelABP.RoomTypes
         /// </summary>
         public int Order { get; set; }
 
-
         /// <summary>
         /// 房型介绍（文字说明）
         /// </summary>

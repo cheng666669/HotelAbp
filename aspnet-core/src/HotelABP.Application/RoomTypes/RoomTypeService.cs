@@ -2,7 +2,9 @@
 using HotelABP.RoomNummbers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using StackExchange.Redis;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,6 +21,7 @@ using Volo.Abp.ObjectMapping;
 
 namespace HotelABP.RoomTypes
 {
+    [IgnoreAntiforgeryToken]
     public class RoomTypeService : ApplicationService, IRoomTypeService
     {
         private readonly IRepository<RoomType, Guid> _roomTypeRepository;
@@ -34,7 +37,8 @@ namespace HotelABP.RoomTypes
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult<RoomTypeDto>> CreateRoomTypeAdd(CreateUpdateRoomTypeDto input)
+
+        public async Task<ApiResult<RoomTypeDto>> CreateAdd(CreateUpdateRoomTypeDto input)
         {
             try
             {
@@ -43,7 +47,8 @@ namespace HotelABP.RoomTypes
 
                 var entitydto = await _roomTypeRepository.InsertAsync(entity);
                 var s  = ObjectMapper.Map<RoomType, RoomTypeDto>(entitydto);
-
+                // 添加成功后，清理缓存
+                await distributedCache.RemoveAsync("GetReserRoom");
                 return ApiResult<RoomTypeDto>.Success(s, ResultCode.Success);
             }
             catch (Exception ex)
@@ -57,10 +62,9 @@ namespace HotelABP.RoomTypes
         /// <param name="seach"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<ApiResult<PageResult<RoomTypeDto>>> GetListRoomType(Seach seach, GetRoomTypeDto dto)
+        public async Task<ApiResult<PageResult<RoomTypeDto>>> GetListShow(Seach seach, GetRoomTypeDto dto)
         {
             string cacheKey = $"RoomType_GetListAsync";
-
             var list = await distributedCache.GetAsync(cacheKey);
             if (list != null)
             {
@@ -75,28 +79,27 @@ namespace HotelABP.RoomTypes
                     }, ResultCode.Success);
             }
 
-            // 构建查询
+            // 查询
             var query = await _roomTypeRepository.GetQueryableAsync();
 
-            // Map RoomType to RoomTypeDto before caching
+            //在缓存之前将RoomType转换成RoomTypeDto
             var roomTypeDtos = ObjectMapper.Map<List<RoomType>, List<RoomTypeDto>>(query.ToList());
 
             await distributedCache.SetAsync(cacheKey, roomTypeDtos, new DistributedCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10000)
             });
 
             query = query.WhereIf(!string.IsNullOrWhiteSpace(dto.Name), x => x.Name.Contains(dto.Name));
             
-            var dtos = ObjectMapper.Map<List<RoomType>, List<RoomTypeDto>>(query.ToList());
+            var dtos =ObjectMapper.Map<List<RoomType>, List<RoomTypeDto>>(query.ToList());
             var res = dtos.AsQueryable().PageResult(seach.PageIndex, seach.PageSize);
-
             return ApiResult<PageResult<RoomTypeDto>>.Success(
                 new PageResult<RoomTypeDto>
                 {
-                    Data = res.Queryable.ToList(),
+                    Data = res.Queryable.OrderByDescending(x=>x.Order).ToList(),
                     TotleCount = res.RowCount,
-                    TotlePage = (int)Math.Ceiling(res.RowCount / (double)seach.PageSize)
+                    TotlePage =(int)Math.Ceiling(res.RowCount / (double)seach.PageSize)
                 }, ResultCode.Success);
         }
         /// <summary>
@@ -120,7 +123,8 @@ namespace HotelABP.RoomTypes
                 
                 // 映射为 DTO 返回
                 var dto = ObjectMapper.Map<RoomType, RoomTypeDto>(updatedEntity);
-
+                // 修改成功后，清理缓存
+                await distributedCache.RemoveAsync("GetReserRoom");
                 return ApiResult<RoomTypeDto>.Success(dto, ResultCode.Success);
             }
             catch (Exception ex)
@@ -133,11 +137,14 @@ namespace HotelABP.RoomTypes
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> DeleteRoomType(Guid id)
+        public async Task<ApiResult<bool>> DeleteRoomTypeDel(Guid id)
         {
             try
             {
+                var res=await _roomTypeRepository.FindAsync(id);
                 await _roomTypeRepository.DeleteAsync(id);
+                // 删除成功后，清理缓存
+                await distributedCache.RemoveAsync("GetReserRoom");
                 return ApiResult<bool>.Success(true, ResultCode.Success);
             }
             catch (Exception ex)
@@ -158,6 +165,9 @@ namespace HotelABP.RoomTypes
                 {
                     await _roomTypeRepository.DeleteAsync(id);
                 }
+                // 删除成功后，清理缓存
+                await distributedCache.RemoveAsync("GetReserRoom");
+
                 return ApiResult<bool>.Success(true, ResultCode.Success);
             }
             catch (Exception ex)
@@ -165,7 +175,29 @@ namespace HotelABP.RoomTypes
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
+        /// <summary>
+        ///  修改房型排序
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="Order"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> UpdateRoomTypeOrder(UpdataRoomTypeOrderDto dto)
+        {
+            try
+            {
+                var res=await _roomTypeRepository.GetAsync(dto.Id);
+                res.Order = dto.Order;
+               await _roomTypeRepository.UpdateAsync(res);
+                // 修改成功后，清理缓存
+                await distributedCache.RemoveAsync("GetReserRoom");
+                return ApiResult.Success( ResultCode.Success);
+            }
+            catch (Exception)
+            {
 
+                throw;
+            }
+        }
         
     }
 }

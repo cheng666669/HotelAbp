@@ -1,4 +1,5 @@
 ﻿using HotelABP.RoomNummbers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections;
@@ -15,7 +16,8 @@ using Volo.Abp.Linq;
 
 namespace HotelABP.RoomNumms
 {
-    public class RoomNummServices : ApplicationService, IRoomNummberService
+    [IgnoreAntiforgeryToken]
+    public class RoomNummServices:ApplicationService,IRoomNummberService
     {
         IRepository<RoomNummber, Guid> _roomNummberRepository;
         IDistributedCache<RoomNummber> _cache;
@@ -29,7 +31,7 @@ namespace HotelABP.RoomNumms
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult<RoomNummDto>> CreateRoomNummberAdd(CreateUpdataRoomNummDto input)
+        public async Task<ApiResult<RoomNummDto>> CreateRoomNumAdd(CreateUpdataRoomNummDto input)
         {
             var entity=ObjectMapper.Map<CreateUpdataRoomNummDto, RoomNummber>(input);
             var entityDto=await _roomNummberRepository.InsertAsync(entity);
@@ -44,7 +46,7 @@ namespace HotelABP.RoomNumms
         /// <param name="seach"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult <PageResult<RoomNummDto>>> GetListToRoomTypeId(Seach seach, RoomNummRoomTypeRequestDto input)
+        public async Task<ApiResult<PageResult<RoomNummDto>>> GetListToRoomTypeId(Seach seach, RoomNummRoomTypeRequestDto input)
         {
             var queryable = await _roomNummberRepository.GetQueryableAsync();
 
@@ -69,7 +71,7 @@ namespace HotelABP.RoomNumms
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> DeleteBatchRoomNummber(List<Guid> ids)
+        public async Task<ApiResult<bool>> DeleteRoomNumBatch(List<Guid> ids)
         {
             foreach (var id in ids)
             {
@@ -101,7 +103,7 @@ namespace HotelABP.RoomNumms
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> UpdateStateToZeroBatchRoomNummber(List<Guid> ids)
+        public async Task<ApiResult<bool>> UpdateStateToRoomNumBatch(List<Guid> ids)
         {
             try
             {
@@ -124,7 +126,7 @@ namespace HotelABP.RoomNumms
         /// <param name="seach"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult<PageResult<RoomNummDto>>> GetListRoomNummber(Seach seach, GetRoomNummberQuery input)
+        public async Task<ApiResult<PageResult<RoomNummDto>>> GetRoomNumList(Seach seach, GetRoomNummberQuery input)
         {
             var queryable = await _roomNummberRepository.GetQueryableAsync();
             queryable = queryable
