@@ -36,7 +36,7 @@ public class HotelABPDbContext :
      */
 
     //Identity
-    public DbSet<Role> Roles { get; set; }
+    public DbSet<Roles> Roles { get; set; }
     public DbSet<SysUser> Users { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
