@@ -1,3 +1,6 @@
+﻿using HotelABP.Customers;
+using HotelABP.Grades;
+using HotelABP.Labels;
 ﻿using HotelABP.RoomReserves;
 ﻿using HotelABP.RoomNummbers;
 using HotelABP.RoomTypes;
@@ -59,6 +62,10 @@ public class HotelABPDbContext :
     /// </summary>
     public DbSet<RoomNummber> RoomNummbers { get; set; }
 
+    public DbSet<HotelABPCustoimers> HotelABPCustoimers { get; set; }
+    public DbSet<HotelABPLabels> HotelABPLabels { get; set; }
+    public DbSet<HotelAbpGrades> HotelAbpGrades { get; set; }
+    public DbSet<HotelABPCustoimerTypeName> HotelABPCustoimerTypeName { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
