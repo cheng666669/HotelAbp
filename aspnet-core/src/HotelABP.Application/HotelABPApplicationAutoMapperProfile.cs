@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using HotelABP.Account;
 using HotelABP.Role;
+using HotelABP.DTos.ReserveRooms;
+using HotelABP.RoomReserves;
 using HotelABP.RoomNummbers;
 using HotelABP.RoomTypes;
 using HotelABP.Users;
@@ -19,6 +21,9 @@ public class HotelABPApplicationAutoMapperProfile : Profile
         CreateMap<CreateUpdateRoleDto, Roles>().ReverseMap();
         CreateMap<GetAccountResultDTO, SysUser>().ReverseMap();
         CreateMap<GetRoleResultDTO, Roles>().ReverseMap();
+        CreateMap<ReserveRoom,ReserveRoomDto>().ReverseMap();
+        CreateMap<ReserveRoom,CreateRoom>().ReverseMap();
+        CreateMap<ReserveRoomShowDto, ReserveRoom>().ReverseMap();
         CreateMap<RoomType, RoomTypeDto>().ReverseMap();
         CreateMap<CreateUpdateRoomTypeDto, RoomType>().ReverseMap();
         CreateMap<RoomNummber, RoomNummDto>().ReverseMap();

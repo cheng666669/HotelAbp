@@ -1,8 +1,10 @@
+﻿using HotelABP.RoomReserves;
 ﻿using HotelABP.RoomNummbers;
 using HotelABP.RoomTypes;
 using Microsoft.EntityFrameworkCore;
 ﻿using HotelABP.Users;
 using Microsoft.EntityFrameworkCore;
+using HotelABP.Users;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -46,6 +48,8 @@ public class HotelABPDbContext :
     {
 
     }
+
+    public DbSet<ReserveRoom> ReserveRooms { get; set; }
     /// <summary>
     /// 房型表
     /// </summary>
