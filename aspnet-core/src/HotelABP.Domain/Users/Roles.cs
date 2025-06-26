@@ -6,7 +6,7 @@ namespace HotelABP.Users
     /// <summary>
     /// 角色表
     /// </summary>
-    public class Role : FullAuditedEntity<Guid>
+    public class Roles : FullAuditedEntity<Guid>
     {
         /// <summary>
         /// 角色名称

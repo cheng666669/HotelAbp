@@ -498,7 +498,7 @@ namespace HotelABP.Migrations
                     b.ToTable("Permissions");
                 });
 
-            modelBuilder.Entity("HotelABP.Users.Role", b =>
+            modelBuilder.Entity("HotelABP.Users.Roles", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
