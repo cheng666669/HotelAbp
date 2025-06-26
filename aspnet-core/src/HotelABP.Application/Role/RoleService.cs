@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using System.Transactions;
 using Volo.Abp.Application.Services;
@@ -308,6 +310,35 @@ namespace HotelABP.Role
                 }
             }
             catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+        /// <summary>
+        /// 获取角色列表
+        /// </summary>
+        /// <param name="seach"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResult<PageResult<GetRoleResultDTO>>> GetRoleList(Seach seach, SearchRoleDTO dto)
+        {
+            try
+            {
+                var role = await roleRep.GetQueryableAsync();
+                role = (System.Linq.IQueryable<Roles>)role.WhereIf(!string.IsNullOrEmpty(dto.RoleName), x => x.RoleName.Contains(dto.RoleName));
+                var list = role.PageResult(seach.PageIndex, seach.PageSize);
+                var dtoList = ObjectMapper.Map<List<Roles>, List<GetRoleResultDTO>>(list.Queryable.ToList());
+                var pageresult = new PageResult<GetRoleResultDTO>
+                {
+                    TotleCount = list.RowCount,
+                    TotlePage = (int)Math.Ceiling(list.RowCount * 1.0 / seach.PageSize),
+                    Data = dtoList
+                };
+                return ApiResult<PageResult<GetRoleResultDTO>>.Success(pageresult, ResultCode.Success);
+            }
+            catch (Exception)
             {
 
                 throw;

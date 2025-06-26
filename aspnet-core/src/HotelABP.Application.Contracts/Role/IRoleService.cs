@@ -11,5 +11,6 @@ namespace HotelABP.Role
         Task<ApiResult<List<PermissionTreeDto>>> GetPermissionTree();
         Task<ApiResult> DelRoleAsync(Guid Id);
         Task<ApiResult> UpdateRoleAsync(Guid Id, CreateUpdateRoleDto dto);
+        Task<ApiResult<PageResult<GetRoleResultDTO>>> GetRoleList(Seach seach, SearchRoleDTO dto);
     }
 }

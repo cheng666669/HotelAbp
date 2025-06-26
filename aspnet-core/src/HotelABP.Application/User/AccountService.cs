@@ -182,5 +182,45 @@ namespace HotelABP.User
                 throw;
             }
         }
+        /// <summary>
+        /// 显示用户列表
+        /// </summary>
+        /// <param name="seach"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResult<PageResult<GetAccountResultDTO>>> GetAccountList(Seach seach, SearchAccountDTO dto)
+        {
+            try
+            {
+                var res = await userRep.GetQueryableAsync();
+                res = res.WhereIf(!string.IsNullOrEmpty(dto.Mobile), x => x.Mobile == dto.Mobile)
+                    .WhereIf(!string.IsNullOrEmpty(dto.NickName), x => x.NickName.Contains(dto.NickName));
+                var list = res.PageResult(seach.PageIndex, seach.PageSize);
+                var dtoList = ObjectMapper.Map<List<SysUser>, List<GetAccountResultDTO>>(list.Queryable.ToList());
+                foreach (var item in dtoList)
+                {
+                    var role = await userRoleRep.GetListAsync(x => x.UserId == item.Id);
+                    foreach (var item1 in role)
+                    {
+                        var roleinfo = await roleRep.FindAsync(x => x.Id == item1.RoleId);
+                        item.RoleName = roleinfo.RoleName;
+                        item.RoleId = item1.RoleId;
+                    }
+                }
+                var pageresult = new PageResult<GetAccountResultDTO>
+                {
+                    Data = dtoList,
+                    TotleCount = list.RowCount,
+                    TotlePage = (int)Math.Ceiling(list.RowCount * 1.0 / seach.PageSize)
+                };
+                return ApiResult<PageResult<GetAccountResultDTO>>.Success(pageresult, ResultCode.Success);
+            }
+            catch ( Exception ex)
+            {
+
+                throw;
+            }
+        }
     }
 }
