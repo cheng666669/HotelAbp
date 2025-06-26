@@ -1,6 +1,6 @@
-﻿using HotelABP.Account;
+﻿using AutoMapper.Internal.Mappers;
+using HotelABP.Account;
 using HotelABP.Users;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -15,7 +15,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace HotelABP.User
 {
-    [Authorize]
+    //[Authorize]
     [IgnoreAntiforgeryToken]
     public class AccountService : ApplicationService, IAccountService
     {
@@ -44,11 +44,12 @@ namespace HotelABP.User
             {
                 using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var userexist = await userRep.FindAsync(x => x.UserName == dto.NickName);
+                    var userexist = await userRep.FindAsync(x => x.NickName == dto.NickName);
                     if (userexist != null)
                     {
                         return ApiResult.Fail("用户已存在", ResultCode.ValidationError);
                     }
+                    dto.Password = dto.Mobile.ToString().Substring(7,4);
                     var data = ObjectMapper.Map<AccountRoleDto, SysUser>(dto);
                     var user = await userRep.InsertAsync(data);
                     var userid = user.Id;
@@ -111,7 +112,6 @@ namespace HotelABP.User
                 throw;
             }
         }
-
         /// <summary>
         /// 删除用户
         /// </summary>
@@ -137,6 +137,50 @@ namespace HotelABP.User
                 throw;
             }
         }
-
+        /// <summary>
+        /// 修改用户
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResult> UpdateAccount(AccountRoleDto dto,Guid id)
+        {
+            try
+            {
+                using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    var userexist = await userRep.FindAsync(x => x.NickName == dto.NickName);
+                    if (userexist != null)
+                    {
+                        return ApiResult.Fail("用户已存在", ResultCode.ValidationError);
+                    }
+                    var rolelist = await userRoleRep.GetListAsync(x => x.UserId == id);
+                    //删除用户角色中间表
+                    foreach(var item in rolelist)
+                    {
+                        await userRoleRep.DeleteAsync(x=>x.RoleId==item.RoleId);
+                    }
+                    var user = ObjectMapper.Map(dto,userexist);
+                    //添加用户角色
+                    foreach (var item in dto.RoleIds)
+                    {
+                        var userRole = new UserRole
+                        {
+                            UserId = id,
+                            RoleId = item
+                        };
+                        await userRoleRep.InsertAsync(userRole);
+                    }
+                    tran.Complete();
+                    return ApiResult.Success(ResultCode.Success);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("修改用户有误" + ex.Message);
+                throw;
+            }
+        }
     }
 }

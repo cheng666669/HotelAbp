@@ -4,11 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.IdentityModel.Tokens;
-using Polly.Caching;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -21,7 +18,8 @@ using Volo.Abp.Domain.Repositories;
 namespace HotelABP.User
 {
     //[ApiExplorerSettings(GroupName = "v1")]
-    [Authorize]
+    //[Authorize]
+    [IgnoreAntiforgeryToken]
     public class UserService:ApplicationService
     {
         private readonly IRepository<SysUser> userRep;
@@ -46,8 +44,13 @@ namespace HotelABP.User
         {
             string guid = $"captcha:{Guid.NewGuid().ToString("N")}";
             var info = captcha.Generate(guid, 120);
-            httpContextAccessor.HttpContext.Response.Cookies.Append("ValidateCode", guid);
-
+            //httpContextAccessor.HttpContext.Response.Cookies.Append("ValidateCode", guid);
+            httpContextAccessor.HttpContext.Response.Cookies.Append("ValidateCode", guid, new CookieOptions
+            {
+                SameSite = SameSiteMode.None,
+                Secure = true,
+                Path = "/"
+            });
             var stream = new System.IO.MemoryStream(info.Bytes);
             return ApiResult<CaptchaDto>.Success(new CaptchaDto
             {
@@ -71,11 +74,15 @@ namespace HotelABP.User
                 //{
                 //    return ApiResult<LoginResultDto>.Fail("请填写验证码图片上的文字，而不是图片本身", ResultCode.ValidationError);
                 //}
-                //var Port = new Uri(httpContextAccessor.HttpContext.Request.Headers["Referer"]).Port;
                 //var capt = httpContextAccessor.HttpContext.Request.Cookies["ValidateCode"];
-                //if (!captcha.Validate(capt, dto.CaptchaCode) && Port == 3000)
+                //if (string.IsNullOrEmpty(capt))
                 //{
-                //    return ApiResult<LoginResultDto>.Fail("验证码错误", ResultCode.ValidationError);
+                //    return ApiResult<LoginResultDto>.Fail("验证码已过期或不存在", ResultCode.Error);
+                //}
+                // 你的验证码校验逻辑
+                //if (dto.CaptchaKey != capt)
+                //{
+                //    return ApiResult<LoginResultDto>.Fail("验证码错误", ResultCode.Error);
                 //}
                 var user = await userRep.FindAsync(x => x.UserName == dto.Username);
                 if (user == null)
@@ -175,7 +182,7 @@ namespace HotelABP.User
                 await userRep.InsertAsync(sysUser);
                 return ApiResult<SysUser>.Success(sysUser,ResultCode.Success);
             }
-            catch (System.Exception)
+            catch (Exception)
             {
 
                 throw;
