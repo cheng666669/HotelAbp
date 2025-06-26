@@ -16,6 +16,7 @@ using Volo.Abp.Linq;
 
 namespace HotelABP.RoomNumms
 {
+    [IgnoreAntiforgeryToken]
     public class RoomNummServices:ApplicationService,IRoomNummberService
     {
         IRepository<RoomNummber, Guid> _roomNummberRepository;
@@ -144,6 +145,7 @@ namespace HotelABP.RoomNumms
                 },
                 ResultCode.Success);
         }
-            
+
+       
     }
 }

@@ -17,7 +17,7 @@ namespace HotelABP.Controllers
         {
             this.webHost = webHost;
         }
-
+        [IgnoreAntiforgeryToken]
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
