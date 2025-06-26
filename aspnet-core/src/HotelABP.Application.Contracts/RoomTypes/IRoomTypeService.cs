@@ -10,6 +10,7 @@ namespace HotelABP.RoomTypes
 {
     public interface IRoomTypeService : IApplicationService
     {
+       
         Task<ApiResult<RoomTypeDto>> CreateAdd(CreateUpdateRoomTypeDto input);
         Task<ApiResult<PageResult<RoomTypeDto>>> GetListShow(Seach seach, GetRoomTypeDto dto);
         Task<ApiResult<bool>> DeleteRoomTypeDel(Guid id);
