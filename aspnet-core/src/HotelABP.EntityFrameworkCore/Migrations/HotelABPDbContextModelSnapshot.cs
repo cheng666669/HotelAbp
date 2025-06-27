@@ -24,6 +24,259 @@ namespace HotelABP.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("HotelABP.Customers.HotelABPCustoimerTypeName", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<string>("CustomerTypeName")
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HotelABPCustoimerTypeName");
+                });
+
+            modelBuilder.Entity("HotelABP.Customers.HotelABPCustoimers", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<decimal>("AvailableBalance")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("AvailableGiftBalance")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("AvailablePoints")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<DateTime?>("Birthday")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)");
+
+                    b.Property<string>("CustomerNickName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("CustomerType")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("GrowthValue")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HotelABPCustoimers");
+                });
+
+            modelBuilder.Entity("HotelABP.Grades.HotelAbpGrades", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("GradeName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HotelAbpGrades");
+                });
+
+            modelBuilder.Entity("HotelABP.Labels.HotelABPLabels", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal?>("AvgOrderValueMax")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal?>("AvgOrderValueMin")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<string>("LabelName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<string>("MemberGender")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("MemberLevel")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("MustMeetAllConditions")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime?>("StartTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("TagType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("TotalSpentMax")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal?>("TotalSpentMin")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<int?>("TradeCountMax")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TradeCountMin")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("TradeTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HotelABPLabels");
+                });
+
             modelBuilder.Entity("HotelABP.RoomNummbers.RoomNummber", b =>
                 {
                     b.Property<Guid>("Id")
@@ -78,12 +331,16 @@ namespace HotelABP.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<int>("RoomNum")
-                        .HasColumnType("int");
+                    b.Property<string>("RoomNum")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("RoomTypeId")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("State")
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
 
@@ -170,22 +427,26 @@ namespace HotelABP.Migrations
                     b.Property<bool>("Obligate")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
+                    b.Property<int>("RoomTypeCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
                     b.Property<string>("VideoUrl")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("VrCoverImageUrl")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("VrLink")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
                     b.ToTable("RoomTypes");
                 });
+
             modelBuilder.Entity("HotelABP.Users.Permission", b =>
                 {
                     b.Property<Guid>("Id")
@@ -237,7 +498,7 @@ namespace HotelABP.Migrations
                     b.ToTable("Permissions");
                 });
 
-            modelBuilder.Entity("HotelABP.Users.Role", b =>
+            modelBuilder.Entity("HotelABP.Users.Roles", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");

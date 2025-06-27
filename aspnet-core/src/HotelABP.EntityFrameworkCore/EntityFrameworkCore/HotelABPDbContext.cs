@@ -1,8 +1,13 @@
+﻿using HotelABP.Customers;
+using HotelABP.Grades;
+using HotelABP.Labels;
+﻿using HotelABP.RoomReserves;
 ﻿using HotelABP.RoomNummbers;
 using HotelABP.RoomTypes;
 using Microsoft.EntityFrameworkCore;
 ﻿using HotelABP.Users;
 using Microsoft.EntityFrameworkCore;
+using HotelABP.Users;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -34,7 +39,7 @@ public class HotelABPDbContext :
      */
 
     //Identity
-    public DbSet<Role> Roles { get; set; }
+    public DbSet<Roles> Roles { get; set; }
     public DbSet<SysUser> Users { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
@@ -46,6 +51,8 @@ public class HotelABPDbContext :
     {
 
     }
+
+    public DbSet<ReserveRoom> ReserveRooms { get; set; }
     /// <summary>
     /// 房型表
     /// </summary>
@@ -55,6 +62,10 @@ public class HotelABPDbContext :
     /// </summary>
     public DbSet<RoomNummber> RoomNummbers { get; set; }
 
+    public DbSet<HotelABPCustoimers> HotelABPCustoimers { get; set; }
+    public DbSet<HotelABPLabels> HotelABPLabels { get; set; }
+    public DbSet<HotelAbpGrades> HotelAbpGrades { get; set; }
+    public DbSet<HotelABPCustoimerTypeName> HotelABPCustoimerTypeName { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {

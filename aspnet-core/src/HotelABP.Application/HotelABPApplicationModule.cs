@@ -1,8 +1,3 @@
-﻿using Volo.Abp.AutoMapper;
-using Lazy.Captcha.Core;
-using Lazy.Captcha.Core.Generator;
-using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp.Caching;
 ﻿using Lazy.Captcha.Core;
 using Lazy.Captcha.Core.Generator;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +10,6 @@ namespace HotelABP;
 [DependsOn(
     typeof(HotelABPDomainModule),
     typeof(HotelABPApplicationContractsModule),
-
     typeof(AbpSettingManagementApplicationModule)
     )]
 public class HotelABPApplicationModule : AbpModule

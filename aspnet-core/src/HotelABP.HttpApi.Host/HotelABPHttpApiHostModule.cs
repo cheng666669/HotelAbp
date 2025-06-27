@@ -1,24 +1,30 @@
+using HotelABP.EntityFrameworkCore;
+using HotelABP.MultiTenancy;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Extensions.DependencyInjection;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
+using OpenIddict.Validation.AspNetCore;
 ﻿using HotelABP.EntityFrameworkCore;
 using HotelABP.MultiTenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using OpenIddict.Validation.AspNetCore;
 using Swashbuckle.AspNetCore.Filters;
-using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Volo.Abp;
-using Volo.Abp.Account;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
@@ -28,9 +34,9 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
+using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
-using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
@@ -76,7 +82,6 @@ public class HotelABPHttpApiHostModule : AbpModule
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
-
 
     }
 
@@ -202,7 +207,7 @@ public class HotelABPHttpApiHostModule : AbpModule
             options.IncludeXmlComments(xmlPath, true); // Ensuring controller comments are included
         });
     }
-    
+
 
     private void ConfigureCors(ServiceConfigurationContext context, IConfiguration configuration)
     {
@@ -260,6 +265,7 @@ public class HotelABPHttpApiHostModule : AbpModule
         app.UseSwaggerUI(c => {
 
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelABP API");
+            c.RoutePrefix = string.Empty;
             var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
             c.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
             c.OAuthScopes("HotelABP");
