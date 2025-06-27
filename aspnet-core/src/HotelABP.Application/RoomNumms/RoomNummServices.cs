@@ -146,7 +146,7 @@ namespace HotelABP.RoomNumms
                 .WhereIf(input.State!=null, x => x.State==input.State)
                 .WhereIf(!string.IsNullOrEmpty(input.RoomNum),x=>x.RoomNum==input.RoomNum);
             var res = queryable.PageResult(seach.PageIndex, seach.PageSize);
-            var dto = ObjectMapper.Map<List<RoomNummber>, List<RoomNummDto>>(queryable.ToList());
+            var dto = ObjectMapper.Map<List<RoomNummber>, List<RoomNummDto>>(res.Queryable.ToList());
             return ApiResult<PageResult<RoomNummDto>>.Success(
                 new PageResult<RoomNummDto>
                 {
@@ -180,6 +180,9 @@ namespace HotelABP.RoomNumms
                 throw;
             }
         }
+
+
+        
             
     }
 }
