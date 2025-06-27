@@ -8,6 +8,7 @@ namespace HotelABP.RoomNummbers
 {
     public class RoomNummDto
     {
+        public Guid Id { get; set; }
         /// <summary>
         /// 房型Id
         /// </summary>

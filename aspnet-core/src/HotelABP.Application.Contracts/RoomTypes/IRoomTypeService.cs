@@ -16,5 +16,6 @@ namespace HotelABP.RoomTypes
         Task<ApiResult<bool>> DeleteBatchRoomType(List<Guid> ids);
         Task<ApiResult<RoomTypeDto>> UpdateRoomType(Guid id, CreateUpdateRoomTypeDto input);
         Task<ApiResult> UpdateRoomTypeOrder(UpdataRoomTypeOrderDto dto);
+
     }
 }

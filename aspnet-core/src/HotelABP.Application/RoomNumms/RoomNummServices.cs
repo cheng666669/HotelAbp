@@ -1,4 +1,5 @@
 ﻿using HotelABP.RoomNummbers;
+using HotelABP.RoomTypes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
@@ -13,6 +14,7 @@ using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Linq;
+using Volo.Abp.ObjectMapping;
 
 namespace HotelABP.RoomNumms
 {
@@ -53,14 +55,14 @@ namespace HotelABP.RoomNumms
             queryable = queryable
                 .WhereIf(!string.IsNullOrWhiteSpace(input.RoomTypeId), x => x.RoomTypeId == input.RoomTypeId);
 
-            var res = queryable.PageResult(seach.PageIndex, seach.PageSize);
+            
             var dto=ObjectMapper.Map<List<RoomNummber>, List<RoomNummDto>>(queryable.ToList());
-
-           return ApiResult<PageResult<RoomNummDto>>.Success(
+            var res = dto.AsQueryable().PageResult(seach.PageIndex, seach.PageSize);
+            return ApiResult<PageResult<RoomNummDto>>.Success(
                new PageResult<RoomNummDto>
                {
-                    Data = dto,
-                    TotleCount = queryable.Count(),
+                   Data = res.Queryable.OrderByDescending(x => x.Order).ToList(),
+                   TotleCount = queryable.Count(),
                     TotlePage = (int)Math.Ceiling(queryable.Count() / (double)seach.PageSize)
                      
                },
@@ -77,6 +79,16 @@ namespace HotelABP.RoomNumms
             {
                 await _roomNummberRepository.DeleteAsync(id);
             }
+            return ApiResult<bool>.Success(true, ResultCode.Success);
+        }
+        /// <summary>
+        /// 删除房号
+        /// </summary>
+        /// <param name="Ids"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<bool>> DeleteRoomNum(Guid Id)
+        {
+            await _roomNummberRepository.DeleteAsync(Id);
             return ApiResult<bool>.Success(true, ResultCode.Success);
         }
         /// <summary>
@@ -144,6 +156,29 @@ namespace HotelABP.RoomNumms
 
                 },
                 ResultCode.Success);
+        }
+
+        /// <summary>
+        /// 修改房号
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<int>> UpdateRoomNumm(Guid Id, CreateUpdataRoomNummDto input) 
+        {
+            try
+            {
+                var queryable = await _roomNummberRepository.GetAsync(Id);
+                // 映射为 DTO 返回
+                var dto = ObjectMapper.Map< CreateUpdataRoomNummDto, RoomNummber>(input, queryable);
+                await _roomNummberRepository.UpdateAsync(dto);
+                return ApiResult<int>.Success(1, ResultCode.Success);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
             
     }
