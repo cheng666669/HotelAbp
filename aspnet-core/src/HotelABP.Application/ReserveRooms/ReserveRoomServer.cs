@@ -242,13 +242,36 @@ namespace HotelABP.ReserveRooms
         /// <returns></returns>
         public async Task<ApiResult> UpdateCheckin(Update1Dto dto)
         {
-            var list = await reserveRoomRepository.GetAsync(dto.id);
+            var list = await reserveRoomRepository.GetAsync(dto.Id);
             if (list == null)
             {
                 return ApiResult.Fail("未找到该预定信息", ResultCode.Error);
             }
             list.Status = 2; // 设置为已入住状态
-            list.IdCard = dto.idCard; // 更新身份证号码
+            list.IdCard = dto.IdCard; // 更新身份证号码
+            list.RoomNum = dto.RoomNum;
+            list.ReserveName = dto.ReserveName;
+            list.Phone = dto.Phone; // 更新手机号码
+            await reserveRoomRepository.UpdateAsync(list);
+            // 成功后，清理缓存
+            await reserveRoomCache.RemoveAsync("GetReserRoom");
+            return ApiResult.Success(ResultCode.Success);
+        }
+        /// <summary>
+        /// 退房
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="room"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> UpdateNoRoom(Guid id)
+        {
+            var list = await reserveRoomRepository.GetAsync(id);
+            if (list == null)
+            {
+                return ApiResult.Fail("未找到该预定信息", ResultCode.Error);
+            }
+
+            list.Status = 3; // 设置为已退房状态
             await reserveRoomRepository.UpdateAsync(list);
             // 成功后，清理缓存
             await reserveRoomCache.RemoveAsync("GetReserRoom");
