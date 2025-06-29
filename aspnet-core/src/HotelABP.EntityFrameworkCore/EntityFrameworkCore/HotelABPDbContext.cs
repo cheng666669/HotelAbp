@@ -59,9 +59,6 @@ public class HotelABPDbContext :
     /// </summary>
     public DbSet<RoomNummber> RoomNummbers { get; set; }
 
-<<<<<<< Updated upstream
-    
-=======
     public DbSet<HotelABPCustoimers> HotelABPCustoimers { get; set; }
     public DbSet<HotelABPLabels> HotelABPLabels { get; set; }
     public DbSet<HotelAbpGrades> HotelAbpGrades { get; set; }
@@ -69,13 +66,7 @@ public class HotelABPDbContext :
 
     public DbSet<MoneyDetail> MoneyDetails { get; set; }
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
