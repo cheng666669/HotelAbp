@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <Import Project="..\..\common.props" />
+	<Import Project="..\..\common.props" />
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <RootNamespace>HotelABP</RootNamespace>
-    <PreserveCompilationReferences>true</PreserveCompilationReferences>
-    <UserSecretsId>HotelABP-4681b4fd-151f-4221-84a4-929d86723e4c</UserSecretsId>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<RootNamespace>HotelABP</RootNamespace>
+		<PreserveCompilationReferences>true</PreserveCompilationReferences>
+		<UserSecretsId>HotelABP-4681b4fd-151f-4221-84a4-929d86723e4c</UserSecretsId>
+	</PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.6" />
@@ -29,20 +29,20 @@
     <PackageReference Include="Volo.Abp.Account.Web.OpenIddict" Version="9.2.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite" Version="4.1.0-preview*" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite" Version="4.1.0-preview*" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\HotelABP.Application\HotelABP.Application.csproj" />
-    <ProjectReference Include="..\HotelABP.EntityFrameworkCore\HotelABP.EntityFrameworkCore.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\HotelABP.Application\HotelABP.Application.csproj" />
+		<ProjectReference Include="..\HotelABP.EntityFrameworkCore\HotelABP.EntityFrameworkCore.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Logs\**" />
-    <Content Remove="Logs\**" />
-    <EmbeddedResource Remove="Logs\**" />
-    <None Remove="Logs\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Logs\**" />
+		<Content Remove="Logs\**" />
+		<EmbeddedResource Remove="Logs\**" />
+		<None Remove="Logs\**" />
+	</ItemGroup>
 
 </Project>

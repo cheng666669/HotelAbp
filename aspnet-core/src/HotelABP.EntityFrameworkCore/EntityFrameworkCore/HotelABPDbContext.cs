@@ -1,3 +1,6 @@
+﻿using HotelABP.Customers;
+using HotelABP.Grades;
+using HotelABP.Labels;
 ﻿using HotelABP.RoomReserves;
 using HotelABP.RoomNummbers;
 using HotelABP.RoomTypes;
@@ -36,7 +39,7 @@ public class HotelABPDbContext :
      */
 
     //Identity
-    public DbSet<Role> Roles { get; set; }
+    public DbSet<Roles> Roles { get; set; }
     public DbSet<SysUser> Users { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
@@ -61,7 +64,9 @@ public class HotelABPDbContext :
 
 
 
+
     public DbSet<MoneyDetail> MoneyDetails { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

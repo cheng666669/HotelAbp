@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace HotelABP.User
 {
@@ -15,8 +10,8 @@ namespace HotelABP.User
         public string Password { get; set; }
 
         [Required]
-        public string? CaptchaKey { get; set; }
+        public string CaptchaKey { get; set; }
         [Required]
-        public string? CaptchaCode { get; set; }
+        public string CaptchaCode { get; set; }
     }
 }
