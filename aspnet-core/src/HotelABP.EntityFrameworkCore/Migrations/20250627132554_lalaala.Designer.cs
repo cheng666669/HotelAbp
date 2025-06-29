@@ -4,6 +4,7 @@ using HotelABP.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace HotelABP.Migrations
 {
     [DbContext(typeof(HotelABPDbContext))]
-    partial class HotelABPDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250627132554_lalaala")]
+    partial class lalaala
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -686,9 +689,7 @@ namespace HotelABP.Migrations
                     b.ToTable("Permissions");
                 });
 
-
             modelBuilder.Entity("HotelABP.Users.RolePermission", b =>
-
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
