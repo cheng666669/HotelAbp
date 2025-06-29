@@ -15,5 +15,6 @@ namespace HotelABP.Customer
         Task<ApiResult<CustomerDto>> AddCustomerAsync (CustomerDto cudto);
         Task<ApiResult<PageResult<GetCustomerDto>>> GetCustomerListAsync(Seach seach, GetCustomerDtoList cudto);
         Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustoimerTypeNameAsync();
+        Task<ApiResult<bool>> UpdateCustomerAsync (UpCustomerDto customerDto);
     }
 }

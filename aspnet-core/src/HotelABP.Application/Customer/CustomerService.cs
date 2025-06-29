@@ -1,4 +1,5 @@
 ﻿using HotelABP.Customers;
+using HotelABP.RoomTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Caching;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.ObjectMapping;
 using static Volo.Abp.Http.MimeTypes;
@@ -70,10 +73,10 @@ namespace HotelABP.Customer
         {
             var list = await _customerRepository.GetQueryableAsync();
             var types = await _customerTypeRepository.GetQueryableAsync();
-            list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerNickName), x => x.CustomerNickName == cudto.CustomerNickName);
+            list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerNickName), x => x.CustomerNickName.Contains( cudto.CustomerNickName));
             list = list.WhereIf(cudto.CustomerType != null, x => x.CustomerType == cudto.CustomerType);
-            list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerName), x => x.CustomerName == cudto.CustomerName);
-            list = list.WhereIf(!string.IsNullOrEmpty(cudto.PhoneNumber), x => x.PhoneNumber == cudto.PhoneNumber);
+            list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerName), x => x.CustomerName.Contains( cudto.CustomerName));
+            list = list.WhereIf(!string.IsNullOrEmpty(cudto.PhoneNumber), x => x.PhoneNumber.Contains(cudto.PhoneNumber));
             list = list.WhereIf(cudto.Gender >= 0, x => x.Gender == cudto.Gender);
             var startTime = cudto.StartTime?.Date;
             var endTime = cudto.EndTime?.Date.AddDays(1);
@@ -116,6 +119,30 @@ namespace HotelABP.Customer
             },
             ResultCode.Success
             );
+        }
+        /// <summary>
+        ///  修改客户信息（批量）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="customerDto"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<bool>> UpdateCustomerAsync( UpCustomerDto customerDto)
+        {
+            try
+            {
+                foreach (var id in customerDto.ids)
+                {
+                    var entity = await _customerRepository.GetAsync(id);
+                    // 将 customerDto 的属性映射到 entity
+                    ObjectMapper.Map(customerDto, entity);
+                    await _customerRepository.UpdateAsync(entity);
+                }
+                return ApiResult<bool>.Success(true, ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
+            }
         }
     }
 }
