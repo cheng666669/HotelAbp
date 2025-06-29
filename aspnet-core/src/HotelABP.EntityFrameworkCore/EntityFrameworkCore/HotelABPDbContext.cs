@@ -69,6 +69,9 @@ public class HotelABPDbContext :
 
     public DbSet<MoneyDetail> MoneyDetails { get; set; }
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -295,6 +295,7 @@ namespace HotelABP.ReserveRooms
             await reserveRoomCache.RemoveAsync("GetReserRoom");
             return ApiResult.Success(ResultCode.Success);
         }
+<<<<<<< Updated upstream
         /// <summary>
         /// 退房
         /// </summary>
@@ -315,6 +316,8 @@ namespace HotelABP.ReserveRooms
             await reserveRoomCache.RemoveAsync("GetReserRoom");
             return ApiResult.Success(ResultCode.Success);
         }
+=======
+>>>>>>> Stashed changes
         //结算
         public async Task<ApiResult> UpdateSettlement(MoneyDetailDto dto)
         {
