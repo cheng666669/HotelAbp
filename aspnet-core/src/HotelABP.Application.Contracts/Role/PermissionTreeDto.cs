@@ -10,6 +10,12 @@ namespace HotelABP.Role
         /// 权限名称
         /// </summary>
         public string PermissionName { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// 是否选中（用于角色权限分配时标记）
+        /// </summary>
+        public bool IsSelected { get; set; } = false;
+        
         /// <summary>
         /// 子级权限
         /// </summary>

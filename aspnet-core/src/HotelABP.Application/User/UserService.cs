@@ -172,10 +172,10 @@ namespace HotelABP.User
                 SysUser sysUser = new SysUser
                 {
                     UserName = "admin",
-                    NickName = "管理员",
+                    NickName = "张三",
                     Gender = Gender.Male,
                     Password = "123456",
-                    Mobile = "13888888888",
+                    Mobile = "18541202154",
                     Status = Status.Enable,
                     Email = "admin@qq.com"
                 };

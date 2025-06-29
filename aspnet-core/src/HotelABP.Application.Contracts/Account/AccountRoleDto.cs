@@ -4,7 +4,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace HotelABP.Account
 {
-    public class AccountRoleDto:EntityDto<Guid>
+    public class AccountRoleDto
     {
 
         /// <summary>

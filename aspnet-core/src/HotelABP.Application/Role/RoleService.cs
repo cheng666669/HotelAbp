@@ -344,5 +344,79 @@ namespace HotelABP.Role
                 throw;
             }
         }
+        /// <summary>
+        /// 根据角色id获取权限树
+        /// </summary>
+        /// <param name="roleid"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResult<List<PermissionTreeDto>>> GetPermByRole(Guid roleid)
+        {
+            try
+            {
+                // 1. 获取角色拥有的权限ID列表
+                var rolePermissions = await roleperRep.GetListAsync(x => x.RoleId == roleid); // 从角色权限表中查询指定角色的所有权限记录
+                var rolePermissionIds = rolePermissions.Select(x => x.PermissionId).ToList(); // 提取出权限ID列表
+
+                // 2. 如果没有权限，返回空列表
+                if (!rolePermissionIds.Any()) // 检查权限ID列表是否为空
+                {
+                    return ApiResult<List<PermissionTreeDto>>.Success(new List<PermissionTreeDto>(), ResultCode.Success); // 如果为空，返回空的成功结果
+                }
+
+                // 3. 获取角色拥有的权限详情
+                var permissions = await perRep.GetListAsync(x => rolePermissionIds.Contains(x.Id)); // 根据权限ID列表获取完整的权限信息
+                
+                // 4. 构建权限树
+                var result = new List<PermissionTreeDto>(); // 创建结果列表，用于存储最终的权限树
+                
+                // 5. 先找到所有一级权限（ParentId为空的）
+                var rootPermissions = permissions.Where(x => x.ParentId == Guid.Empty).ToList(); // 筛选出所有没有父级的权限（一级权限）
+                
+                // 6. 为每个一级权限构建树
+                foreach (var rootPermission in rootPermissions) // 遍历每个一级权限
+                {
+                    var treeNode = BuildTreeNode(rootPermission, permissions); // 为当前一级权限构建完整的树结构
+                    result.Add(treeNode); // 将构建好的树节点添加到结果列表中
+                }
+                
+                return ApiResult<List<PermissionTreeDto>>.Success(result, ResultCode.Success); // 返回成功结果
+            }
+            catch (Exception ex) // 捕获异常
+            {
+                Logger.LogError($"根据角色ID获取权限树失败: {ex.Message}"); // 记录错误日志
+                throw; // 重新抛出异常
+            }
+        }
+
+        /// <summary>
+        /// 构建权限树节点
+        /// </summary>
+        /// <param name="permission">当前权限</param>
+        /// <param name="allPermissions">所有权限列表</param>
+        /// <returns></returns>
+        private PermissionTreeDto BuildTreeNode(Permission permission, List<Permission> allPermissions)
+        {
+            // 创建权限树节点对象
+            var node = new PermissionTreeDto
+            {
+                Id = permission.Id, // 设置权限ID
+                PermissionName = permission.PermissionName, // 设置权限名称
+                IsSelected = true, // 设置选中状态为true（因为所有显示的权限都是角色拥有的）
+                Children = new List<PermissionTreeDto>() // 初始化子权限列表
+            };
+
+            // 找到当前权限的所有子权限
+            var children = allPermissions.Where(x => x.ParentId == permission.Id).ToList(); // 筛选出所有父级ID等于当前权限ID的权限
+            
+            // 为每个子权限递归构建树
+            foreach (var child in children) // 遍历每个子权限
+            {
+                var childNode = BuildTreeNode(child, allPermissions); // 递归调用，为子权限构建树节点
+                node.Children.Add(childNode); // 将子节点添加到当前节点的子权限列表中
+            }
+
+            return node; // 返回构建好的树节点
+        }
     }
 }
