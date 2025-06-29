@@ -296,6 +296,7 @@ namespace HotelABP.ReserveRooms
             return ApiResult.Success(ResultCode.Success);
         }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
         /// <summary>
         /// 退房
@@ -318,6 +319,8 @@ namespace HotelABP.ReserveRooms
             return ApiResult.Success(ResultCode.Success);
         }
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
         //结算
