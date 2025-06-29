@@ -285,7 +285,7 @@ namespace HotelABP.ReserveRooms
             {
                 return ApiResult.Fail("未找到该预定信息", ResultCode.Error);
             }
-            list.Status = 2; // 设置为已入住状态
+            list.Status = 1; // 设置为已入住状态
             list.IdCard = dto.IdCard; // 更新身份证号码
             list.RoomNum = dto.RoomNum;
             list.ReserveName = dto.ReserveName;
@@ -295,8 +295,7 @@ namespace HotelABP.ReserveRooms
             await reserveRoomCache.RemoveAsync("GetReserRoom");
             return ApiResult.Success(ResultCode.Success);
         }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
 
         /// <summary>
         /// 退房
@@ -312,17 +311,14 @@ namespace HotelABP.ReserveRooms
                 return ApiResult.Fail("未找到该预定信息", ResultCode.Error);
             }
 
-            list.Status = 3; // 设置为已退房状态
+            list.Status = 2; // 设置为已退房状态
             await reserveRoomRepository.UpdateAsync(list);
             // 成功后，清理缓存
             await reserveRoomCache.RemoveAsync("GetReserRoom");
             return ApiResult.Success(ResultCode.Success);
         }
 
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
         //结算
         public async Task<ApiResult> UpdateSettlement(MoneyDetailDto dto)
         {
@@ -342,7 +338,7 @@ namespace HotelABP.ReserveRooms
                 var list123 = await monrydetails.FirstOrDefaultAsync(x => x.BookingNumber == dto.BookingNumber);
                 if (list123 != null)
                 {
-                    list.Status = 2; // 设置为已结算状态
+                    list.Status = 3; // 设置为已结算状态
                     await monrydetails.UpdateAsync(list123);
                 }
                
