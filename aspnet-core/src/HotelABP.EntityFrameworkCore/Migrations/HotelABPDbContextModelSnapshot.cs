@@ -425,7 +425,6 @@ namespace HotelABP.Migrations
                     b.ToTable("Permissions");
                 });
 
-
             modelBuilder.Entity("HotelABP.Users.RolePermission", b =>
                 {
                     b.Property<Guid>("Id")
@@ -473,7 +472,6 @@ namespace HotelABP.Migrations
                 });
 
             modelBuilder.Entity("HotelABP.Users.Roles", b =>
-
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");

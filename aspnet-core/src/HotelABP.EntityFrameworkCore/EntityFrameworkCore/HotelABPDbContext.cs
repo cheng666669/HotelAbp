@@ -1,8 +1,8 @@
 ﻿using HotelABP.RoomReserves;
-﻿using HotelABP.RoomNummbers;
+using HotelABP.RoomNummbers;
 using HotelABP.RoomTypes;
 using Microsoft.EntityFrameworkCore;
-﻿using HotelABP.Users;
+using HotelABP.Users;
 using Microsoft.EntityFrameworkCore;
 using HotelABP.Users;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
@@ -65,7 +65,6 @@ public class HotelABPDbContext :
     public DbSet<HotelABPCustoimerTypeName> HotelABPCustoimerTypeName { get; set; }
 
     public DbSet<MoneyDetail> MoneyDetails { get; set; }
-
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
