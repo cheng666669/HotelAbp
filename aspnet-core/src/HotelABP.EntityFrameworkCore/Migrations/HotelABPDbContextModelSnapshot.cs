@@ -466,12 +466,12 @@ namespace HotelABP.Migrations
                     b.Property<Guid>("PermissionId")
                         .HasColumnType("char(36)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("HotelABP.Users.Roles", b =>
