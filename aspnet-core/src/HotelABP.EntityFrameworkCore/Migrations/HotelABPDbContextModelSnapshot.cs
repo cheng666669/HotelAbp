@@ -427,8 +427,11 @@ namespace HotelABP.Migrations
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             modelBuilder.Entity("HotelABP.Users.Role", b =>
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
             modelBuilder.Entity("HotelABP.Users.RolePermission", b =>
@@ -479,6 +482,9 @@ namespace HotelABP.Migrations
 
             modelBuilder.Entity("HotelABP.Users.Roles", b =>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

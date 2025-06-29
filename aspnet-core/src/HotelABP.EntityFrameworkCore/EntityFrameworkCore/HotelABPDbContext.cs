@@ -70,6 +70,9 @@ public class HotelABPDbContext :
     public DbSet<MoneyDetail> MoneyDetails { get; set; }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
