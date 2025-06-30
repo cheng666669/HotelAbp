@@ -16,6 +16,8 @@
 
   <ItemGroup>
 
+    <PackageReference Include="NPOI" Version="2.7.4" />
+
     <PackageReference Include="Volo.Abp.Caching" Version="9.2.0" />
 
     <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="9.2.0" />

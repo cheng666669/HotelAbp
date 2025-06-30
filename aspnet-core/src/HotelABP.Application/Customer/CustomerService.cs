@@ -1,17 +1,29 @@
-﻿using HotelABP.Customers;
+﻿using AutoMapper;
+using HotelABP.Customers;
+using HotelABP.Export;
 using HotelABP.RoomTypes;
+using Microsoft.AspNetCore.Http;
+using NPOI.SS.Formula.Functions;
+using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
+using Volo.Abp.Content;
+using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.ObjectMapping;
+using Volo.Abp.Validation;
 using static Volo.Abp.Http.MimeTypes;
 
 namespace HotelABP.Customer
@@ -20,11 +32,16 @@ namespace HotelABP.Customer
     {
         private readonly IRepository<HotelABPCustoimers, Guid> _customerRepository;
         private readonly IRepository<HotelABPCustoimerTypeName, Guid> _customerTypeRepository;
-
-        public CustomerService(IRepository<HotelABPCustoimers, Guid> customerRepository, IRepository<HotelABPCustoimerTypeName, Guid> customerTypeRepository)
+        // 声明一个只读字段来保存我们封装的导出服务实例
+        private readonly IExportAppService _exportAppService;
+   
+   
+        public CustomerService(IRepository<HotelABPCustoimers, Guid> customerRepository, IRepository<HotelABPCustoimerTypeName, Guid> customerTypeRepository, IExportAppService exportAppService)
         {
             _customerRepository = customerRepository;
             _customerTypeRepository = customerTypeRepository;
+            _exportAppService = exportAppService;
+           
         }
         /// <summary>
         /// 添加客户信息
@@ -35,8 +52,8 @@ namespace HotelABP.Customer
         {
             try
             {
-                var  entity = ObjectMapper.Map<CustomerDto, HotelABPCustoimers>(cudto);
-                var  entitydto = await _customerRepository.InsertAsync(entity);
+                var entity = ObjectMapper.Map<CustomerDto, HotelABPCustoimers>(cudto);
+                var entitydto = await _customerRepository.InsertAsync(entity);
                 var s = ObjectMapper.Map<HotelABPCustoimers, CustomerDto>(entitydto);
                 return ApiResult<CustomerDto>.Success(s, ResultCode.Success);
             }
@@ -59,7 +76,7 @@ namespace HotelABP.Customer
                 Id = x.Id,
                 CustomerTypeName = x.CustomerTypeName
             }).ToList();
-            
+
 
             return ApiResult<List<GetCustoimerTypeNameDto>>.Success(result, ResultCode.Success);
         }
@@ -73,9 +90,9 @@ namespace HotelABP.Customer
         {
             var list = await _customerRepository.GetQueryableAsync();
             var types = await _customerTypeRepository.GetQueryableAsync();
-            list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerNickName), x => x.CustomerNickName.Contains( cudto.CustomerNickName));
+            list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerNickName), x => x.CustomerNickName.Contains(cudto.CustomerNickName));
             list = list.WhereIf(cudto.CustomerType != null, x => x.CustomerType == cudto.CustomerType);
-            list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerName), x => x.CustomerName.Contains( cudto.CustomerName));
+            list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerName), x => x.CustomerName.Contains(cudto.CustomerName));
             list = list.WhereIf(!string.IsNullOrEmpty(cudto.PhoneNumber), x => x.PhoneNumber.Contains(cudto.PhoneNumber));
             list = list.WhereIf(cudto.Gender >= 0, x => x.Gender == cudto.Gender);
             var startTime = cudto.StartTime?.Date;
@@ -108,15 +125,15 @@ namespace HotelABP.Customer
 
 
             var res = type.AsQueryable().PageResult(seach.PageIndex, seach.PageSize);
-            
+
             return ApiResult<PageResult<GetCustomerDto>>.Success(
                 new PageResult<GetCustomerDto>
-            {
-                Data = res.Queryable.ToList(),
-                TotleCount = list.Count(),
-                 TotlePage = (int)Math.Ceiling(list.Count() / (double)seach.PageSize)
+                {
+                    Data = res.Queryable.ToList(),
+                    TotleCount = list.Count(),
+                    TotlePage = (int)Math.Ceiling(list.Count() / (double)seach.PageSize)
 
-            },
+                },
             ResultCode.Success
             );
         }
@@ -126,7 +143,7 @@ namespace HotelABP.Customer
         /// <param name="ids"></param>
         /// <param name="customerDto"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> UpdateCustomerAsync( UpCustomerDto customerDto)
+        public async Task<ApiResult<bool>> UpdateCustomerAsync(UpCustomerDto customerDto)
         {
             try
             {
@@ -144,5 +161,44 @@ namespace HotelABP.Customer
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
+        /// <summary>
+        /// 导出所有客户数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IRemoteStreamContent> ExportAllCustomersAsync()
+        {
+            // ... 获取数据的代码 ...
+            var allCustomers = await _customerRepository.GetListAsync();
+
+            var exportData = new ExportDataDto<HotelABPCustoimers>
+            {
+                FileName = "客户管理",
+                Items = allCustomers,
+                ColumnMappings = new Dictionary<string, string>
+        {
+            { "Id", "客户ID" },
+            { "CustomerNickName", "客户昵称" },
+            { "CustomerType", "客户类型" },
+            { "CustomerName", "客户姓名" },
+            { "PhoneNumber", "手机号" },
+            { "Gender", "性别" },
+            { "Birthday", "出生日期" },
+            { "City", "所在城市" },
+            { "Address", "详细地址" },
+            { "GrowthValue", "成长值" },
+            { "AvailableBalance", "可用充值余额" },
+            { "AvailableGiftBalance", "可用赠送余额" },
+            { "AvailablePoints", "可用积分" }
+        }
+            };
+
+            // 直接调用并返回 IRemoteStreamContent
+            return await _exportAppService.ExportToExcelAsync(exportData);
+        }
+
+       
+
     }
+  
 }
+
