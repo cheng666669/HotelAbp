@@ -14,9 +14,12 @@ namespace HotelABP.DTos.ReserveRooms
     }
     public class Update1Dto
     {
-        public Guid id { get; set; }
+        public Guid Id { get; set; }
+        public string RoomNum { get; set; }
+        public string Phone { get; set; } // 手机号
+        public string ReserveName { get; set; } // 姓名
 
-        public string idCard { get; set; } // 身份证号
+        public string IdCard { get; set; } // 身份证号
     }
 
     public class UpdateNoReserDto
