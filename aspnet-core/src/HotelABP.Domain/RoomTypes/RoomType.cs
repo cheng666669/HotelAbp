@@ -19,7 +19,7 @@ namespace HotelABP.RoomTypes
         /// </summary>
         public string? Name { get; set; }
         /// <summary>
-        /// 0设为净房，设为脏房
+        /// 0设为净房，1设为脏房，2设为维修，3设为预定，4设为在住，5设为保留，6设为空房
         /// </summary>
         public int State { get; set; }
 

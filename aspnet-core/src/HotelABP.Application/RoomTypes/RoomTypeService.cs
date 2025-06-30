@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HotelABP.RoomTypes.Types;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
 using System;
@@ -40,7 +41,7 @@ namespace HotelABP.RoomTypes
                 var entitydto = await _roomTypeRepository.InsertAsync(entity);
                 var s  = ObjectMapper.Map<RoomType, RoomTypeDto>(entitydto);
                 // 添加成功后，清理缓存
-                await distributedCache.RemoveAsync("GetReserRoom");
+                await distributedCache.RemoveAsync("RoomType_GetListAsync");
                 return ApiResult<RoomTypeDto>.Success(s, ResultCode.Success);
             }
             catch (Exception ex)
@@ -116,7 +117,7 @@ namespace HotelABP.RoomTypes
                 // 映射为 DTO 返回
                 var dto = ObjectMapper.Map<RoomType, RoomTypeDto>(updatedEntity);
                 // 修改成功后，清理缓存
-                await distributedCache.RemoveAsync("GetReserRoom");
+                await distributedCache.RemoveAsync("RoomType_GetListAsync");
                 return ApiResult<RoomTypeDto>.Success(dto, ResultCode.Success);
             }
             catch (Exception ex)
@@ -136,7 +137,7 @@ namespace HotelABP.RoomTypes
                 var res=await _roomTypeRepository.FindAsync(id);
                 await _roomTypeRepository.DeleteAsync(id);
                 // 删除成功后，清理缓存
-                await distributedCache.RemoveAsync("GetReserRoom");
+                await distributedCache.RemoveAsync("RoomType_GetListAsync");
                 return ApiResult<bool>.Success(true, ResultCode.Success);
             }
             catch (Exception ex)
@@ -158,7 +159,7 @@ namespace HotelABP.RoomTypes
                     await _roomTypeRepository.DeleteAsync(id);
                 }
                 // 删除成功后，清理缓存
-                await distributedCache.RemoveAsync("GetReserRoom");
+                await distributedCache.RemoveAsync("RoomType_GetListAsync");
 
                 return ApiResult<bool>.Success(true, ResultCode.Success);
             }
@@ -181,7 +182,7 @@ namespace HotelABP.RoomTypes
                 res.Order = dto.Order;
                await _roomTypeRepository.UpdateAsync(res);
                 // 修改成功后，清理缓存
-                await distributedCache.RemoveAsync("GetReserRoom");
+                await distributedCache.RemoveAsync("RoomType_GetListAsync");
                 return ApiResult.Success( ResultCode.Success);
             }
             catch (Exception)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotelABP.RoomTypes
+namespace HotelABP.RoomTypes.Types
 {
     public class UpdataRoomTypeOrderDto
     {

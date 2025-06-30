@@ -1,7 +1,7 @@
 ﻿using System;
 using Volo.Abp.Application.Dtos;
 
-namespace HotelABP.RoomTypes
+namespace HotelABP.RoomTypes.Types
 {
     public class RoomTypeDto : AuditedEntityDto<Guid>
     {
