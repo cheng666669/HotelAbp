@@ -65,5 +65,6 @@ namespace HotelABP.DTos.ReserveRooms
         public string? Message { get; set; } // 预定备注信息
         //身份证号
         public string? IdCard { get; set; }
+        public int? PayStatus { get; set; }
     }
 }
