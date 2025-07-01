@@ -13,5 +13,6 @@ namespace HotelABP.Role
         Task<ApiResult> UpdateRoleAsync(Guid Id, CreateUpdateRoleDto dto);
         Task<ApiResult<PageResult<GetRoleResultDTO>>> GetRoleList(Seach seach, SearchRoleDTO dto);
         Task<ApiResult<List<PermissionTreeDto>>> GetPermByRole(Guid roleid);
+        Task<ApiResult> DeleteRange(List<Guid> guids);
     }
 }

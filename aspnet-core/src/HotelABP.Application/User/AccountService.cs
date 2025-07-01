@@ -154,7 +154,7 @@ namespace HotelABP.User
                     //删除用户角色中间表
                     foreach(var item in rolelist)
                     {
-                        await userRoleRep.DeleteAsync(x=>x.RoleId==item.RoleId);
+                        await userRoleRep.DeleteAsync(item);
                     }
                     var user = ObjectMapper.Map(dto,userexist);
                     await userRep.UpdateAsync(user);

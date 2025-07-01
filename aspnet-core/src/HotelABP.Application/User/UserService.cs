@@ -121,6 +121,7 @@ namespace HotelABP.User
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim("NickName", user.NickName),
             };
+
             //JWT密钥转换字节对称密钥
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtConfig:Bearer:SecurityKey"]));
             //算法
@@ -146,7 +147,10 @@ namespace HotelABP.User
                 AccessToken = jwt,
                 Expires = expires,
                 TokenType = "Bearer",
-                RefreshToken = Guid.NewGuid().ToString()
+                RefreshToken = Guid.NewGuid().ToString(),
+                UserName = user.UserName,
+                NickName = user.NickName,
+                Id = user.Id
             };
         }
         /// <summary>

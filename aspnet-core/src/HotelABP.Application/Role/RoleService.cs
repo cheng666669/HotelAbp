@@ -1,5 +1,4 @@
-﻿using AutoMapper.Internal.Mappers;
-using HotelABP.Users;
+﻿using HotelABP.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -21,13 +20,15 @@ namespace HotelABP.Role
         private readonly IRepository<Permission> perRep;
         private readonly IDistributedCache<List<PermissionTreeDto>> cache;
         private readonly IRepository<RolePermission> roleperRep;
+        private readonly ILogger<RoleService> logger;
 
-        public RoleService(IRepository<Roles> roleRep,IRepository<Permission> perRep,IDistributedCache<List<PermissionTreeDto>> cache,IRepository<RolePermission> roleperRep)
+        public RoleService(IRepository<Roles> roleRep, IRepository<Permission> perRep, IDistributedCache<List<PermissionTreeDto>> cache, IRepository<RolePermission> roleperRep, ILogger<RoleService> logger)
         {
             this.roleRep = roleRep;
             this.perRep = perRep;
             this.cache = cache;
             this.roleperRep = roleperRep;
+            this.logger = logger;
         }
         /// <summary>
         /// 添加角色权限
@@ -35,7 +36,7 @@ namespace HotelABP.Role
         /// <param name="dto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResult> CreateRoleAsync(CreateUpdateRoleDto dto)
+        public async Task<ApiResult> CreateRoleAsync([FromBody]CreateUpdateRoleDto dto)
         {
             try
             {
@@ -62,7 +63,7 @@ namespace HotelABP.Role
             }
             catch (Exception ex) 
             {
-
+                logger.LogError("添加角色权限有误" + ex.Message);
                 throw;
             }
         }
@@ -242,6 +243,7 @@ namespace HotelABP.Role
         /// <param name="Id"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
+        [HttpDelete]
         public async Task<ApiResult> DelRoleAsync(Guid Id)
         {
             try
@@ -267,6 +269,7 @@ namespace HotelABP.Role
         /// <param name="dto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
+        [HttpPut]
         public async Task<ApiResult> UpdateRoleAsync(Guid Id, CreateUpdateRoleDto dto)
         {
             try
@@ -285,11 +288,6 @@ namespace HotelABP.Role
                     {
                         await roleperRep.DeleteAsync(item);
                     }
-
-                    //var rolelist = ObjectMapper.Map<CreateUpdateRoleDto, Roles>(dto);
-                    //rolelist.Id = Id;
-                    //await roleRep.UpdateAsync(rolelist);
-
                     var roltlist = ObjectMapper.Map(dto,role);
                     var a = await roleRep.UpdateAsync(roltlist);
                     //添加中间表
@@ -302,8 +300,6 @@ namespace HotelABP.Role
                         };
                         await roleperRep.InsertAsync(roleper);
                     }
-
-                
                     //提交事务
                     tran.Complete();
                     return ApiResult.Success(ResultCode.Success);
@@ -311,7 +307,7 @@ namespace HotelABP.Role
             }
             catch (Exception ex)
             {
-
+                logger.LogError("修改角色有误" + ex.Message);
                 throw;
             }
         }
@@ -338,9 +334,9 @@ namespace HotelABP.Role
                 };
                 return ApiResult<PageResult<GetRoleResultDTO>>.Success(pageresult, ResultCode.Success);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                logger.LogError("获取角色列表有误"+ex.Message);
                 throw;
             }
         }
@@ -397,26 +393,57 @@ namespace HotelABP.Role
         /// <returns></returns>
         private PermissionTreeDto BuildTreeNode(Permission permission, List<Permission> allPermissions)
         {
-            // 创建权限树节点对象
-            var node = new PermissionTreeDto
+            try
             {
-                Id = permission.Id, // 设置权限ID
-                PermissionName = permission.PermissionName, // 设置权限名称
-                IsSelected = true, // 设置选中状态为true（因为所有显示的权限都是角色拥有的）
-                Children = new List<PermissionTreeDto>() // 初始化子权限列表
-            };
+                // 创建权限树节点对象
+                var node = new PermissionTreeDto
+                {
+                    Id = permission.Id, // 设置权限ID
+                    PermissionName = permission.PermissionName, // 设置权限名称
+                    IsSelected = true, // 设置选中状态为true（因为所有显示的权限都是角色拥有的）
+                    Children = new List<PermissionTreeDto>() // 初始化子权限列表
+                };
 
-            // 找到当前权限的所有子权限
-            var children = allPermissions.Where(x => x.ParentId == permission.Id).ToList(); // 筛选出所有父级ID等于当前权限ID的权限
-            
-            // 为每个子权限递归构建树
-            foreach (var child in children) // 遍历每个子权限
-            {
-                var childNode = BuildTreeNode(child, allPermissions); // 递归调用，为子权限构建树节点
-                node.Children.Add(childNode); // 将子节点添加到当前节点的子权限列表中
+                // 找到当前权限的所有子权限
+                var children = allPermissions.Where(x => x.ParentId == permission.Id).ToList(); // 筛选出所有父级ID等于当前权限ID的权限
+
+                // 为每个子权限递归构建树
+                foreach (var child in children) // 遍历每个子权限
+                {
+                    var childNode = BuildTreeNode(child, allPermissions); // 递归调用，为子权限构建树节点
+                    node.Children.Add(childNode); // 将子节点添加到当前节点的子权限列表中
+                }
+
+                return node; // 返回构建好的树节点
             }
-
-            return node; // 返回构建好的树节点
+            catch (Exception ex)
+            {
+                logger.LogError("构建权限树节点有误" + ex.Message);
+                throw;
+            }
+        }
+        /// <summary>
+        /// 批量删除
+        /// </summary>
+        /// <param name="guids"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResult> DeleteRange(List<Guid> guids)
+        {
+            try
+            {
+                foreach (var item in guids)
+                {
+                    var res = await roleRep.FindAsync(x=>x.Id==item);
+                    await roleRep.DeleteAsync(res);
+                }
+                return ApiResult.Success(ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("批量删除角色有误" + ex.Message);
+                throw;
+            }
         }
     }
 }
