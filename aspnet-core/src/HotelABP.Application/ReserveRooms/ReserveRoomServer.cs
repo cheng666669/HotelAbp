@@ -146,30 +146,9 @@ namespace HotelABP.ReserveRooms
                                   Status = reserveRoom.Status,
                                   IdCard = reserveRoom.IdCard,
                                   RoomNum = reserveRoom.RoomNum,
-                                  Message = reserveRoom.Message
+                                  Message = reserveRoom.Message,
+                                   PayStatus= reserveRoom.PayStatus
                               };
-                //var listdto = from reserveRoom in list
-                //              join roomType in roomTypes on reserveRoom.RoomTypeid equals roomType.Id.ToString()
-                //              select new ReserveRoomShowDto
-                //              {
-                //                  Id = reserveRoom.Id,
-                //                  Infomation = reserveRoom.Infomation,
-                //                  Ordersource = reserveRoom.Ordersource,
-                //                  ReserveName = reserveRoom.ReserveName,
-                //                  Phone = reserveRoom.Phone,
-                //                  BookingNumber = reserveRoom.BookingNumber,
-                //                  Sdate = reserveRoom.Sdate,
-                //                  Edate = reserveRoom.Edate,
-                //                  Day = reserveRoom.Day,
-                //                  RoomTypeid = roomType.Id.ToString(),
-                //                  RoomTypeName = roomType.Name, // 房型名称
-                //                  BreakfastNum = reserveRoom.BreakfastNum,
-                //                  Price = reserveRoom.Price,
-                //                  Status = reserveRoom.Status,
-                //                  IdCard = reserveRoom.IdCard,
-                //                  RoomNum = reserveRoom.RoomNum,
-                //                  Message = reserveRoom.Message
-                //              };
                 return listdto.ToList();
 
             }, () => new DistributedCacheEntryOptions

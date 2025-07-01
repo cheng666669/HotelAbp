@@ -75,5 +75,7 @@ namespace HotelABP.RoomReserves
         //取消预订备注
         public string? NoReservRoom { get; set; }
 
+        public int? PayStatus {  get; set; }=0; // 0:未支付,1:已支付,2:支付失败,3:退款中,4:已退款       
+
     }
 }
