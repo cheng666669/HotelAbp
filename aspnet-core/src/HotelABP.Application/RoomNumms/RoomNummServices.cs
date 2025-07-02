@@ -10,6 +10,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
@@ -78,11 +79,15 @@ namespace HotelABP.RoomNumms
         /// <returns></returns>
         public async Task<ApiResult<bool>> DeleteRoomNumBatch(List<Guid> ids)
         {
-            foreach (var id in ids)
+            using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                await _roomNummberRepository.DeleteAsync(id);
+                foreach (var id in ids)
+                {
+                    await _roomNummberRepository.DeleteAsync(id);
+                }
+                tran.Complete();
+                return ApiResult<bool>.Success(true, ResultCode.Success);
             }
-            return ApiResult<bool>.Success(true, ResultCode.Success);
         }
         /// <summary>
         /// 删除房号
@@ -103,6 +108,7 @@ namespace HotelABP.RoomNumms
         {
             try
             {
+
                 var entity = await _roomNummberRepository.GetAsync(id);
                 entity.State = state;
                 await _roomNummberRepository.UpdateAsync(entity);
@@ -122,13 +128,17 @@ namespace HotelABP.RoomNumms
         {
             try
             {
-                foreach (var id in ids)
+                using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var entity = await _roomNummberRepository.GetAsync(id);
-                    entity.State = state;
-                    await _roomNummberRepository.UpdateAsync(entity);
+                    foreach (var id in ids)
+                    {
+                        var entity = await _roomNummberRepository.GetAsync(id);
+                        entity.State = state;
+                        await _roomNummberRepository.UpdateAsync(entity);
+                    }
+                    tran.Complete();
+                    return ApiResult<bool>.Success(true, ResultCode.Success);
                 }
-                return ApiResult<bool>.Success(true, ResultCode.Success);
             }
             catch (Exception ex)
             {

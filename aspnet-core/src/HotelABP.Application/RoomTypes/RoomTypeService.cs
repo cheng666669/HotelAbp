@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using System.Transactions;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
@@ -154,14 +155,18 @@ namespace HotelABP.RoomTypes
         {
             try
             {
-                foreach (var id in ids)
+                using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    await _roomTypeRepository.DeleteAsync(id);
+                    foreach (var id in ids)
+                    {
+                        await _roomTypeRepository.DeleteAsync(id);
+                    }
+                    // 删除成功后，清理缓存
+                    await distributedCache.RemoveAsync("RoomType_GetListAsync");
+                    tran.Complete();
+                    return ApiResult<bool>.Success(true, ResultCode.Success);
                 }
-                // 删除成功后，清理缓存
-                await distributedCache.RemoveAsync("RoomType_GetListAsync");
-
-                return ApiResult<bool>.Success(true, ResultCode.Success);
+                
             }
             catch (Exception ex)
             {

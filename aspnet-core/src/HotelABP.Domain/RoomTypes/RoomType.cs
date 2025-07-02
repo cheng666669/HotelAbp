@@ -61,7 +61,7 @@ namespace HotelABP.RoomTypes
         /// <summary>
         /// 房型图片路径（主图）
         /// </summary>
-        public string? ImageUrl { get; set; }
+        public string? ImageUrls { get; set; }
 
         /// <summary>
         /// 房型视频路径
