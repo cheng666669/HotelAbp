@@ -130,110 +130,173 @@ namespace HotelABP.Role
                 // 1. 一级权限
                 var permissions = new List<Permission>();
 
-                var overview = new Permission { PermissionName = "概况" };
-                var roomStatus = new Permission { PermissionName = "房态" };
-                var futureRoomStatus = new Permission { PermissionName = "远期房态" };
-                var order = new Permission { PermissionName = "订单" };
-                var business = new Permission { PermissionName = "业务" };
-                var customer = new Permission { PermissionName = "客户" };
-                var marketing = new Permission { PermissionName = "营销" };
-                var handleBooking = new Permission { PermissionName = "办理预订" };
-
-                // 2. 插入一级权限，获取Id
-                await perRep.InsertAsync(overview);
+                // 房态
+                var roomStatus = new Permission { PermissionName = "房态", Path = "/room-status", Icon = "icon-room", Order = 1, IsMenu = true, IsVisible = true };
                 await perRep.InsertAsync(roomStatus);
-                await perRep.InsertAsync(futureRoomStatus);
-                await perRep.InsertAsync(order);
-                await perRep.InsertAsync(business);
-                await perRep.InsertAsync(customer);
-                await perRep.InsertAsync(marketing);
-                await perRep.InsertAsync(handleBooking);
-
-                // 3. 二级及以下权限
-                // 房态操作权限
                 var roomStatusOps = new[]
                 {
                     "设为维修","设为脏房","设为胜房","设为保留","办理预订","办理入住","取消保留","操作入住",
                     "取消预订","办理退房","办理换房","办理结算","批量设置保留","快速预订","住宿记录","切换房态"
                 };
+                int roomStatusOrder = 1;
                 foreach (var name in roomStatusOps)
                 {
-                    await perRep.InsertAsync(new Permission
-                    {
-                        PermissionName = name,
-                        ParentId = roomStatus.Id
-                    });
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = roomStatus.Id, Path = string.Empty, Icon = string.Empty, Order = roomStatusOrder++, IsMenu = false, IsVisible = true });
                 }
 
-                // 远期房态操作权限
-                var futureRoomStatusOps = new[]
+                // 订单
+                var order = new Permission { PermissionName = "订单", Path = "/order", Icon = "icon-order", Order = 2, IsMenu = true, IsVisible = true };
+                await perRep.InsertAsync(order);
+
+                // 订单下的子权限及其操作权限
+                // 住宿订单
+                var stayOrder = new Permission { PermissionName = "住宿订单", ParentId = order.Id, Path = "/order/stay", Icon = "icon-stay", Order = 1, IsMenu = false, IsVisible = true };
+                await perRep.InsertAsync(stayOrder);
+                var stayOrderOps = new[] { "导出明细", "取消房间", "取消订单", "退房", "绿标", "取消订单", "办理入住" };
+                int stayOrderOrder = 1;
+                foreach (var name in stayOrderOps)
                 {
-                    "换房","退房","入账","结算","办理预订","办理入住","取消预订","设为维修","设为脏房","设为胜房",
-                    "设为保留","批量设置保留","快速预订","住宿记录","切换房态"
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = stayOrder.Id, Path = string.Empty, Icon = string.Empty, Order = stayOrderOrder++, IsMenu = false, IsVisible = true });
+                }
+
+                // 订房订单
+                var bookOrder = new Permission { PermissionName = "订房订单", ParentId = order.Id, Path = "/order/book", Icon = "icon-book", Order = 2, IsMenu = false, IsVisible = true };
+                await perRep.InsertAsync(bookOrder);
+                var bookOrderOps = new[] { "导出记录", "确认预订", "拒绝" };
+                int bookOrderOrder = 1;
+                foreach (var name in bookOrderOps)
+                {
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = bookOrder.Id, Path = string.Empty, Icon = string.Empty, Order = bookOrderOrder++, IsMenu = false, IsVisible = true });
+                }
+
+                // 商城订单
+                var mallOrder = new Permission { PermissionName = "商城订单", ParentId = order.Id, Path = "/order/mall", Icon = "icon-mall", Order = 3, IsMenu = false, IsVisible = true };
+                await perRep.InsertAsync(mallOrder);
+                var mallOrderOps = new[] { "通用", "结算" };
+                int mallOrderOrder = 1;
+                foreach (var name in mallOrderOps)
+                {
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = mallOrder.Id, Path = string.Empty, Icon = string.Empty, Order = mallOrderOrder++, IsMenu = false, IsVisible = true });
+                }
+
+                // 售后管理
+                var afterSale = new Permission { PermissionName = "售后管理", ParentId = order.Id, Path = "/order/aftersale", Icon = "icon-aftersale", Order = 4, IsMenu = false, IsVisible = true };
+                await perRep.InsertAsync(afterSale);
+                var afterSaleOps = new[] { "退货", "退款" };
+                int afterSaleOrder = 1;
+                foreach (var name in afterSaleOps)
+                {
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = afterSale.Id, Path = string.Empty, Icon = string.Empty, Order = afterSaleOrder++, IsMenu = false, IsVisible = true });
+                }
+
+                // 业务
+                var business = new Permission { PermissionName = "业务", Path = "/business", Icon = "icon-business", Order = 3, IsMenu = true, IsVisible = true };
+                await perRep.InsertAsync(business);
+
+                // 房价房态
+                var priceStatus = new Permission { PermissionName = "房价房态", ParentId = business.Id, Path = "/business/price-status", Icon = "icon-price", Order = 1, IsMenu = false, IsVisible = true };
+                await perRep.InsertAsync(priceStatus);
+                var priceStatusOps = new[] { "排房", "礼包设置", "投放", "删除", "价格自有", "启用", "停用" };
+                int priceStatusOrder = 1;
+                foreach (var name in priceStatusOps)
+                {
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = priceStatus.Id, Path = string.Empty, Icon = string.Empty, Order = priceStatusOrder++, IsMenu = false, IsVisible = true });
+                }
+
+                // 房型管理
+                var roomTypeManage = new Permission { PermissionName = "房型管理", ParentId = business.Id, Path = "/business/room-type", Icon = "icon-roomtype", Order = 2, IsMenu = false, IsVisible = true };
+                await perRep.InsertAsync(roomTypeManage);
+                var roomTypeManageOps = new[] { "新增", "编辑", "删除", "批量删除", "设置房价", "编辑房型", "调整房型房量" };
+                int roomTypeManageOrder = 1;
+                foreach (var name in roomTypeManageOps)
+                {
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = roomTypeManage.Id, Path = string.Empty, Icon = string.Empty, Order = roomTypeManageOrder++, IsMenu = false, IsVisible = true });
+                }
+
+                // 商品管理
+                var productManage = new Permission { PermissionName = "商品管理", ParentId = business.Id, Path = "/business/product", Icon = "icon-product", Order = 3, IsMenu = false, IsVisible = true };
+                await perRep.InsertAsync(productManage);
+                var productManageOps = new[] { "新增", "编辑", "删除", "批量删除", "设置价格", "编辑商品", "调整商品数量" };
+                int productManageOrder = 1;
+                foreach (var name in productManageOps)
+                {
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = productManage.Id, Path = string.Empty, Icon = string.Empty, Order = productManageOrder++, IsMenu = false, IsVisible = true });
+                }
+
+                // 餐饮管理
+                var diningManage = new Permission { PermissionName = "餐饮管理", ParentId = business.Id, Path = "/business/dining", Icon = "icon-dining", Order = 4, IsMenu = false, IsVisible = true };
+                await perRep.InsertAsync(diningManage);
+                var diningManageOps = new[] { "新增", "编辑", "删除", "批量删除", "设置价格", "编辑菜品", "调整菜品数量" };
+                int diningManageOrder = 1;
+                foreach (var name in diningManageOps)
+                {
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = diningManage.Id, Path = string.Empty, Icon = string.Empty, Order = diningManageOrder++, IsMenu = false, IsVisible = true });
+                }
+
+                // 收款码管理
+                var paymentCodeManage = new Permission { PermissionName = "收款码管理", ParentId = business.Id, Path = "/business/payment-code", Icon = "icon-payment", Order = 5, IsMenu = false, IsVisible = true };
+                await perRep.InsertAsync(paymentCodeManage);
+                var paymentCodeManageOps = new[] { "新增", "编辑", "删除", "批量删除", "设置收款码", "编辑收款码", "调整收款码数量" };
+                int paymentCodeManageOrder = 1;
+                foreach (var name in paymentCodeManageOps)
+                {
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = paymentCodeManage.Id, Path = string.Empty, Icon = string.Empty, Order = paymentCodeManageOrder++, IsMenu = false, IsVisible = true });
+                }
+
+                // 客户
+                var customer = new Permission { PermissionName = "客户", Path = "/customer", Icon = "icon-customer", Order = 4, IsMenu = true, IsVisible = true };
+                await perRep.InsertAsync(customer);
+
+                // 客户管理
+                var customerManage = new Permission { PermissionName = "客户管理", ParentId = customer.Id, Path = "/customer/manage", Icon = "icon-customer-manage", Order = 1, IsMenu = false, IsVisible = true };
+                await perRep.InsertAsync(customerManage);
+                var customerManageOps = new[] { "清除", "充值", "重置有效期", "送积分", "同步粉丝", "标签管理", "发送优惠券", "导入会员", "编辑", "冻结", "传给微信", "打标签" };
+                int customerManageOrder = 1;
+                foreach (var name in customerManageOps)
+                {
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = customerManage.Id, Path = string.Empty, Icon = string.Empty, Order = customerManageOrder++, IsMenu = false, IsVisible = true });
+                }
+
+                // 会员卡
+                var memberCard = new Permission { PermissionName = "会员卡", ParentId = customer.Id, Path = "/customer/member-card", Icon = "icon-member-card", Order = 2, IsMenu = false, IsVisible = true };
+                await perRep.InsertAsync(memberCard);
+                var memberCardOps = new[] { "启用", "停用", "编辑会员卡", "选择移交", "转出", "保存", "删除等级", "添加自定义权益", "删除" };
+                int memberCardOrder = 1;
+                foreach (var name in memberCardOps)
+                {
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = memberCard.Id, Path = string.Empty, Icon = string.Empty, Order = memberCardOrder++, IsMenu = false, IsVisible = true });
+                }
+
+                // 设置
+                var setting = new Permission { PermissionName = "设置", Path = "/setting", Icon = "icon-setting", Order = 5, IsMenu = true, IsVisible = true };
+                await perRep.InsertAsync(setting);
+                var settingChildren = new[]
+                {
+                    "基本设置","员工管理","权限管理","通知设置","店铺认证","业务入口","客户关系"
                 };
-                foreach (var name in futureRoomStatusOps)
+                int settingOrder = 1;
+                foreach (var name in settingChildren)
                 {
-                    await perRep.InsertAsync(new Permission
-                    {
-                        PermissionName = name,
-                        ParentId = futureRoomStatus.Id
-                    });
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = setting.Id, Path = $"/setting/{settingOrder}", Icon = $"icon-setting-{settingOrder}", Order = settingOrder++, IsMenu = false, IsVisible = true });
                 }
 
-                // 订单子权限
-                var orderChildren = new[]
+                // 权限管理下的子权限
+                var permissionManage = await perRep.InsertAsync(new Permission { PermissionName = "权限管理", ParentId = setting.Id, Path = "/setting/permission-manage", Icon = "icon-permission-manage", Order = 3, IsMenu = false, IsVisible = true });
+                var permissionManageChildren = new[]
                 {
-                    "住宿订单","商城订单","餐饮订单","售后管理","会员开卡订单","充值订单","收款码订单","扫码核销","其他订单"
+                    "账户管理","账户编辑","角色管理","角色编辑","操作日志"
                 };
-                foreach (var name in orderChildren)
+                int permissionManageOrder = 1;
+                foreach (var name in permissionManageChildren)
                 {
-                    await perRep.InsertAsync(new Permission
-                    {
-                        PermissionName = name,
-                        ParentId = order.Id
-                    });
+                    await perRep.InsertAsync(new Permission { PermissionName = name, ParentId = permissionManage.Id, Path = string.Empty, Icon = string.Empty, Order = permissionManageOrder++, IsMenu = false, IsVisible = true });
                 }
-
-                // 业务子权限
-                var businessChildren = new[]
-                {
-                    "房价房态","房型管理","商品管理","餐饮管理","收款码管理"
-                };
-                foreach (var name in businessChildren)
-                {
-                    await perRep.InsertAsync(new Permission
-                    {
-                        PermissionName = name,
-                        ParentId = business.Id
-                    });
-                }
-
-                // 客户子权限
-                var customerChildren = new[]
-                {
-                    "客户管理","会员卡","资产管理","资产记录"
-                };
-                foreach (var name in customerChildren)
-                {
-                    await perRep.InsertAsync(new Permission
-                    {
-                        PermissionName = name,
-                        ParentId = customer.Id
-                    });
-                }
-
-                // 营销子权限
-                await perRep.InsertAsync(new Permission
-                {
-                    PermissionName = "营销应用",
-                    ParentId = marketing.Id
-                });
 
                 return ApiResult.Success(ResultCode.Success);
             }
             catch (Exception e)
             {
-                Logger.LogError("初始化权限数据有误" + e.Message);
+                logger.LogError("初始化权限数据有误" + e.Message);
                 throw;
             }
         }
