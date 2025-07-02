@@ -7,6 +7,7 @@ using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
@@ -28,20 +29,26 @@ using static Volo.Abp.Http.MimeTypes;
 
 namespace HotelABP.Customer
 {
+    /// <summary>
+    /// 客户管理
+    /// </summary>
     public class CustomerService : ApplicationService, ICustomerServices
     {
         private readonly IRepository<HotelABPCustoimers, Guid> _customerRepository;
         private readonly IRepository<HotelABPCustoimerTypeName, Guid> _customerTypeRepository;
         // 声明一个只读字段来保存我们封装的导出服务实例
         private readonly IExportAppService _exportAppService;
-   
-   
-        public CustomerService(IRepository<HotelABPCustoimers, Guid> customerRepository, IRepository<HotelABPCustoimerTypeName, Guid> customerTypeRepository, IExportAppService exportAppService)
+        // 声明一个只读字段来保存导入服务实例
+
+
+        public CustomerService(
+            IRepository<HotelABPCustoimers, Guid> customerRepository,
+            IRepository<HotelABPCustoimerTypeName, Guid> customerTypeRepository,
+            IExportAppService exportAppService)
         {
             _customerRepository = customerRepository;
             _customerTypeRepository = customerTypeRepository;
             _exportAppService = exportAppService;
-           
         }
         /// <summary>
         /// 添加客户信息
@@ -52,9 +59,13 @@ namespace HotelABP.Customer
         {
             try
             {
+                // 将 CustomerDto 映射为 HotelABPCustoimers 实体对象
                 var entity = ObjectMapper.Map<CustomerDto, HotelABPCustoimers>(cudto);
+                // 插入实体对象到数据库，并返回插入后的实体
                 var entitydto = await _customerRepository.InsertAsync(entity);
+                // 将插入后的实体对象再次映射为 CustomerDto
                 var s = ObjectMapper.Map<HotelABPCustoimers, CustomerDto>(entitydto);
+                // 返回带有插入结果的 ApiResult
                 return ApiResult<CustomerDto>.Success(s, ResultCode.Success);
             }
             catch (Exception ex)
@@ -167,38 +178,57 @@ namespace HotelABP.Customer
         /// <returns></returns>
         public async Task<IRemoteStreamContent> ExportAllCustomersAsync()
         {
-            // ... 获取数据的代码 ...
-            var allCustomers = await _customerRepository.GetListAsync();
+            // 获取数据
+            var list = await _customerRepository.GetListAsync();
+            var types = await _customerTypeRepository.GetListAsync();
+            var type = from a in list
+                       join b in types
+                       on a.CustomerType equals b.Id into temp
+                       from b in temp.DefaultIfEmpty()
+                       select new GetCustomerDto
+                       {
+                           Id = a.Id,
+                           CustomerNickName = a.CustomerNickName,
+                           CustomerType = a.CustomerType,
+                           CustomerTypeName = b.CustomerTypeName,
+                           Gender = a.Gender,
+                           CustomerName = a.CustomerName,
+                           PhoneNumber = a.PhoneNumber,
+                           Birthday = a.Birthday,
+                           Address = a.Address,
+                           City = a.City,
+                           GrowthValue = a.GrowthValue,
+                           AvailableBalance = a.AvailableBalance,
+                           AvailableGiftBalance = a.AvailableGiftBalance,
+                           AvailablePoints = a.AvailablePoints
+                       };
 
-            var exportData = new ExportDataDto<HotelABPCustoimers>
+            // 修复 Items 的赋值问题
+            var exportData = new ExportDataDto<GetCustomerDto>
             {
                 FileName = "客户管理",
-                Items = allCustomers,
+                Items = type.ToList(), // 将查询结果转换为列表并赋值给 Items
                 ColumnMappings = new Dictionary<string, string>
-        {
-            { "Id", "客户ID" },
-            { "CustomerNickName", "客户昵称" },
-            { "CustomerType", "客户类型" },
-            { "CustomerName", "客户姓名" },
-            { "PhoneNumber", "手机号" },
-            { "Gender", "性别" },
-            { "Birthday", "出生日期" },
-            { "City", "所在城市" },
-            { "Address", "详细地址" },
-            { "GrowthValue", "成长值" },
-            { "AvailableBalance", "可用充值余额" },
-            { "AvailableGiftBalance", "可用赠送余额" },
-            { "AvailablePoints", "可用积分" }
-        }
+                {
+                    { "Id", "客户ID" },
+                    { "CustomerNickName", "客户昵称" },
+                    { "CustomerTypeName", "客户类型名称" },
+                    { "CustomerName", "客户姓名" },
+                    { "PhoneNumber", "手机号" },
+                    { "Gender", "性别" },
+                    { "Birthday", "出生日期" },
+                    { "City", "所在城市" },
+                    { "Address", "详细地址" },
+                    { "GrowthValue", "成长值" },
+                    { "AvailableBalance", "可用充值余额" },
+                    { "AvailableGiftBalance", "可用赠送余额" },
+                    { "AvailablePoints", "可用积分" }
+                }
             };
 
-            // 直接调用并返回 IRemoteStreamContent
+            // 返回导出的内容
             return await _exportAppService.ExportToExcelAsync(exportData);
         }
-
-       
-
     }
-  
 }
 

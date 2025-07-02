@@ -9,7 +9,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace HotelABP.Labels
 {
-    public class HotelABPLabels:FullAuditedEntity<Guid>
+    public class HotelABPLabelss:FullAuditedEntity<Guid>
     {
         /// <summary>
         /// 标签名称
@@ -31,12 +31,12 @@ namespace HotelABP.Labels
         /// <summary>
         /// 开卡时间（可选）
         /// </summary>
-        public DateTime? StartTime { get; set; }
+        public string  StartTime { get; set; }= string.Empty;
 
         /// <summary>
         /// 交易时间（可选）
         /// </summary>
-        public DateTime? TradeTime { get; set; }
+        public string TradeTime { get; set; } = string.Empty;
 
         // ---------------- 会员条件 ----------------
 
@@ -48,7 +48,7 @@ namespace HotelABP.Labels
         /// <summary>
         /// 会员性别（如 男、女）
         /// </summary>
-        public string MemberGender { get; set; } = string.Empty;
+        public int? MemberGender { get; set; } 
 
         // ---------------- 交易条件 ----------------
 
@@ -87,5 +87,5 @@ namespace HotelABP.Labels
         /// </summary>
         [Range(0, 990000, ErrorMessage = "累计消费请填写 0～99 万的小数")]
         public decimal? TotalSpentMax { get; set; }
-        }
+    }
 }

@@ -3,6 +3,8 @@ using HotelABP.Account;
 using HotelABP.Customer;
 using HotelABP.Customers;
 using HotelABP.DTos.ReserveRooms;
+using HotelABP.Label;
+using HotelABP.Labels;
 using HotelABP.Role;
 using HotelABP.RoomNummbers;
 using HotelABP.RoomReserves;
@@ -33,5 +35,6 @@ public class HotelABPApplicationAutoMapperProfile : Profile
         CreateMap<RoomNummber, RoomNummDto>().ReverseMap();
         CreateMap<CreateUpdataRoomNummDto, RoomNummber>().ReverseMap();
         CreateMap<UpCustomerDto,HotelABPCustoimers>().ReverseMap();
+        CreateMap<LabelDto,HotelABPLabelss>().ReverseMap();
     }
 }
