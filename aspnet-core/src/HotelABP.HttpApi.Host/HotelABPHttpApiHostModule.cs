@@ -86,6 +86,11 @@ public class HotelABPHttpApiHostModule : AbpModule
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
 
+        // 注册全局异常过滤器
+        context.Services.AddControllers(options =>
+        {
+            options.Filters.Add<GlobalExceptionFilter>();
+        });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
