@@ -4,10 +4,13 @@ using HotelABP.ReserveRooms;
 using HotelABP.RoomReserves;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.Domain.Repositories;
 
 namespace HotelABP.Controllers
 {
@@ -16,10 +19,12 @@ namespace HotelABP.Controllers
     {
         private readonly IAlipayService _alipayService;
         private readonly AlipayOptions _options;
+        IRepository<ReserveRoom, Guid> _roomReserveRepository;
 
-        public AlipayController(IAlipayService alipayService)
+        public AlipayController(IAlipayService alipayService, IRepository<ReserveRoom, Guid> roomReserveRepository)
         {
             _alipayService = alipayService;
+            _roomReserveRepository = roomReserveRepository;
         }
 
         [HttpPost("pay")]
@@ -33,18 +38,38 @@ namespace HotelABP.Controllers
         public async Task<IActionResult> Notify()
         {
             var form = await Request.ReadFormAsync();
-            // 验签略（可使用 AlipaySignature.RSACheckV1）
+
+            // 打印日志（建议）
+            Logger.LogInformation("支付宝回调参数：" + JsonSerializer.Serialize(form));
+
             var outTradeNo = form["out_trade_no"];
             var tradeStatus = form["trade_status"];
 
-            // TODO: 根据 out_trade_no 更新数据库状态
             if (tradeStatus == "TRADE_SUCCESS")
             {
-                // 修改订单状态为已支付
+                // 用 outTradeNo 查找订单（确保是你订单表中的唯一编号）
+                var reserveRoom = await _roomReserveRepository.FirstOrDefaultAsync(
+                    r => r.Id.ToString() == outTradeNo.ToString() // ✅ 注意这里不要用 Id，除非你自己确实用 outTradeNo 生成的就是主键
+                );
+
+                if (reserveRoom == null)
+                {
+                    Logger.LogWarning("未找到订单：" + outTradeNo);
+                    return Content("success"); // 回调正常结束，支付宝不再重试
+                }
+
+                if (reserveRoom.PayStatus != 1) // 幂等处理
+                {
+                    reserveRoom.PayStatus = 1;
+                    await _roomReserveRepository.UpdateAsync(reserveRoom,true);
+                    //await CurrentUnitOfWork.SaveChangesAsync(); // ✅ 强烈建议添加，确保写入
+                    Logger.LogInformation("订单状态更新成功：" + outTradeNo);
+                }
             }
 
             return Content("success");
         }
+
     }
 
 

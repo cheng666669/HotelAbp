@@ -10,6 +10,7 @@ namespace HotelABP.DTos.ReserveRooms
     {
         public Guid id { get; set; }
         public string roomnum { get; set; } // 房间号
+        public Guid Userid { get; set; } // 操作人Id
 
     }
     public class Update1Dto
@@ -20,12 +21,13 @@ namespace HotelABP.DTos.ReserveRooms
         public string ReserveName { get; set; } // 姓名
 
         public string IdCard { get; set; } // 身份证号
+        public Guid Userid { get; set; } // 操作人Id
     }
 
     public class UpdateNoReserDto
     {
         public Guid id { get; set; }
-
         public string NoReservRoom { get; set; } // 取消预订备注
+        public Guid Userid { get; set; } // 操作人Id
     }
 }
