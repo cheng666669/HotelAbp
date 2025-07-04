@@ -1,4 +1,4 @@
-﻿namespace HotelABP.RoomTypes
+﻿namespace HotelABP.RoomTypes.Types
 {
     public class GetRoomTypeDto
     {

@@ -1,11 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
-
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Features; // 需要加上这个命名空间
 namespace HotelABP;
 
 public class Program
@@ -28,7 +31,32 @@ public class Program
         try
         {
             Log.Information("Starting HotelABP.HttpApi.Host.");
+
+          
+
+          
             var builder = WebApplication.CreateBuilder(args);
+
+            // 在 builder 创建后添加
+            builder.Services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 1024 * 1024 * 1024; // 1GB，根据需要调整
+            });
+            // 加载默认 appsettings.json
+            builder.Configuration
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+            // 加载本地机密配置
+            builder.Configuration
+                .AddJsonFile(@"C:\Users\13775\AppData\Roaming\Microsoft\UserSecrets\HotelABP-4681b4fd-151f-4221-84a4-929d86723e4c\secrets.json", optional: true, reloadOnChange: true);
+
+            // 支持环境变量
+            builder.Configuration.AddEnvironmentVariables();
+
+            // 替换 ABP 使用的配置
+            builder.Services.ReplaceConfiguration(builder.Configuration);
+
             builder.Host.AddAppSettingsSecretsJson()
                 .UseAutofac()
                 .UseSerilog();
