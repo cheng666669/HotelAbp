@@ -11,7 +11,8 @@ namespace HotelABP.RoomNummbers
 
         Task<ApiResult<PageResult<RoomNummDto>>> GetListToRoomTypeId(Seach seach, RoomNummRoomTypeRequestDto input);
         Task<ApiResult<bool>> DeleteRoomNumBatch(List<Guid> ids);
-        Task<ApiResult<bool>> UpdateStateToRoomNum(Guid id);
+        Task<ApiResult<bool>> UpdateStateToRoomNum(Guid id, bool state);
+        Task<ApiResult<int>> UpdateRoomNumm(Guid Id, CreateUpdataRoomNummDto input);
 
     }
 } 

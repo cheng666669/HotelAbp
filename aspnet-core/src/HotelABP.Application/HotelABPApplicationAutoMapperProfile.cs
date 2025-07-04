@@ -10,6 +10,7 @@ using HotelABP.RoomNummbers;
 using HotelABP.RoomReserves;
 using HotelABP.RoomTypes;
 using HotelABP.Users;
+using HotelABP.RoomTypes.Types;
 
 namespace HotelABP;
 
