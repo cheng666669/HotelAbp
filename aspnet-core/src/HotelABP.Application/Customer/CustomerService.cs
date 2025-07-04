@@ -26,6 +26,7 @@ using Volo.Abp.Domain.Repositories;
 using Volo.Abp.ObjectMapping;
 using Volo.Abp.Validation;
 using static Volo.Abp.Http.MimeTypes;
+using System.Transactions;
 
 namespace HotelABP.Customer
 {
@@ -130,8 +131,13 @@ namespace HotelABP.Customer
                            GrowthValue = a.GrowthValue,
                            AvailableBalance = a.AvailableBalance,
                            AvailableGiftBalance = a.AvailableGiftBalance,
-                           AvailablePoints = a.AvailablePoints
-                           
+                           AvailablePoints = a.AvailablePoints,
+                          Status = a.Status,
+                           Sumofconsumption = a.Sumofconsumption,
+                           ComsumerNumber = a.ComsumerNumber,
+                           ConsumerDesc = a.ConsumerDesc,
+                            Accumulativeconsumption=a.Accumulativeconsumption+a.Sumofconsumption
+
                        };
 
 
@@ -316,6 +322,44 @@ namespace HotelABP.Customer
             }
             catch (Exception ex)
             {
+                return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
+            }
+        }
+
+        /// <summary>
+        /// 批量修改客户状态，操作使用事务保证原子性
+        /// </summary>
+        /// <param name="upStautsdto">包含客户ID列表和目标状态的DTO</param>
+        /// <returns>操作结果</returns>
+        public async Task<ApiResult<bool>> UpdateCustomerStatusAsync(UpStautsDto upStautsdto)
+        {
+            try
+            {
+                // 使用事务，确保批量操作的原子性（全部成功或全部失败）
+                using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    // 遍历所有待更新的客户ID
+                    foreach (var id in upStautsdto.ids)
+                    {
+                        // 获取客户实体
+                        var entity = await _customerRepository.GetAsync(id);
+                        if (entity != null)
+                        {
+                            // 设置客户状态为目标状态
+                            entity.Status = upStautsdto.Status;
+                            // 更新数据库
+                            await _customerRepository.UpdateAsync(entity);
+                        }
+                    }
+                    // 提交事务，所有操作成功才会真正保存
+                    tran.Complete();
+                }
+                // 返回成功结果
+                return ApiResult<bool>.Success(true, ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                // 捕获异常并返回失败信息
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }

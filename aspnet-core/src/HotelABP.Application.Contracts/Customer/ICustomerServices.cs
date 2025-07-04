@@ -48,5 +48,11 @@ namespace HotelABP.Customer
         /// <param name="balanceDto">包含可用余额相关信息的DTO，用于指定消费的账户或具体余额信息</param>
         /// <returns>操作成功返回 true，否则返回 false。</returns>
         Task<ApiResult<bool>> UpSumofconsumption(UpSumofconsumptionDto sumofconsumptionDto);
+        /// <summary>
+        /// 修改会员状态
+        /// </summary>
+        /// <param name="upStautsdto"></param>
+        /// <returns></returns>
+        Task<ApiResult<bool>> UpdateCustomerStatusAsync(UpStautsDto upStautsdto);
     }
 }
