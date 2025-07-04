@@ -3,6 +3,7 @@ using HotelABP.RoomNummbers;
 using HotelABP.RoomReserves;
 using HotelABP.RoomTypes;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
@@ -79,7 +80,7 @@ namespace HotelABP.ReserveRooms
                         var reserveRoom = ObjectMapper.Map<CreateRoom, ReserveRoom>(room);
                         reserveRoom.RoomTypeid = item.Id.ToString();
                         reserveRoom.Price = item.Price;
-                        reserveRoom.RoomNum = "未排房";
+                        //reserveRoom.RoomNum = "未排房";
                         // 建议补充 BreakfastNum 字段赋值
                         reserveRoom.BreakfastNum = 0;
                        var res= await reserveRoomRepository.InsertAsync(reserveRoom);
@@ -92,7 +93,14 @@ namespace HotelABP.ReserveRooms
                             States = 2
                         };
                         await monrydetails.InsertAsync(moneyDetail);
+                        var num=await roomnumberreposi.FirstOrDefaultAsync(x => x.RoomNum==res.RoomNum);
+                        num.RoomState = 5;
+                        await roomnumberreposi.UpdateAsync(num);
                     }
+
+
+                    
+
 
                     // 添加成功后，清理缓存
                     await reserveRoomCache.RemoveAsync("GetReserRoom");
