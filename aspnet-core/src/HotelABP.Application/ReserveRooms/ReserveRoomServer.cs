@@ -94,7 +94,7 @@ namespace HotelABP.ReserveRooms
                         };
                         await monrydetails.InsertAsync(moneyDetail);
                         var num=await roomnumberreposi.FirstOrDefaultAsync(x => x.RoomNum==res.RoomNum);
-                        num.RoomState = 5;
+                        num.RoomState = 4;
                         await roomnumberreposi.UpdateAsync(num);
                     }
 

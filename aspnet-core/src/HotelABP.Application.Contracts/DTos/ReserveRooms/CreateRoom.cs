@@ -43,6 +43,10 @@ namespace HotelABP.DTos.ReserveRooms
         /// </summary>
         public int Day { get; set; }
         public string? Message { get; set; } // 预定备注信息
+        /// <summary>
+        /// 房间号
+        /// </summary>
+        public string? RoomNum { get; set; }
         public IList<RoomTypeDto> aaa { get; set; } // 房型信息列表
 
     }
