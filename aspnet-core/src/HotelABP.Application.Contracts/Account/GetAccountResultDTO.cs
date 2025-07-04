@@ -28,5 +28,22 @@ namespace HotelABP.Account
         /// 角色名称
         /// </summary>
         public string RoleName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string UserName { get; set; } = string.Empty;
+        /// <summary>
+        /// 性别
+        /// </summary>
+        public Gender Gender { get; set; }
+        /// <summary>
+        /// 状态（1-正常，0-禁用）
+        /// </summary>
+        public Status Status { get; set; }
+        /// <summary>
+        /// 邮箱
+        /// </summary>
+        public string Email { get; set; } = string.Empty;
     }
 }

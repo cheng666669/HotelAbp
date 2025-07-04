@@ -11,5 +11,6 @@ namespace HotelABP.Account
         Task<ApiResult> DelAccount(Guid Id);
         Task<ApiResult> UpdateAccount(AccountRoleDto dto,Guid id);
         Task<ApiResult<PageResult<GetAccountResultDTO>>> GetAccountList(Seach seach,SearchAccountDTO dto);
+        Task<ApiResult<AccountRoleDto>> GetAccount(Guid id);
     }
 }

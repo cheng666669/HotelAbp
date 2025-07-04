@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,26 +38,21 @@ namespace HotelABP.User
         /// <summary>
         /// 生成验证码
         /// </summary>
+        /// <param name="id"></param>
         /// <returns></returns>
-        //[HttpGet("/api/v1/user/Captcha")]
-        [AllowAnonymous]
-        public ApiResult<CaptchaDto> GetCaptcha()
+        [HttpGet]
+        public IActionResult Captcha(string id)
         {
-            string guid = $"captcha:{Guid.NewGuid().ToString("N")}";
-            var info = captcha.Generate(guid, 120);
-            //httpContextAccessor.HttpContext.Response.Cookies.Append("ValidateCode", guid);
-            httpContextAccessor.HttpContext.Response.Cookies.Append("ValidateCode", guid, new CookieOptions
-            {
-                SameSite = SameSiteMode.None,
-                Secure = true,
-                Path = "/"
-            });
-            var stream = new System.IO.MemoryStream(info.Bytes);
-            return ApiResult<CaptchaDto>.Success(new CaptchaDto
-            {
-                captchaKey = guid,
-                captchaBase64 = $"data:image/gif;base64,{Convert.ToBase64String(stream.ToArray())}"
-            },ResultCode.Success);
+            var info = captcha.Generate(id);
+            return new FileContentResult(info.Bytes, "image/gif");
+        }
+        /// <summary>
+        /// 演示时使用HttpGet传参方便，这里仅做返回处理
+        /// </summary>
+        [HttpGet("validate")]
+        public bool Validate(string id, string code)
+        {
+            return captcha.Validate(id, code);
         }
         /// <summary>
         /// 登录
@@ -69,21 +65,11 @@ namespace HotelABP.User
         {
             try
             {
-                //// 新增：判断验证码格式
-                //if (!string.IsNullOrEmpty(dto.CaptchaCode) && dto.CaptchaCode.StartsWith("data:image"))
-                //{
-                //    return ApiResult<LoginResultDto>.Fail("请填写验证码图片上的文字，而不是图片本身", ResultCode.ValidationError);
-                //}
-                //var capt = httpContextAccessor.HttpContext.Request.Cookies["ValidateCode"];
-                //if (string.IsNullOrEmpty(capt))
-                //{
-                //    return ApiResult<LoginResultDto>.Fail("验证码已过期或不存在", ResultCode.Error);
-                //}
-                // 你的验证码校验逻辑
-                //if (dto.CaptchaKey != capt)
-                //{
-                //    return ApiResult<LoginResultDto>.Fail("验证码错误", ResultCode.Error);
-                //}
+                // 验证码校验
+                if (!captcha.Validate(dto.CaptchaKey, dto.CaptchaCode))
+                {
+                    return ApiResult<LoginResultDto>.Fail("验证码错误", ResultCode.Error);
+                }
                 var user = await userRep.FindAsync(x => x.UserName == dto.Username);
                 if (user == null)
                 {
@@ -121,6 +107,7 @@ namespace HotelABP.User
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim("NickName", user.NickName),
             };
+
             //JWT密钥转换字节对称密钥
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtConfig:Bearer:SecurityKey"]));
             //算法
@@ -175,10 +162,10 @@ namespace HotelABP.User
                 SysUser sysUser = new SysUser
                 {
                     UserName = "admin",
-                    NickName = "管理员",
+                    NickName = "张三",
                     Gender = Gender.Male,
                     Password = "123456",
-                    Mobile = "13888888888",
+                    Mobile = "18541202154",
                     Status = Status.Enable,
                     Email = "admin@qq.com"
                 };
