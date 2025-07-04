@@ -4,6 +4,7 @@ using HotelABP.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace HotelABP.Migrations
 {
     [DbContext(typeof(HotelABPDbContext))]
-    partial class HotelABPDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250627132554_lalaala")]
+    partial class lalaala
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,9 +75,6 @@ namespace HotelABP.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
 
-                    b.Property<decimal?>("Accumulativeconsumption")
-                        .HasColumnType("decimal(65,30)");
-
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -97,12 +97,6 @@ namespace HotelABP.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int?>("ComsumerNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConsumerDesc")
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("CreationTime");
@@ -110,9 +104,6 @@ namespace HotelABP.Migrations
                     b.Property<Guid?>("CreatorId")
                         .HasColumnType("char(36)")
                         .HasColumnName("CreatorId");
-
-                    b.Property<string>("CustomerDesc")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("CustomerName")
                         .IsRequired()
@@ -157,15 +148,6 @@ namespace HotelABP.Migrations
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<decimal>("Rechargeamount")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<bool?>("Status")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<decimal>("Sumofconsumption")
-                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 
@@ -216,7 +198,7 @@ namespace HotelABP.Migrations
                     b.ToTable("HotelAbpGrades");
                 });
 
-            modelBuilder.Entity("HotelABP.Labels.HotelABPLabelss", b =>
+            modelBuilder.Entity("HotelABP.Labels.HotelABPLabels", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
@@ -261,8 +243,9 @@ namespace HotelABP.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("LastModifierId");
 
-                    b.Property<int?>("MemberGender")
-                        .HasColumnType("int");
+                    b.Property<string>("MemberGender")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("MemberLevel")
                         .IsRequired()
@@ -271,9 +254,8 @@ namespace HotelABP.Migrations
                     b.Property<bool>("MustMeetAllConditions")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<string>("StartTime")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<DateTime?>("StartTime")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("TagType")
                         .HasColumnType("int");
@@ -290,13 +272,12 @@ namespace HotelABP.Migrations
                     b.Property<int?>("TradeCountMin")
                         .HasColumnType("int");
 
-                    b.Property<string>("TradeTime")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<DateTime?>("TradeTime")
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("HotelABPLabelss");
+                    b.ToTable("HotelABPLabels");
                 });
 
             modelBuilder.Entity("HotelABP.RoomNummbers.RoomNummber", b =>
@@ -368,7 +349,6 @@ namespace HotelABP.Migrations
 
                     b.ToTable("RoomNummbers");
                 });
-
 
             modelBuilder.Entity("HotelABP.RoomReserves.MoneyDetail", b =>
                 {
@@ -708,8 +688,6 @@ namespace HotelABP.Migrations
 
                     b.ToTable("Permissions");
                 });
-
-
 
             modelBuilder.Entity("HotelABP.Users.RolePermission", b =>
                 {

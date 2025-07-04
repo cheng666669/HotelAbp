@@ -146,7 +146,10 @@ namespace HotelABP.User
                 AccessToken = jwt,
                 Expires = expires,
                 TokenType = "Bearer",
-                RefreshToken = Guid.NewGuid().ToString()
+                RefreshToken = Guid.NewGuid().ToString(),
+                UserName = user.UserName,
+                NickName = user.NickName,
+                Id = user.Id
             };
         }
         /// <summary>

@@ -2,10 +2,10 @@
 using HotelABP.Grades;
 using HotelABP.Labels;
 ﻿using HotelABP.RoomReserves;
-﻿using HotelABP.RoomNummbers;
+using HotelABP.RoomNummbers;
 using HotelABP.RoomTypes;
 using Microsoft.EntityFrameworkCore;
-﻿using HotelABP.Users;
+using HotelABP.Users;
 using Microsoft.EntityFrameworkCore;
 using HotelABP.Users;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
@@ -62,11 +62,19 @@ public class HotelABPDbContext :
     /// </summary>
     public DbSet<RoomNummber> RoomNummbers { get; set; }
 
+
     public DbSet<HotelABPCustoimers> HotelABPCustoimers { get; set; }
     public DbSet<HotelABPLabelss> HotelABPLabelss { get; set; }
     public DbSet<HotelAbpGrades> HotelAbpGrades { get; set; }
     public DbSet<HotelABPCustoimerTypeName> HotelABPCustoimerTypeName { get; set; }
     
+
+
+
+
+    public DbSet<MoneyDetail> MoneyDetails { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

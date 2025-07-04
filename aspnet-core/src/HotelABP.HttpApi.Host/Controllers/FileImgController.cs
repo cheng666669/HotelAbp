@@ -59,5 +59,11 @@ namespace HotelABP.Controllers
                 return StatusCode(500, $"服务器内部错误: {ex.Message}");
             }
         }
+
+        [HttpGet("error")]
+        public IActionResult ThrowError()
+        {
+            throw new Exception("测试异常");
+        }
     }
 }
