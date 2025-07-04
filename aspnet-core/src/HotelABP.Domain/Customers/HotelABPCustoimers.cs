@@ -10,6 +10,7 @@ namespace HotelABP.Customers
 {
     public class HotelABPCustoimers:FullAuditedEntity<Guid>
     {
+
         /// <summary>
         ///   客户昵称
         /// </summary>
@@ -67,13 +68,13 @@ namespace HotelABP.Customers
         public decimal GrowthValue { get; set; }=1;
 
         /// <summary>
-        /// 可用充值余额（必须大于0，最多95万，仅会员有效）
+        /// 可用余额（必须大于0，最多95万，仅会员有效）
         /// </summary>
         [Range(0.01, 950000, ErrorMessage = "可用充值余额必须大于0且不超过95万")]
         public decimal AvailableBalance { get; set; }=1;
 
         /// <summary>
-        /// 可用赠送余额（必须大于0，最多95万，仅会员有效）
+        /// 可用赠送余额余额（必须大于0，最多95万，仅会员有效）
         /// </summary>
         [Range(0.01, 950000, ErrorMessage = "可用赠送余额必须大于0且不超过95万")]
         public decimal AvailableGiftBalance { get; set; } = 1;
@@ -82,6 +83,28 @@ namespace HotelABP.Customers
         /// 可用积分（必须大于0，最多10亿，仅会员有效）
         /// </summary>
         [Range(1, 1000000000, ErrorMessage = "积分必须大于0且不超过10亿")]
-        public decimal AvailablePoints { get; set; }= 1;
+        public decimal AvailablePoints { get; set; } = 1;
+
+        /// <summary>
+        /// 充值金额（默认为0元）
+        /// </summary>
+        public decimal Rechargeamount { get; set; } = 0; // 充值金额，默认为0元
+        /// <summary>
+        ///  消费金额（默认为0元）
+        /// </summary>
+        public decimal Sumofconsumption { get; set; } = 0; // 累计消费金额，默认为0元
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string? CustomerDesc { get; set; }= string.Empty;     
+        /// <summary>
+        /// 消费次数
+        /// </summary>
+        public int? ComsumerNumber { get; set; } // 消费次数
+        public int? Status { get; set; } = 1; // 状态（1 = 正常，0 = 禁用）
+        /// <summary>
+        /// 消费描述
+        /// </summary>
+        public string? ConsumerDesc { get; set; } = string.Empty;
     }
 }

@@ -1,5 +1,4 @@
-﻿using AutoMapper.Internal.Mappers;
-using HotelABP.Account;
+﻿using HotelABP.Account;
 using HotelABP.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -67,7 +66,7 @@ namespace HotelABP.User
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<ApiResult> AddAccount(AccountRoleDto dto)
+        public async Task<ApiResult> AddAccount([FromBody]AccountRoleDto dto)
         {
             try
             {
@@ -78,7 +77,7 @@ namespace HotelABP.User
                     {
                         return ApiResult.Fail("用户已存在", ResultCode.ValidationError);
                     }
-                    dto.Password = dto.Mobile.ToString().Substring(7,4);
+                    dto.Password = dto.Mobile.ToString().Substring(5,6);
                     var data = ObjectMapper.Map<AccountRoleDto, SysUser>(dto);
                     var user = await userRep.InsertAsync(data);
                     var userid = user.Id;
@@ -101,7 +100,6 @@ namespace HotelABP.User
                 throw;
             }
         }
-
         /// <summary>
         /// 显示角色列表
         /// </summary>
@@ -180,17 +178,16 @@ namespace HotelABP.User
                 using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     var userexist = await userRep.FindAsync(x => x.NickName == dto.NickName);
-                    if (userexist != null)
-                    {
-                        return ApiResult.Fail("用户已存在", ResultCode.ValidationError);
-                    }
+                    
                     var rolelist = await userRoleRep.GetListAsync(x => x.UserId == id);
                     //删除用户角色中间表
                     foreach(var item in rolelist)
                     {
-                        await userRoleRep.DeleteAsync(x=>x.RoleId==item.RoleId);
+                        await userRoleRep.DeleteAsync(item);
                     }
+                    dto.Password = dto.Mobile.ToString().Substring(5, 6);
                     var user = ObjectMapper.Map(dto,userexist);
+                    await userRep.UpdateAsync(user);
                     //添加用户角色
                     foreach (var item in dto.RoleIds)
                     {
@@ -223,8 +220,8 @@ namespace HotelABP.User
             try
             {
                 var res = await userRep.GetQueryableAsync();
-                res = res.WhereIf(!string.IsNullOrEmpty(dto.Mobile), x => x.Mobile == dto.Mobile)
-                    .WhereIf(!string.IsNullOrEmpty(dto.NickName), x => x.NickName.Contains(dto.NickName));
+                //res = res.WhereIf(!string.IsNullOrEmpty(dto.Mobile), x => x.Mobile == dto.Mobile)
+                //    .WhereIf(!string.IsNullOrEmpty(dto.NickName), x => x.NickName.Contains(dto.NickName));
                 var list = res.PageResult(seach.PageIndex, seach.PageSize);
                 var dtoList = ObjectMapper.Map<List<SysUser>, List<GetAccountResultDTO>>(list.Queryable.ToList());
                 foreach (var item in dtoList)
@@ -233,10 +230,18 @@ namespace HotelABP.User
                     foreach (var item1 in role)
                     {
                         var roleinfo = await roleRep.FindAsync(x => x.Id == item1.RoleId);
-                        item.RoleName = roleinfo.RoleName;
+                        item.RoleName += roleinfo.RoleName+",";
                         item.RoleId = item1.RoleId;
                     }
+                    // 去除最后一个逗号
+                    if (!string.IsNullOrEmpty(item.RoleName))
+                    {
+                        item.RoleName = item.RoleName.TrimEnd(',');
+                    }
                 }
+                dtoList = dtoList.WhereIf(!string.IsNullOrEmpty(dto.Mobile), x => x.Mobile == dto.Mobile)
+                    .WhereIf(!string.IsNullOrEmpty(dto.NickName), x => x.NickName.Contains(dto.NickName))
+                    .WhereIf(dto.RoleId != null, x => x.RoleId == dto.RoleId).ToList();
                 var pageresult = new PageResult<GetAccountResultDTO>
                 {
                     Data = dtoList,
@@ -246,6 +251,26 @@ namespace HotelABP.User
                 return ApiResult<PageResult<GetAccountResultDTO>>.Success(pageresult, ResultCode.Success);
             }
             catch ( Exception ex)
+            {
+
+                throw;
+            }
+        }
+        /// <summary>
+        /// 显示用户详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResult<AccountRoleDto>> GetAccount(Guid id)
+        {
+            try
+            {
+                var user = await userRep.GetAsync(x=>x.Id==id);
+                var dto = ObjectMapper.Map<SysUser, AccountRoleDto>(user);
+                return ApiResult<AccountRoleDto>.Success(dto, ResultCode.Success);
+            }
+            catch (Exception ex)
             {
 
                 throw;

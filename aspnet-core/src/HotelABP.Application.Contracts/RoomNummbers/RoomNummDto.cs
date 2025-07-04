@@ -1,15 +1,21 @@
-﻿namespace HotelABP.RoomNummbers
+﻿using System;
+
+namespace HotelABP.RoomNummbers
 {
     public class RoomNummDto
     {
+        public Guid Id { get; set; }
         /// <summary>
         /// 房型Id
         /// </summary>
         public string RoomTypeId { get; set; }
+        public string TypeName { get; set; }
+        public int TypeState { get; set; }
+
         /// <summary>
         /// 房号
         /// </summary>
-        public int RoomNum { get; set; }
+        public string RoomNum { get; set; }
         public bool State { get; set; }
         /// <summary>
         /// 排序

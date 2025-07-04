@@ -3,7 +3,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace HotelABP.User
 {
-    public class LoginResultDto : EntityDto<Guid>
+    public class LoginResultDto: EntityDto<Guid>
     {
         public string AccessToken { get; set; }
         public object Expires { get; set; }

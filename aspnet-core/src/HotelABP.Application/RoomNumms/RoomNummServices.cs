@@ -1,13 +1,22 @@
-﻿using HotelABP.RoomNummbers;
+﻿using HotelABP.DTos.ReserveRooms;
+using HotelABP.RoomNummbers;
+using HotelABP.RoomTypes;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
+using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Linq;
+using Volo.Abp.ObjectMapping;
 
 namespace HotelABP.RoomNumms
 {
@@ -15,11 +24,13 @@ namespace HotelABP.RoomNumms
     public class RoomNummServices:ApplicationService,IRoomNummberService
     {
         IRepository<RoomNummber, Guid> _roomNummberRepository;
+        IRepository<RoomType, Guid> _roomTypeRepository;
         IDistributedCache<RoomNummber> _cache;
-        public RoomNummServices(IRepository<RoomNummber, Guid> roomNummberRepository, IDistributedCache<RoomNummber> cache)
+        public RoomNummServices(IRepository<RoomNummber, Guid> roomNummberRepository, IDistributedCache<RoomNummber> cache, IRepository<RoomType, Guid> roomTypeRepository)
         {
             _roomNummberRepository = roomNummberRepository;
             _cache = cache;
+            _roomTypeRepository = roomTypeRepository;
         }
         /// <summary>
         /// 新增房号
@@ -48,14 +59,14 @@ namespace HotelABP.RoomNumms
             queryable = queryable
                 .WhereIf(!string.IsNullOrWhiteSpace(input.RoomTypeId), x => x.RoomTypeId == input.RoomTypeId);
 
-            var res = queryable.PageResult(seach.PageIndex, seach.PageSize);
+            
             var dto=ObjectMapper.Map<List<RoomNummber>, List<RoomNummDto>>(queryable.ToList());
-
-           return ApiResult<PageResult<RoomNummDto>>.Success(
+            var res = dto.AsQueryable().PageResult(seach.PageIndex, seach.PageSize);
+            return ApiResult<PageResult<RoomNummDto>>.Success(
                new PageResult<RoomNummDto>
                {
-                    Data = dto,
-                    TotleCount = queryable.Count(),
+                   Data = res.Queryable.OrderByDescending(x => x.Order).ToList(),
+                   TotleCount = queryable.Count(),
                     TotlePage = (int)Math.Ceiling(queryable.Count() / (double)seach.PageSize)
                      
                },
@@ -68,23 +79,38 @@ namespace HotelABP.RoomNumms
         /// <returns></returns>
         public async Task<ApiResult<bool>> DeleteRoomNumBatch(List<Guid> ids)
         {
-            foreach (var id in ids)
+            using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                await _roomNummberRepository.DeleteAsync(id);
+                foreach (var id in ids)
+                {
+                    await _roomNummberRepository.DeleteAsync(id);
+                }
+                tran.Complete();
+                return ApiResult<bool>.Success(true, ResultCode.Success);
             }
+        }
+        /// <summary>
+        /// 删除房号
+        /// </summary>
+        /// <param name="Ids"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<bool>> DeleteRoomNum(Guid Id)
+        {
+            await _roomNummberRepository.DeleteAsync(Id);
             return ApiResult<bool>.Success(true, ResultCode.Success);
         }
         /// <summary>
-        /// 设置房号状态为0
+        /// 设置房号状态(上架/下架)
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> UpdateStateToRoomNum(Guid id)
+        public async Task<ApiResult<bool>> UpdateStateToRoomNum(Guid id,bool state)
         {
             try
             {
+
                 var entity = await _roomNummberRepository.GetAsync(id);
-                entity.State = false;
+                entity.State = state;
                 await _roomNummberRepository.UpdateAsync(entity);
                 return ApiResult<bool>.Success(true, ResultCode.Success);
             }
@@ -94,21 +120,25 @@ namespace HotelABP.RoomNumms
             }
         }
         /// <summary>
-        /// 批量设置房号状态为0
+        /// 批量设置房号状态（上架下架）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<ApiResult<bool>> UpdateStateToRoomNumBatch(List<Guid> ids)
+        public async Task<ApiResult<bool>> UpdateStateToRoomNumBatch(List<Guid> ids,bool state)
         {
             try
             {
-                foreach (var id in ids)
+                using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var entity = await _roomNummberRepository.GetAsync(id);
-                    entity.State = false;
-                    await _roomNummberRepository.UpdateAsync(entity);
+                    foreach (var id in ids)
+                    {
+                        var entity = await _roomNummberRepository.GetAsync(id);
+                        entity.State = state;
+                        await _roomNummberRepository.UpdateAsync(entity);
+                    }
+                    tran.Complete();
+                    return ApiResult<bool>.Success(true, ResultCode.Success);
                 }
-                return ApiResult<bool>.Success(true, ResultCode.Success);
             }
             catch (Exception ex)
             {
@@ -123,24 +153,66 @@ namespace HotelABP.RoomNumms
         /// <returns></returns>
         public async Task<ApiResult<PageResult<RoomNummDto>>> GetRoomNumList(Seach seach, GetRoomNummberQuery input)
         {
-            var queryable = await _roomNummberRepository.GetQueryableAsync();
-            queryable = queryable
-                .WhereIf(!string.IsNullOrEmpty(input.RoomTypeId), x => x.RoomTypeId == input.RoomTypeId)
-                .WhereIf(input.State!=null, x => x.State==input.State)
-                .WhereIf(!string.IsNullOrEmpty(input.RoomNum),x=>x.RoomNum==input.RoomNum);
-            var res = queryable.PageResult(seach.PageIndex, seach.PageSize);
-            var dto = ObjectMapper.Map<List<RoomNummber>, List<RoomNummDto>>(queryable.ToList());
+            // 查询数据库
+            //预订信息
+            var list = await _roomNummberRepository.GetQueryableAsync();
+            //房间类型
+            var roomTypes = await _roomTypeRepository.GetQueryableAsync();
+
+            var listdto = from roomnum in list
+                          join roomType in roomTypes on roomnum.RoomTypeId equals roomType.Id.ToString()
+                          select new RoomNummDto
+                          {
+                              Id = roomnum.Id,
+                               RoomTypeId = roomType.Id.ToString(),
+                               TypeName = roomType.Name,
+                               RoomNum = roomnum.RoomNum,
+                               State = roomnum.State,
+                               Order = roomnum.Order,
+                               Description = roomnum.Description
+                                
+                          };
+
+            listdto = listdto
+               .WhereIf(!string.IsNullOrEmpty(input.RoomTypeId), x => x.RoomTypeId == input.RoomTypeId)
+               .WhereIf(input.State != null, x => x.State == input.State)
+                .WhereIf(!string.IsNullOrEmpty(input.RoomNum), x => x.RoomNum == input.RoomNum);
+            var res = listdto.PageResult(seach.PageIndex, seach.PageSize);
             return ApiResult<PageResult<RoomNummDto>>.Success(
                 new PageResult<RoomNummDto>
                 {
-                    Data = dto,
-                    TotleCount = queryable.Count(),
-                    TotlePage = (int)Math.Ceiling(queryable.Count() / (double)seach.PageSize)
-
+                    Data = res.Queryable.ToList(),
+                    TotleCount = res.RowCount,
+                    TotlePage = (int)Math.Ceiling(res.RowCount / (double)seach.PageSize)
                 },
                 ResultCode.Success);
         }
 
-       
+        /// <summary>
+        /// 修改房号
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<int>> UpdateRoomNumm(Guid Id, CreateUpdataRoomNummDto input) 
+        {
+            try
+            {
+                var queryable = await _roomNummberRepository.GetAsync(Id);
+                // 映射为 DTO 返回
+                var dto = ObjectMapper.Map< CreateUpdataRoomNummDto, RoomNummber>(input, queryable);
+                await _roomNummberRepository.UpdateAsync(dto);
+                return ApiResult<int>.Success(1, ResultCode.Success);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+
+        
+            
     }
 }

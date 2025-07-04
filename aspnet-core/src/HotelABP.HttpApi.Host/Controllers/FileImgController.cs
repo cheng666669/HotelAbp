@@ -1,49 +1,59 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using HotelABP.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Volo.Abp;
 
 namespace HotelABP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [IgnoreAntiforgeryToken]
     public class FileImgController : ControllerBase
     {
         IWebHostEnvironment webHost;
-        
-        public FileImgController(IWebHostEnvironment webHost)
+        private readonly AliyunOssService _aliyunOssService;
+        public FileImgController(IWebHostEnvironment webHost, AliyunOssService aliyunOssService)
         {
             this.webHost = webHost;
+            _aliyunOssService = aliyunOssService;
         }
-        [IgnoreAntiforgeryToken]
-        [HttpPost]
-        public async Task<IActionResult> UploadFile(IFormFile file)
+        [HttpGet("error")]
+        public IActionResult ThrowError()
         {
-            if (file == null || file.Length == 0)
+            throw new Exception("测试异常");
+        }
+       
+        [HttpPost]
+        public async Task<IActionResult> UploadFiles(List<IFormFile> files)
+        {
+            if (files == null || files.Count == 0)
             {
                 return BadRequest("上传文件为空。");
             }
 
-            try
+            var resultList = new List<string>();
+            var webRootPath = webHost.WebRootPath;
+            if (string.IsNullOrEmpty(webRootPath))
             {
-                var webRootPath = webHost.WebRootPath;
-                if (string.IsNullOrEmpty(webRootPath))
-                {
-                    webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                }
+                webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            }
+            var dateFolder = DateTime.Now.ToString("yyyy-MM-dd");
+            var uploadFolder = Path.Combine(webRootPath, "uploads", dateFolder);
 
-                var dateFolder = DateTime.Now.ToString("yyyy-MM-dd");
-                var uploadFolder = Path.Combine(webRootPath, "uploads", dateFolder);
+            if (!Directory.Exists(uploadFolder))
+            {
+                Directory.CreateDirectory(uploadFolder);
+            }
 
-                if (!Directory.Exists(uploadFolder))
-                {
-                    Directory.CreateDirectory(uploadFolder);
-                }
-
+            foreach (var file in files)
+            {
                 var fileExtension = Path.GetExtension(file.FileName);
-                var newFileName = $"{DateTime.Now:yyyyMMddHHmmssfff}{fileExtension}";
+                var newFileName = $"{DateTime.Now:yyyyMMddHHmmssfff}_{Guid.NewGuid()}{fileExtension}";
                 var filePath = Path.Combine(uploadFolder, newFileName);
 
                 await using (var stream = new FileStream(filePath, FileMode.Create))
@@ -52,18 +62,24 @@ namespace HotelABP.Controllers
                 }
 
                 var relativePath = $"/uploads/{dateFolder}/{newFileName}";
-                return Ok(new { filePath = relativePath });
+                resultList.Add(relativePath);
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"服务器内部错误: {ex.Message}");
-            }
+
+            return Ok(new { filePaths = resultList });
         }
 
-        [HttpGet("error")]
-        public IActionResult ThrowError()
+        [HttpPost("UploadVideoAsync")]
+        [DisableRequestSizeLimit] // 根据需要允许大文件上传
+        public async Task<string> UploadVideoAsync(IFormFile file)
         {
-            throw new Exception("测试异常");
+            if (file == null || file.Length == 0)
+                throw new UserFriendlyException("文件不能为空");
+
+            using var stream = file.OpenReadStream();
+            var result = _aliyunOssService.UploadVideo(stream, file.FileName);
+            return result;
         }
+
+        
     }
 }

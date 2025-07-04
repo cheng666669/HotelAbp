@@ -1,9 +1,6 @@
-﻿using System;
-using Volo.Abp.Application.Dtos;
-
-namespace HotelABP.RoomTypes
+﻿namespace HotelABP.RoomTypes.Types
 {
-    public class RoomTypeDto : AuditedEntityDto<Guid>
+    public class CreateUpdateRoomTypeDto
     {
         /// <summary>
         /// 房型名称，例如：标准大床房、豪华双床房

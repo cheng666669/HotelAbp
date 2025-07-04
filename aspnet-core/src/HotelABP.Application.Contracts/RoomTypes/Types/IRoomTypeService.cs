@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
-namespace HotelABP.RoomTypes
+namespace HotelABP.RoomTypes.Types
 {
     public interface IRoomTypeService : IApplicationService
     {
@@ -14,5 +14,6 @@ namespace HotelABP.RoomTypes
         Task<ApiResult<bool>> DeleteBatchRoomType(List<Guid> ids);
         Task<ApiResult<RoomTypeDto>> UpdateRoomType(Guid id, CreateUpdateRoomTypeDto input);
         Task<ApiResult> UpdateRoomTypeOrder(UpdataRoomTypeOrderDto dto);
+
     }
 }
