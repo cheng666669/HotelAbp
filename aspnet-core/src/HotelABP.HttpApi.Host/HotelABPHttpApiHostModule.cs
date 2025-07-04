@@ -78,7 +78,7 @@ public class HotelABPHttpApiHostModule : AbpModule
    
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        
+        //343443434334
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
         Configure<AbpAntiForgeryOptions>(options =>
