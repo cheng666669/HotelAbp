@@ -79,5 +79,11 @@ namespace HotelABP.Controllers
             var result = _aliyunOssService.UploadVideo(stream, file.FileName);
             return result;
         }
+
+        [HttpGet("error")]
+        public IActionResult ThrowError()
+        {
+            throw new Exception("测试异常");
+        }
     }
 }

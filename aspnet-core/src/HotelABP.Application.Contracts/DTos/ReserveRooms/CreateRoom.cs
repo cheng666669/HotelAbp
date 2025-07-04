@@ -47,6 +47,7 @@ namespace HotelABP.DTos.ReserveRooms
         /// 房间号
         /// </summary>
         public string? RoomNum { get; set; }
+        public Guid? UserId { get; set; } //操作人
         public IList<RoomTypeDto> aaa { get; set; } // 房型信息列表
 
     }

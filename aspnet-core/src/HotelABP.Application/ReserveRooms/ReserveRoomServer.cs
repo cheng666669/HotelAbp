@@ -83,14 +83,17 @@ namespace HotelABP.ReserveRooms
                         //reserveRoom.RoomNum = "未排房";
                         // 建议补充 BreakfastNum 字段赋值
                         reserveRoom.BreakfastNum = 0;
-                       var res= await reserveRoomRepository.InsertAsync(reserveRoom);
+                        reserveRoom.CreatorId=room.UserId; // 设置创建者ID
+                        var res= await reserveRoomRepository.InsertAsync(reserveRoom);
                         var moneyDetail = new MoneyDetail
                         {
                             BookingNumber = res.Id.ToString(),
                             BusinesName = "房间",
                             Money = res.Price,
                             Money1 = 0,
-                            States = 2
+                            States = 2,
+                             LoginName = room.UserId.ToString(), // 设置操作人
+                              CreatorId = room.UserId, // 设置创建者ID
                         };
                         await monrydetails.InsertAsync(moneyDetail);
                         var num=await roomnumberreposi.FirstOrDefaultAsync(x => x.RoomNum==res.RoomNum);
@@ -154,30 +157,9 @@ namespace HotelABP.ReserveRooms
                                   Status = reserveRoom.Status,
                                   IdCard = reserveRoom.IdCard,
                                   RoomNum = reserveRoom.RoomNum,
-                                  Message = reserveRoom.Message
+                                  Message = reserveRoom.Message,
+                                   PayStatus= reserveRoom.PayStatus
                               };
-                //var listdto = from reserveRoom in list
-                //              join roomType in roomTypes on reserveRoom.RoomTypeid equals roomType.Id.ToString()
-                //              select new ReserveRoomShowDto
-                //              {
-                //                  Id = reserveRoom.Id,
-                //                  Infomation = reserveRoom.Infomation,
-                //                  Ordersource = reserveRoom.Ordersource,
-                //                  ReserveName = reserveRoom.ReserveName,
-                //                  Phone = reserveRoom.Phone,
-                //                  BookingNumber = reserveRoom.BookingNumber,
-                //                  Sdate = reserveRoom.Sdate,
-                //                  Edate = reserveRoom.Edate,
-                //                  Day = reserveRoom.Day,
-                //                  RoomTypeid = roomType.Id.ToString(),
-                //                  RoomTypeName = roomType.Name, // 房型名称
-                //                  BreakfastNum = reserveRoom.BreakfastNum,
-                //                  Price = reserveRoom.Price,
-                //                  Status = reserveRoom.Status,
-                //                  IdCard = reserveRoom.IdCard,
-                //                  RoomNum = reserveRoom.RoomNum,
-                //                  Message = reserveRoom.Message
-                //              };
                 return listdto.ToList();
 
             }, () => new DistributedCacheEntryOptions
@@ -216,6 +198,7 @@ namespace HotelABP.ReserveRooms
             }
 
             list.RoomNum = dto.roomnum; // 更新房间号码
+            list.CreatorId = dto.Userid; // 更新操作人ID
             await reserveRoomRepository.UpdateAsync(list);
             // 成功后，清理缓存
             await reserveRoomCache.RemoveAsync("GetReserRoom");
@@ -252,6 +235,7 @@ namespace HotelABP.ReserveRooms
             }
 
             list.RoomNum = "未排房";
+
             await reserveRoomRepository.UpdateAsync(list);
             // 成功后，清理缓存
             await reserveRoomCache.RemoveAsync("GetReserRoom");
@@ -274,6 +258,7 @@ namespace HotelABP.ReserveRooms
 
             list.Status = 5; // 设置为已取消状态
             list.NoReservRoom = dto.NoReservRoom;
+            list.CreatorId = dto.Userid; // 更新操作人ID
             await reserveRoomRepository.UpdateAsync(list);
             // 成功后，清理缓存
             await reserveRoomCache.RemoveAsync("GetReserRoom");
@@ -298,6 +283,7 @@ namespace HotelABP.ReserveRooms
             list.RoomNum = dto.RoomNum;
             list.ReserveName = dto.ReserveName;
             list.Phone = dto.Phone; // 更新手机号码
+            list.CreatorId = dto.Userid; // 更新操作人ID
             await reserveRoomRepository.UpdateAsync(list);
             // 成功后，清理缓存
             await reserveRoomCache.RemoveAsync("GetReserRoom");

@@ -4,6 +4,9 @@ using HotelABP.Import;
 using HotelABP.MultiTenancy;
 using HotelABP.MultiTenancy;
 using HotelABP.Services;
+using HotelABP.MultiTenancy;
+using HotelABP.MultiTenancy;
+using HotelABP.RoomReserves;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Builder;
@@ -83,6 +86,9 @@ public class HotelABPHttpApiHostModule : AbpModule
             options.AutoValidate = false; // ⛔ 禁用全局防伪验证
         }); 
         //context.Services.AddTransient(typeof(IExcelImporter<>), typeof(NpoiExcelImporter<>));
+        // 绑定 Alipay 配置
+        context.Services.Configure<AlipayOptions>(configuration.GetSection("Alipay"));
+
         ConfigureAuthentication(context);
        
         context.Services.Configure<AliyunOptions>(context.Services.GetConfiguration().GetSection("Aliyun"));
@@ -94,6 +100,11 @@ public class HotelABPHttpApiHostModule : AbpModule
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
 
+        // 注册全局异常过滤器
+        context.Services.AddControllers(options =>
+        {
+            options.Filters.Add<GlobalExceptionFilter>();
+        });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)

@@ -89,7 +89,21 @@ namespace HotelABP.Customer
         /// <summary>
         /// 客户类型名称
         /// </summary>
-        public string CustomerTypeName { get; set; } 
+        public string CustomerTypeName { get; set; }
+
+
+        /// <summary>
+        /// 充值金额（默认为0元）
+        /// </summary>
+        public decimal Rechargeamount { get; set; } = 0; // 充值金额，默认为0元
+        /// <summary>
+        ///  消费金额（默认为0元）
+        /// </summary>
+        public decimal Sumofconsumption { get; set; } = 0; // 累计消费金额，默认为0元
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string? CustomerDesc { get; set; } = string.Empty;
 
     }
 }

@@ -63,6 +63,13 @@ public class HotelABPDbContext :
     public DbSet<RoomNummber> RoomNummbers { get; set; }
 
 
+    public DbSet<HotelABPCustoimers> HotelABPCustoimers { get; set; }
+    public DbSet<HotelABPLabelss> HotelABPLabelss { get; set; }
+    public DbSet<HotelAbpGrades> HotelAbpGrades { get; set; }
+    public DbSet<HotelABPCustoimerTypeName> HotelABPCustoimerTypeName { get; set; }
+    
+
+
 
 
     public DbSet<MoneyDetail> MoneyDetails { get; set; }
