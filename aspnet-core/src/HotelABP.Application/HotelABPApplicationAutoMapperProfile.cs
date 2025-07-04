@@ -36,5 +36,7 @@ public class HotelABPApplicationAutoMapperProfile : Profile
         CreateMap<CreateUpdataRoomNummDto, RoomNummber>().ReverseMap();
         CreateMap<UpCustomerDto,HotelABPCustoimers>().ReverseMap();
         CreateMap<LabelDto,HotelABPLabelss>().ReverseMap();
+        CreateMap<GetLabeDtoList, HotelABPLabelss>().ReverseMap();
+        CreateMap<GetLabelDto, HotelABPLabelss>().ReverseMap();
     }
 }

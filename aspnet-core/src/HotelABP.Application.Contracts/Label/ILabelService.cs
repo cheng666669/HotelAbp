@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using HotelABP.Customer;
+using Microsoft.AspNetCore.Builder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,6 @@ namespace HotelABP.Label
     public interface ILabelService :IApplicationService
     {
         Task<ApiResult<LabelDto>> AddLabelAsync(LabelDto ldto);
+        Task<ApiResult<PageResult<GetLabelDto>>> GetCustomerListAsync(Seach seach, GetLabeDtoList dtoList);
     }
 }

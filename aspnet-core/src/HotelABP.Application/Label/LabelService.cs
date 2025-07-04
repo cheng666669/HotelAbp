@@ -1,9 +1,11 @@
 ﻿using HotelABP.Customer;
 using HotelABP.Customers;
 using HotelABP.Labels;
+using HotelABP.RoomNummbers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
@@ -48,5 +50,32 @@ namespace HotelABP.Label
             }
         }
 
+        public async Task<ApiResult<PageResult<GetLabelDto>>> GetCustomerListAsync(Seach seach, GetLabeDtoList dtoList)
+        {
+            try
+            {
+                var list = await _labelRepository.GetQueryableAsync();
+                list = list.WhereIf(!string.IsNullOrEmpty(dtoList.LabelName), x => x.LabelName.Contains(dtoList.LabelName));
+
+                var res = list.AsQueryable().PageResult(seach.PageIndex, seach.PageSize);
+                var dto = ObjectMapper.Map<List<HotelABPLabelss>, List<GetLabelDto>>(list.ToList());
+                return ApiResult<PageResult<GetLabelDto>>.Success(
+             new PageResult<GetLabelDto>
+             {
+                 Data = dto,
+                 TotleCount = list.Count(),
+                 TotlePage = (int)Math.Ceiling(list.Count() / (double)seach.PageSize)
+
+             },
+                         ResultCode.Success
+          );
+            }
+            catch (Exception ex)
+            { 
+             
+                // 捕获异常并返回失败的 ApiResult
+                return ApiResult<PageResult<GetLabelDto>>.Fail(ex.Message, ResultCode.Error);
+            }
+        }
     }
 }

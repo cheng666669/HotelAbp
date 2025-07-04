@@ -131,7 +131,7 @@ namespace HotelABP.Customer
                            AvailableBalance = a.AvailableBalance,
                            AvailableGiftBalance = a.AvailableGiftBalance,
                            AvailablePoints = a.AvailablePoints
-
+                           
                        };
 
 
@@ -228,6 +228,96 @@ namespace HotelABP.Customer
 
             // 返回导出的内容
             return await _exportAppService.ExportToExcelAsync(exportData);
+        }
+        /// <summary>
+        /// 更新客户可用余额
+        /// </summary>
+        /// <param name="balanceDto"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<bool>> UpAvailableBalance(UpAvailableBalanceDto balanceDto)
+        {
+            try
+            {
+                // 1. 校验参数
+                if (balanceDto == null || balanceDto.Id == Guid.Empty || balanceDto.Rechargeamount < 0)
+                {
+                    return ApiResult<bool>.Fail("参数无效", ResultCode.Error);
+                }
+
+                // 2. 获取客户实体
+                var customer = await _customerRepository.GetAsync(balanceDto.Id);
+                if (customer == null)
+                {
+                    return ApiResult<bool>.Fail("客户不存在", ResultCode.Error);
+                }
+                // 4. 更新客户的可用余额
+                customer.AvailableBalance += balanceDto.Rechargeamount;
+                customer.CustomerDesc = balanceDto.CustomerDesc;
+
+                // 5. 更新数据库
+                await _customerRepository.UpdateAsync(customer);
+
+                return ApiResult<bool>.Success(true, ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
+            }
+        }
+
+        public async Task<ApiResult<bool>> UpSumofconsumption(UpSumofconsumptionDto sumofconsumptionDto)
+        {
+            try
+            {
+                // 1. 校验参数
+                if (sumofconsumptionDto == null || sumofconsumptionDto.Id == Guid.Empty || sumofconsumptionDto.Sumofconsumption <= 0)
+                {
+                    return ApiResult<bool>.Fail("参数无效", ResultCode.Error);
+                }
+
+                // 2. 获取客户实体
+                var customer = await _customerRepository.GetAsync(sumofconsumptionDto.Id);
+                if (customer == null)
+                {
+                    return ApiResult<bool>.Fail("客户不存在", ResultCode.Error);
+                }
+
+                // 3. 判断余额是否足够
+                decimal totalAvailable = customer.AvailableBalance + customer.AvailableGiftBalance;
+                if (totalAvailable < sumofconsumptionDto.Sumofconsumption)
+                {
+                    return ApiResult<bool>.Fail("余额不足", ResultCode.Error);
+                }
+
+                decimal consume = sumofconsumptionDto.Sumofconsumption;
+
+                // 优先扣减可用余额
+                if (customer.AvailableBalance >= consume)
+                {
+                    customer.AvailableBalance -= consume;
+                }
+                else
+                {
+                    // 可用余额不足，先扣完可用余额，再扣赠送余额
+                    decimal left = consume - customer.AvailableBalance;
+                    customer.AvailableBalance = 0;
+                    customer.AvailableGiftBalance -= left;
+                }
+
+                // 4. 增加累计消费金额和消费次数
+                customer.Sumofconsumption += consume;
+                customer.ComsumerNumber = (customer.ComsumerNumber ?? 0) + 1;
+                customer.ConsumerDesc = sumofconsumptionDto.ConsumerDesc;
+
+                // 5. 更新数据库
+                await _customerRepository.UpdateAsync(customer);
+
+                return ApiResult<bool>.Success(true, ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
+            }
         }
     }
 }

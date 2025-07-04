@@ -4,6 +4,7 @@ using HotelABP.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace HotelABP.Migrations
 {
     [DbContext(typeof(HotelABPDbContext))]
-    partial class HotelABPDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250703125835_客户添加字段")]
+    partial class 客户添加字段
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,12 +97,6 @@ namespace HotelABP.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int?>("ComsumerNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConsumerDesc")
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("CreationTime");
@@ -157,9 +154,6 @@ namespace HotelABP.Migrations
 
                     b.Property<decimal>("Rechargeamount")
                         .HasColumnType("decimal(65,30)");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("Sumofconsumption")
                         .HasColumnType("decimal(65,30)");
