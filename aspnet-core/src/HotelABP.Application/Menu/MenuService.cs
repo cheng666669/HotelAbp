@@ -20,7 +20,7 @@ namespace HotelABP.Menu
             this.roleperRep = roleperRep;
         }
         /// <summary>
-        /// 获取用户菜单树
+        /// 获取用户菜单树及操作权限
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
@@ -34,15 +34,16 @@ namespace HotelABP.Menu
             var rolePermissions = await roleperRep.GetListAsync(x => roleIds.Contains(x.RoleId));
             var permissionIds = rolePermissions.Select(x => x.PermissionId).Distinct().ToList();
 
-            // 3. 查询Permission表中IsMenu==true且在权限Id集合中的所有菜单
-            var allMenus = await perRep.GetListAsync(x =>   permissionIds.Contains(x.Id) && x.IsVisible);
+            // 3. 查询所有菜单和操作权限
+            var allMenus = await perRep.GetListAsync(x => x.IsMenu && permissionIds.Contains(x.Id) && x.IsVisible);
+            var allActions = await perRep.GetListAsync(x => !x.IsMenu && permissionIds.Contains(x.Id) && x.IsVisible);
 
             // 4. 递归组装树结构
-            var menuTree = BuildMenuTree(allMenus, Guid.Empty);
-            return ApiResult<List<MenuDto>>.Success(menuTree,ResultCode.Success);
+            var menuTree = BuildMenuTree(allMenus, allActions, Guid.Empty);
+            return ApiResult<List<MenuDto>>.Success(menuTree, ResultCode.Success);
         }
 
-        private List<MenuDto> BuildMenuTree(List<Permission> allMenus, Guid parentId)
+        private List<MenuDto> BuildMenuTree(List<Permission> allMenus, List<Permission> allActions, Guid parentId)
         {
             return allMenus
                 .Where(m => m.ParentId == parentId)
@@ -56,7 +57,11 @@ namespace HotelABP.Menu
                     Order = m.Order,
                     IsMenu = m.IsMenu,
                     IsVisible = m.IsVisible,
-                    Children = BuildMenuTree(allMenus, m.Id)
+                    Children = BuildMenuTree(allMenus, allActions, m.Id),
+                    Actions = allActions
+                        .Where(a => a.ParentId == m.Id)
+                        .Select(a => new ActionDto { Id = a.Id, Name = a.PermissionName })
+                        .ToList()
                 }).ToList();
         }
     }

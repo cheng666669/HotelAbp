@@ -156,6 +156,7 @@ namespace HotelABP.User
                     {
                         await userRoleRep.DeleteAsync(item);
                     }
+                    dto.Password = dto.Mobile.ToString().Substring(5, 6);
                     var user = ObjectMapper.Map(dto,userexist);
                     await userRep.UpdateAsync(user);
                     //添加用户角色

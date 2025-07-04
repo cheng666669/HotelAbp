@@ -16,6 +16,12 @@ namespace HotelABP.Menu
         public int Order { get; set; }
         public bool IsMenu { get; set; }
         public bool IsVisible { get; set; }
-        public List<MenuDto> Children { get; set; }
+        public List<MenuDto> Children { get; set; } = new List<MenuDto>();
+        public List<ActionDto> Actions { get; set; } = new List<ActionDto>();
+    }
+    public class ActionDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
     }
 }
