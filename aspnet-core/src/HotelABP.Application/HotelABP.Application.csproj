@@ -16,6 +16,8 @@
 
   <ItemGroup>
 
+    <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.14.1" />
+
     <PackageReference Include="Volo.Abp.Caching" Version="9.2.0" />
 
     <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="9.2.0" />

@@ -1,29 +1,33 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using HotelABP.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using Volo.Abp;
 
 namespace HotelABP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [IgnoreAntiforgeryToken]
     public class FileImgController : ControllerBase
     {
         IWebHostEnvironment webHost;
-        
-        public FileImgController(IWebHostEnvironment webHost)
+        private readonly AliyunOssService _aliyunOssService;
+        public FileImgController(IWebHostEnvironment webHost, AliyunOssService aliyunOssService)
         {
             this.webHost = webHost;
+            _aliyunOssService = aliyunOssService;
         }
         [HttpGet("error")]
         public IActionResult ThrowError()
         {
             throw new Exception("测试异常");
         }
-        [IgnoreAntiforgeryToken]
+       
         [HttpPost]
         public async Task<IActionResult> UploadFiles(List<IFormFile> files)
         {
@@ -62,6 +66,18 @@ namespace HotelABP.Controllers
             }
 
             return Ok(new { filePaths = resultList });
+        }
+
+        [HttpPost("UploadVideoAsync")]
+        [DisableRequestSizeLimit] // 根据需要允许大文件上传
+        public async Task<string> UploadVideoAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                throw new UserFriendlyException("文件不能为空");
+
+            using var stream = file.OpenReadStream();
+            var result = _aliyunOssService.UploadVideo(stream, file.FileName);
+            return result;
         }
     }
 }

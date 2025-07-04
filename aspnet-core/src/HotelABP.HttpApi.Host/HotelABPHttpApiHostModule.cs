@@ -1,24 +1,25 @@
 using HotelABP.EntityFrameworkCore;
+﻿using HotelABP.EntityFrameworkCore;
 using HotelABP.MultiTenancy;
+using HotelABP.MultiTenancy;
+using HotelABP.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
-using OpenIddict.Validation.AspNetCore;
-﻿using HotelABP.EntityFrameworkCore;
-using HotelABP.MultiTenancy;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Models;
+using OpenIddict.Validation.AspNetCore;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.IO;
@@ -35,12 +36,12 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.Caching.StackExchangeRedis;
+using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
-using Volo.Abp.Caching.StackExchangeRedis;
 
 namespace HotelABP;
 
@@ -69,13 +70,17 @@ public class HotelABPHttpApiHostModule : AbpModule
             });
         });
     }
-
+   
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
-
+        
         ConfigureAuthentication(context);
+
+        context.Services.Configure<AliyunOptions>(context.Services.GetConfiguration().GetSection("Aliyun"));
+        context.Services.AddTransient<AliyunOssService>();
         ConfigureBundles();
         ConfigureUrls(configuration);
         ConfigureConventionalControllers();
