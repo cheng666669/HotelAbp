@@ -1,5 +1,6 @@
 using HotelABP.EntityFrameworkCore;
 ﻿using HotelABP.EntityFrameworkCore;
+using HotelABP.Import;
 using HotelABP.MultiTenancy;
 using HotelABP.MultiTenancy;
 using HotelABP.Services;
@@ -29,6 +30,7 @@ using Volo.Abp;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.AspNetCore.Mvc.AntiForgery;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
@@ -76,9 +78,13 @@ public class HotelABPHttpApiHostModule : AbpModule
         
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
-        
+        Configure<AbpAntiForgeryOptions>(options =>
+        {
+            options.AutoValidate = false; // ⛔ 禁用全局防伪验证
+        }); 
+        //context.Services.AddTransient(typeof(IExcelImporter<>), typeof(NpoiExcelImporter<>));
         ConfigureAuthentication(context);
-
+       
         context.Services.Configure<AliyunOptions>(context.Services.GetConfiguration().GetSection("Aliyun"));
         context.Services.AddTransient<AliyunOssService>();
         ConfigureBundles();
