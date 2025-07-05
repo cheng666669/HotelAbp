@@ -104,6 +104,23 @@ namespace HotelABP.Customer
         /// 描述
         /// </summary>
         public string? CustomerDesc { get; set; } = string.Empty;
+        /// <summary>
+        /// 消费次数
+        /// </summary>
+        public int? ComsumerNumber { get; set; } // 消费次数
+      
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public bool? Status { get; set; } = true;
+        /// <summary>
+        /// 消费描述
+        /// </summary>
+        public string? ConsumerDesc { get; set; } = string.Empty;
+        /// <summary>
+        ///  累计消费金额
+        /// </summary>
+        public decimal? Accumulativeconsumption { get; set; } = 0;
 
     }
 }
