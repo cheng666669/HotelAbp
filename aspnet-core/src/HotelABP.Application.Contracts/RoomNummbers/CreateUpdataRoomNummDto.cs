@@ -18,7 +18,7 @@ namespace HotelABP.RoomNummbers
         /// <summary>
         /// 房号
         /// </summary>
-        public int RoomNum { get; set; }
+        public string RoomNum { get; set; }
         public bool State { get; set; } = true;
         /// <summary>
         /// 排序

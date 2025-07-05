@@ -39,9 +39,14 @@ namespace HotelABP.RoomNumms
         /// <returns></returns>
         public async Task<ApiResult<RoomNummDto>> CreateRoomNumAdd(CreateUpdataRoomNummDto input)
         {
-            var entity=ObjectMapper.Map<CreateUpdataRoomNummDto, RoomNummber>(input);
-            var entityDto=await _roomNummberRepository.InsertAsync(entity);
-            var dto=ObjectMapper.Map<RoomNummber, RoomNummDto>(entityDto);
+            var roomnum = await _roomNummberRepository.FindAsync(x => x.RoomNum == input.RoomNum);
+            if (roomnum != null)
+            {
+                return ApiResult<RoomNummDto>.Fail("此房号已存在", ResultCode.Error);
+            }
+            var entity = ObjectMapper.Map<CreateUpdataRoomNummDto, RoomNummber>(input);
+            var entityDto = await _roomNummberRepository.InsertAsync(entity);
+            var dto = ObjectMapper.Map<RoomNummber, RoomNummDto>(entityDto);
             return ApiResult<RoomNummDto>.Success(dto, ResultCode.Success);
         }
 
