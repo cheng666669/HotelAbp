@@ -11,10 +11,15 @@ namespace HotelABP.Account
         /// <summary>
         /// 手机号
         /// </summary>
-        public string Mobile { get; set; } = string.Empty;
+        public string? Mobile { get; set; } = string.Empty;
         /// <summary>
         /// 昵称
         /// </summary>
-        public string NickName { get; set; } = string.Empty;
+        public string? NickName { get; set; } = string.Empty;
+        /// <summary>
+        /// 角色Id
+        /// </summary>
+        public Guid? RoleId {  get; set; }
+
     }
 }

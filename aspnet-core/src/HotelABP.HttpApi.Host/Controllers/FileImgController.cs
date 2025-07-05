@@ -75,10 +75,6 @@ namespace HotelABP.Controllers
             return result;
         }
 
-        [HttpGet("error")]
-        public IActionResult ThrowError()
-        {
-            throw new Exception("测试异常");
-        }
+        
     }
 }
