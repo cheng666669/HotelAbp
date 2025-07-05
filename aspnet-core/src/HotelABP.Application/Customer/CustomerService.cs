@@ -270,7 +270,11 @@ namespace HotelABP.Customer
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
-
+        /// <summary>
+        /// 更新客户总消费金额
+        /// </summary>
+        /// <param name="sumofconsumptionDto"></param>
+        /// <returns></returns>
         public async Task<ApiResult<bool>> UpSumofconsumption(UpSumofconsumptionDto sumofconsumptionDto)
         {
             try
