@@ -24,6 +24,7 @@ public class HotelABPApplicationAutoMapperProfile : Profile
         CreateMap<CustomerDto, HotelABPCustoimers>().ReverseMap();
         CreateMap<HotelABPCustoimers, GetCustomerDtoList>().ReverseMap();
         CreateMap<AccountRoleDto,SysUser>().ReverseMap();
+        CreateMap<AccountDto, SysUser>().ReverseMap();
         CreateMap<RoleDto,Roles>().ReverseMap();
         CreateMap<CreateUpdateRoleDto, Roles>().ReverseMap();
         CreateMap<GetAccountResultDTO, SysUser>().ReverseMap();
