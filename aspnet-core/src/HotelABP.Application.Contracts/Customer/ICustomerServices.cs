@@ -35,7 +35,7 @@ namespace HotelABP.Customer
         /// </summary>
         /// <param name="customerDto">包含更新客户信息相关信息的DTO</param>
         /// <returns></returns>
-        Task<ApiResult<bool>> UpdateCustomerAsync (UpCustomerDto customerDto);
+        Task<ApiResult<bool>> UpdateCustomerAsync(UpCustomerDto customerDto);
         /// <summary>
         /// 充值
         /// </summary>
