@@ -96,11 +96,11 @@ namespace HotelABP.Customers
         /// <summary>
         /// 描述
         /// </summary>
-        public string? CustomerDesc { get; set; }= string.Empty;     
+        public string? CustomerDesc { get; set; }= string.Empty;
         /// <summary>
         /// 消费次数
         /// </summary>
-        public int? ComsumerNumber { get; set; } // 消费次数
+        public int? ComsumerNumber { get; set; } = 0; // 消费次数
         /// <summary>
         /// 状态
         /// </summary>
@@ -113,5 +113,13 @@ namespace HotelABP.Customers
         ///  累计消费金额
         /// </summary>
         public decimal? Accumulativeconsumption { get; set; }= 0;
+        /// <summary>
+        /// 累计积分
+        /// </summary>
+        public decimal? Accumulativeintegral { get; set; } = 0; 
+        /// <summary>
+        /// 积分备注
+        /// </summary>
+        public string? Pointsmodifydesc { get; set; } = string.Empty;
     }
 }
