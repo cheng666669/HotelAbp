@@ -1,26 +1,23 @@
-﻿using HotelABP.DTos.ReserveRooms;
-using HotelABP.RoomNummbers;
+﻿using HotelABP.RoomNummbers;
 using HotelABP.RoomTypes;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
-using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp.Linq;
-using Volo.Abp.ObjectMapping;
 
 namespace HotelABP.RoomNumms
 {
+    /// <summary>
+    /// 房号管理
+    /// </summary>
     [IgnoreAntiforgeryToken]
+    [ApiExplorerSettings(GroupName = "roomnum")]
     public class RoomNummServices:ApplicationService,IRoomNummberService
     {
         IRepository<RoomNummber, Guid> _roomNummberRepository;
@@ -33,10 +30,15 @@ namespace HotelABP.RoomNumms
             _roomTypeRepository = roomTypeRepository;
         }
         /// <summary>
-        /// 新增房号
+        /// 新增房号（支持DTO映射）
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="input">房号新增DTO</param>
+        /// <returns>新增后的房号DTO</returns>
+        /// <remarks>
+        /// 1. 使用ObjectMapper将输入DTO映射为实体。
+        /// 2. 插入数据库。
+        /// 3. 映射为返回DTO。
+        /// </remarks>
         public async Task<ApiResult<RoomNummDto>> CreateRoomNumAdd(CreateUpdataRoomNummDto input)
         {
             var entity=ObjectMapper.Map<CreateUpdataRoomNummDto, RoomNummber>(input);
@@ -45,13 +47,18 @@ namespace HotelABP.RoomNumms
             return ApiResult<RoomNummDto>.Success(dto, ResultCode.Success);
         }
 
-
         /// <summary>
-        /// 根据房型Id查询房号列表
+        /// 根据房型Id查询房号列表（支持分页和条件筛选）
         /// </summary>
-        /// <param name="seach"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="seach">分页参数</param>
+        /// <param name="input">房型ID请求DTO</param>
+        /// <returns>分页后的房号DTO列表</returns>
+        /// <remarks>
+        /// 1. 查询所有房号。
+        /// 2. 按房型ID筛选。
+        /// 3. DTO映射。
+        /// 4. 分页返回。
+        /// </remarks>
         public async Task<ApiResult<PageResult<RoomNummDto>>> GetListToRoomTypeId(Seach seach, RoomNummRoomTypeRequestDto input)
         {
             var queryable = await _roomNummberRepository.GetQueryableAsync();
@@ -59,7 +66,6 @@ namespace HotelABP.RoomNumms
             queryable = queryable
                 .WhereIf(!string.IsNullOrWhiteSpace(input.RoomTypeId), x => x.RoomTypeId == input.RoomTypeId);
 
-            
             var dto=ObjectMapper.Map<List<RoomNummber>, List<RoomNummDto>>(queryable.ToList());
             var res = dto.AsQueryable().PageResult(seach.PageIndex, seach.PageSize);
             return ApiResult<PageResult<RoomNummDto>>.Success(
@@ -68,15 +74,19 @@ namespace HotelABP.RoomNumms
                    Data = res.Queryable.OrderByDescending(x => x.Order).ToList(),
                    TotleCount = queryable.Count(),
                     TotlePage = (int)Math.Ceiling(queryable.Count() / (double)seach.PageSize)
-                     
                },
                ResultCode.Success);
         }
         /// <summary>
-        /// 批量删除房号
+        /// 批量删除房号（支持事务）
         /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
+        /// <param name="ids">房号ID集合</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 开启事务，保证批量删除的原子性。
+        /// 2. 遍历ID集合，依次删除房号。
+        /// 3. 提交事务。
+        /// </remarks>
         public async Task<ApiResult<bool>> DeleteRoomNumBatch(List<Guid> ids)
         {
             using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -90,10 +100,13 @@ namespace HotelABP.RoomNumms
             }
         }
         /// <summary>
-        /// 删除房号
+        /// 删除房号（单个）
         /// </summary>
-        /// <param name="Ids"></param>
-        /// <returns></returns>
+        /// <param name="Id">房号ID</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 根据ID删除房号。
+        /// </remarks>
         public async Task<ApiResult<bool>> DeleteRoomNum(Guid Id)
         {
             await _roomNummberRepository.DeleteAsync(Id);
@@ -102,13 +115,19 @@ namespace HotelABP.RoomNumms
         /// <summary>
         /// 设置房号状态(上架/下架)
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">房号ID</param>
+        /// <param name="state">状态（true上架，false下架）</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 根据ID查找房号。
+        /// 2. 修改状态字段。
+        /// 3. 更新数据库。
+        /// 4. 捕获异常并返回失败信息。
+        /// </remarks>
         public async Task<ApiResult<bool>> UpdateStateToRoomNum(Guid id,bool state)
         {
             try
             {
-
                 var entity = await _roomNummberRepository.GetAsync(id);
                 entity.State = state;
                 await _roomNummberRepository.UpdateAsync(entity);
@@ -120,10 +139,17 @@ namespace HotelABP.RoomNumms
             }
         }
         /// <summary>
-        /// 批量设置房号状态（上架下架）
+        /// 批量设置房号状态（上架下架，支持事务）
         /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
+        /// <param name="ids">房号ID集合</param>
+        /// <param name="state">状态（true上架，false下架）</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 开启事务，保证批量操作的原子性。
+        /// 2. 遍历ID集合，依次修改状态。
+        /// 3. 提交事务。
+        /// 4. 捕获异常并返回失败信息。
+        /// </remarks>
         public async Task<ApiResult<bool>> UpdateStateToRoomNumBatch(List<Guid> ids,bool state)
         {
             try
@@ -146,11 +172,18 @@ namespace HotelABP.RoomNumms
             }
         }
         /// <summary>
-        /// 条件查询显示页面
+        /// 条件查询显示页面（支持多条件筛选和分页，房型联表）
         /// </summary>
-        /// <param name="seach"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="seach">分页参数</param>
+        /// <param name="input">筛选条件DTO</param>
+        /// <returns>分页后的房号DTO列表</returns>
+        /// <remarks>
+        /// 1. 查询所有房号。
+        /// 2. 查询所有房型。
+        /// 3. 联表查询，组装DTO。
+        /// 4. 支持房型ID、状态、房号多条件筛选。
+        /// 5. 分页返回。
+        /// </remarks>
         public async Task<ApiResult<PageResult<RoomNummDto>>> GetRoomNumList(Seach seach, GetRoomNummberQuery input)
         {
             // 查询数据库
@@ -170,7 +203,6 @@ namespace HotelABP.RoomNumms
                                State = roomnum.State,
                                Order = roomnum.Order,
                                Description = roomnum.Description
-                                
                           };
 
             listdto = listdto
@@ -189,11 +221,17 @@ namespace HotelABP.RoomNumms
         }
 
         /// <summary>
-        /// 修改房号
+        /// 修改房号（支持DTO映射）
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="Id">房号ID</param>
+        /// <param name="input">房号修改DTO</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 根据ID查找房号。
+        /// 2. 用ObjectMapper将DTO属性映射到实体。
+        /// 3. 更新数据库。
+        /// 4. 捕获异常并抛出。
+        /// </remarks>
         public async Task<ApiResult<int>> UpdateRoomNumm(Guid Id, CreateUpdataRoomNummDto input) 
         {
             try
@@ -206,7 +244,6 @@ namespace HotelABP.RoomNumms
             }
             catch (Exception)
             {
-
                 throw;
             }
         }

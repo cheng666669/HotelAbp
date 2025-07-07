@@ -10,9 +10,13 @@ using Volo.Abp;
 
 namespace HotelABP.Controllers
 {
+    /// <summary>
+    /// 文件上传
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     [IgnoreAntiforgeryToken]
+    [ApiExplorerSettings(GroupName = "fileimg")]
     public class FileImgController : ControllerBase
     {
         IWebHostEnvironment webHost;

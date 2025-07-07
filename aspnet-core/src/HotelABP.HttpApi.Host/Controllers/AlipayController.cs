@@ -14,13 +14,21 @@ using Volo.Abp.Domain.Repositories;
 
 namespace HotelABP.Controllers
 {
+    /// <summary>
+    /// 支付宝
+    /// </summary>
+    [ApiExplorerSettings(GroupName = "apipay")]
     [Route("api/alipay")]
     public class AlipayController : AbpController
     {
         private readonly IAlipayService _alipayService;
         private readonly AlipayOptions _options;
         IRepository<ReserveRoom, Guid> _roomReserveRepository;
-
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="alipayService"></param>
+        /// <param name="roomReserveRepository"></param>
         public AlipayController(IAlipayService alipayService, IRepository<ReserveRoom, Guid> roomReserveRepository)
         {
             _alipayService = alipayService;

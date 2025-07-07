@@ -14,8 +14,12 @@ namespace HotelABP.Controllers
     {
         public IFormFile File { get; set; }
     }
+    /// <summary>
+    /// 导入Excel
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [ApiExplorerSettings(GroupName = "import")]
     public class ImportController : ControllerBase
     {
         private readonly ProductExcelDataHandler _excelHandler;

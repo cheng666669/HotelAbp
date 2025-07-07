@@ -1,29 +1,15 @@
 using HotelABP.EntityFrameworkCore;
-﻿using HotelABP.EntityFrameworkCore;
-using HotelABP.Import;
-using HotelABP.MultiTenancy;
-using HotelABP.MultiTenancy;
-using HotelABP.Services;
-using HotelABP.MultiTenancy;
 using HotelABP.MultiTenancy;
 using HotelABP.RoomReserves;
+using HotelABP.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Extensions.DependencyInjection;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.OpenApi.Models;
-using OpenIddict.Validation.AspNetCore;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.IO;
@@ -41,8 +27,6 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.Caching.StackExchangeRedis;
-using Volo.Abp.Caching.StackExchangeRedis;
-using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
@@ -207,7 +191,24 @@ public class HotelABPHttpApiHostModule : AbpModule
         {
             // Correcting the misplaced code and ensuring proper syntax
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelABP API", Version = "v1" });
-            options.DocInclusionPredicate((docName, description) => true);
+            options.SwaggerDoc("label", new OpenApiInfo { Title = "标签管理API", Version = "v1" });
+            options.SwaggerDoc("customer", new OpenApiInfo { Title = "客户管理API", Version = "v1" });
+            options.SwaggerDoc("account", new OpenApiInfo { Title = "用户管理API", Version = "v1" });
+            options.SwaggerDoc("apipay", new OpenApiInfo { Title = "支付管理API", Version = "v1" });
+            options.SwaggerDoc("fileimg", new OpenApiInfo { Title = "上传文件/视频管理API", Version = "v1" });
+            options.SwaggerDoc("import", new OpenApiInfo { Title = "导入管理API", Version = "v1" });
+            options.SwaggerDoc("menu", new OpenApiInfo { Title = "菜单管理API", Version = "v1" });
+            options.SwaggerDoc("reserveroom", new OpenApiInfo { Title = "预订管理API", Version = "v1" });
+            options.SwaggerDoc("role", new OpenApiInfo { Title = "角色管理API", Version = "v1" });
+            options.SwaggerDoc("roomnum", new OpenApiInfo { Title = "房号管理API", Version = "v1" });
+            options.SwaggerDoc("roomstate", new OpenApiInfo { Title = "房态管理API", Version = "v1" });
+            options.SwaggerDoc("roomtype", new OpenApiInfo { Title = "房型管理API", Version = "v1" });
+            options.SwaggerDoc("user", new OpenApiInfo { Title = "用户登录管理API", Version = "v1" });
+            options.DocInclusionPredicate((docName, apiDesc) =>
+            {
+                if (apiDesc.GroupName == null) return docName == "v1"; // 没有分组的归到v1
+                return apiDesc.GroupName == docName;
+            });
             options.CustomSchemaIds(type => type.FullName);
 
             // Adding security definitions
@@ -287,6 +288,19 @@ public class HotelABPHttpApiHostModule : AbpModule
         app.UseSwaggerUI(c => {
 
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelABP API");
+            c.SwaggerEndpoint("/swagger/label/swagger.json", "标签管理API");
+            c.SwaggerEndpoint("/swagger/customer/swagger.json", "客户管理API");
+            c.SwaggerEndpoint("/swagger/account/swagger.json", "用户管理API");
+            c.SwaggerEndpoint("/swagger/apipay/swagger.json", "支付管理API");
+            c.SwaggerEndpoint("/swagger/fileimg/swagger.json", "上传文件/视频管理API");
+            c.SwaggerEndpoint("/swagger/import/swagger.json", "导入管理API");
+            c.SwaggerEndpoint("/swagger/menu/swagger.json", "菜单管理API");
+            c.SwaggerEndpoint("/swagger/reserveroom/swagger.json", "预订管理API");
+            c.SwaggerEndpoint("/swagger/role/swagger.json", "角色管理API");
+            c.SwaggerEndpoint("/swagger/roomnum/swagger.json", "房号管理API");
+            c.SwaggerEndpoint("/swagger/roomstate/swagger.json", "房态管理API");
+            c.SwaggerEndpoint("/swagger/roomtype/swagger.json", "房型管理API");
+            c.SwaggerEndpoint("/swagger/user/swagger.json", "用户登录管理API");
             c.RoutePrefix = string.Empty;
             var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
             c.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);

@@ -3,25 +3,24 @@ using HotelABP.RoomNummbers;
 using HotelABP.RoomReserves;
 using HotelABP.RoomTypes;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
-using Volo.Abp.Data;
-using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp.ObjectMapping;
 
 namespace HotelABP.ReserveRooms
 {
+    /// <summary>
+    /// 预定房间管理
+    /// </summary>
     [IgnoreAntiforgeryToken]
+    [ApiExplorerSettings(GroupName = "reserveroom")]
     public class ReserveRoomServer : ApplicationService, IReserveRoomServer
     {
         private readonly IRepository<ReserveRoom, Guid> reserveRoomRepository; // Fix type to ReserveRoom
@@ -41,9 +40,14 @@ namespace HotelABP.ReserveRooms
 
 
         /// <summary>
-        /// 房间类型列表
+        /// 房间类型列表（查询所有房型）
         /// </summary>
-        /// <returns></returns>
+        /// <returns>房型实体列表</returns>
+        /// <remarks>
+        /// 1. 查询所有房型。
+        /// 2. 返回ApiResult包装的房型列表。
+        /// 3. 捕获异常并抛出。
+        /// </remarks>
         public async Task<ApiResult<List<RoomType>>> GetRoomTypesList()
         {
             try
@@ -53,16 +57,25 @@ namespace HotelABP.ReserveRooms
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
 
         /// <summary>
-        /// 房间预定添加
+        /// 房间预定添加（支持事务、DTO映射、房态变更、金额明细记录、缓存清理）
         /// </summary>
-        /// <param name="room"></param>
-        /// <returns></returns>
+        /// <param name="room">预定房间DTO</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 开启事务，保证预定、金额明细、房态变更原子性。
+        /// 2. 遍历每个预定房型，校验ID有效性。
+        /// 3. DTO映射为实体，插入预定表。
+        /// 4. 插入金额明细表。
+        /// 5. 修改房号状态为"预定"。
+        /// 6. 清理缓存。
+        /// 7. 提交事务。
+        /// 8. 捕获异常并返回详细错误信息。
+        /// </remarks>
         public async Task<ApiResult> AddReserveRoom(CreateRoom room)
         {
             try
@@ -100,11 +113,6 @@ namespace HotelABP.ReserveRooms
                         num.RoomState = 4;
                         await roomnumberreposi.UpdateAsync(num);
                     }
-
-
-                    
-
-
                     // 添加成功后，清理缓存
                     await reserveRoomCache.RemoveAsync("GetReserRoom");
                     tran.Complete(); // 提交事务
@@ -119,11 +127,17 @@ namespace HotelABP.ReserveRooms
         }
 
         /// <summary>
-        ///预定房间信息
+        /// 预定房间信息（支持缓存、DTO组装、条件筛选、分页）
         /// </summary>
-        /// <param name="search1"></param>
-        /// <param name="seach"></param>
-        /// <returns></returns>
+        /// <param name="search1">查询条件</param>
+        /// <param name="seach">分页参数</param>
+        /// <returns>分页后的预定房间DTO列表</returns>
+        /// <remarks>
+        /// 1. 优先从缓存获取预定信息。
+        /// 2. 若缓存未命中则查询数据库并组装DTO。
+        /// 3. 支持多条件筛选（状态、时间、关键字等）。
+        /// 4. 支持分页。
+        /// </remarks>
         public async Task<ApiResult<PageResult<ReserveRoomShowDto>>> ShowReserveRoom([FromQuery] SearchTiao search1, [FromQuery] Seach seach)
         {
             var cacheKey = "GetReserRoom";
@@ -166,6 +180,7 @@ namespace HotelABP.ReserveRooms
             {
                 SlidingExpiration = TimeSpan.FromMinutes(30) // 设置缓存过期时间为30分钟
             });
+            // 多条件筛选
             cachedResult = cachedResult.WhereIf(search1.Status >= 0, x => x.Status == search1.Status)
                     .WhereIf(!string.IsNullOrEmpty(search1.Sdate), x => x.Sdate >= Convert.ToDateTime(search1.Sdate))
                     .WhereIf(!string.IsNullOrEmpty(search1.Edate), x => x.Sdate <= Convert.ToDateTime(search1.Edate))
@@ -184,11 +199,16 @@ namespace HotelABP.ReserveRooms
             return ApiResult<PageResult<ReserveRoomShowDto>>.Success(result, ResultCode.Success);
         }
         /// <summary>
-        /// 排房
+        /// 排房（为预定分配房号）
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="room"></param>
-        /// <returns></returns>
+        /// <param name="dto">排房DTO</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 根据预定ID查找预定信息。
+        /// 2. 更新房号和操作人。
+        /// 3. 更新数据库。
+        /// 4. 清理缓存。
+        /// </remarks>
         public async Task<ApiResult> UpdateTerraces(UpdateDto dto)
         {
             var list = await reserveRoomRepository.GetAsync(dto.id);
@@ -205,9 +225,14 @@ namespace HotelABP.ReserveRooms
             return ApiResult.Success(ResultCode.Success);
         }
         /// <summary>
-        /// 房间号
+        /// 房间号列表（根据房型ID查询）
         /// </summary>
-        /// <returns></returns>
+        /// <param name="guid">房型ID</param>
+        /// <returns>房号DTO列表</returns>
+        /// <remarks>
+        /// 1. 查询所有房号。
+        /// 2. 组装为DTO列表。
+        /// </remarks>
         public async Task<ApiResult<List<RoomNumDto>>> GetRoomNmlist(string guid)
         {
             var list = await roomnumberreposi.GetListAsync(x => x.RoomTypeId == guid);
@@ -219,13 +244,17 @@ namespace HotelABP.ReserveRooms
             return ApiResult<List<RoomNumDto>>.Success(roomNumList, ResultCode.Success);
         }
 
-
         /// <summary>
-        /// 取消排房
+        /// 取消排房（将房号重置为"未排房"）
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="room"></param>
-        /// <returns></returns>
+        /// <param name="id">预定ID</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 根据预定ID查找预定信息。
+        /// 2. 重置房号。
+        /// 3. 更新数据库。
+        /// 4. 清理缓存。
+        /// </remarks>
         public async Task<ApiResult> UpdateNoTerraces(Guid id)
         {
             var list = await reserveRoomRepository.GetAsync(id);
@@ -243,11 +272,17 @@ namespace HotelABP.ReserveRooms
         }
 
         /// <summary>
-        /// 取消预定
+        /// 取消预定（支持原因记录）
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="room"></param>
-        /// <returns></returns>
+        /// <param name="dto">取消预定DTO</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 根据预定ID查找预定信息。
+        /// 2. 设置状态为已取消，记录原因。
+        /// 3. 更新操作人。
+        /// 4. 更新数据库。
+        /// 5. 清理缓存。
+        /// </remarks>
         public async Task<ApiResult> UpdateNotReserc(UpdateNoReserDto dto)
         {
             var list = await reserveRoomRepository.GetAsync(dto.id);
@@ -266,11 +301,16 @@ namespace HotelABP.ReserveRooms
         }
 
         /// <summary>
-        /// 入住
+        /// 入住（支持信息补全）
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="room"></param>
-        /// <returns></returns>
+        /// <param name="dto">入住DTO</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 根据预定ID查找预定信息。
+        /// 2. 设置状态为已入住，补全入住信息。
+        /// 3. 更新数据库。
+        /// 4. 清理缓存。
+        /// </remarks>
         public async Task<ApiResult> UpdateCheckin(Update1Dto dto)
         {
             var list = await reserveRoomRepository.GetAsync(dto.Id);
@@ -290,13 +330,17 @@ namespace HotelABP.ReserveRooms
             return ApiResult.Success(ResultCode.Success);
         }
 
-
         /// <summary>
-        /// 退房
+        /// 退房（设置状态）
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="room"></param>
-        /// <returns></returns>
+        /// <param name="id">预定ID</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 根据预定ID查找预定信息。
+        /// 2. 设置状态为已退房。
+        /// 3. 更新数据库。
+        /// 4. 清理缓存。
+        /// </remarks>
         public async Task<ApiResult> UpdateNoRoom(Guid id)
         {
             var list = await reserveRoomRepository.GetAsync(id);
@@ -312,8 +356,21 @@ namespace HotelABP.ReserveRooms
             return ApiResult.Success(ResultCode.Success);
         }
 
-
-        //结算
+        /// <summary>
+        /// 结算（支持事务、金额明细记录、缓存清理）
+        /// </summary>
+        /// <param name="dto">结算DTO</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 开启事务。
+        /// 2. 根据预定编号查找预定信息。
+        /// 3. 设置状态为已结算。
+        /// 4. 更新数据库。
+        /// 5. 清理缓存。
+        /// 6. 查找并更新金额明细。
+        /// 7. 新增结算金额明细。
+        /// 8. 提交事务。
+        /// </remarks>
         public async Task<ApiResult> UpdateSettlement(MoneyDetailDto dto)
         {
             using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -346,6 +403,17 @@ namespace HotelABP.ReserveRooms
             }
         }
 
+        /// <summary>
+        /// 查询单个预定详情（根据ID）
+        /// </summary>
+        /// <param name="id">预定ID</param>
+        /// <returns>预定详情DTO</returns>
+        /// <remarks>
+        /// 1. 查询所有预定信息。
+        /// 2. 查询所有房型。
+        /// 3. 联表组装DTO。
+        /// 4. 返回单个对象。
+        /// </remarks>
         [HttpGet]
         public async Task<ApiResult<ReserveRoomShowDto>> ShowFanReserveRoom(Guid id)
         {
