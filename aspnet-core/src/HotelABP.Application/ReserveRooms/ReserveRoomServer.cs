@@ -273,21 +273,32 @@ namespace HotelABP.ReserveRooms
         /// <returns></returns>
         public async Task<ApiResult> UpdateCheckin(Update1Dto dto)
         {
-            var list = await reserveRoomRepository.GetAsync(dto.Id);
-            if (list == null)
+            using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                return ApiResult.Fail("未找到该预定信息", ResultCode.Error);
+                var list = await reserveRoomRepository.GetAsync(dto.Id);
+                if (list == null)
+                {
+                    return ApiResult.Fail("未找到该预定信息", ResultCode.Error);
+                }
+                list.Status = 1; // 设置为已入住状态
+                list.IdCard = dto.IdCard; // 更新身份证号码
+                list.RoomNum = dto.RoomNum;
+                list.ReserveName = dto.ReserveName;
+                list.Phone = dto.Phone; // 更新手机号码
+                list.CreatorId = dto.Userid; // 更新操作人ID
+                await reserveRoomRepository.UpdateAsync(list);
+                // 成功后，清理缓存
+                await reserveRoomCache.RemoveAsync("GetReserRoom");
+
+                var num = await roomnumberreposi.FirstOrDefaultAsync(x => x.RoomNum == list.RoomNum);
+                num.RoomState = 4;
+                await roomnumberreposi.UpdateAsync(num);
+
+                tran.Complete();
+                return ApiResult.Success(ResultCode.Success);
             }
-            list.Status = 1; // 设置为已入住状态
-            list.IdCard = dto.IdCard; // 更新身份证号码
-            list.RoomNum = dto.RoomNum;
-            list.ReserveName = dto.ReserveName;
-            list.Phone = dto.Phone; // 更新手机号码
-            list.CreatorId = dto.Userid; // 更新操作人ID
-            await reserveRoomRepository.UpdateAsync(list);
-            // 成功后，清理缓存
-            await reserveRoomCache.RemoveAsync("GetReserRoom");
-            return ApiResult.Success(ResultCode.Success);
+
+           
         }
 
 

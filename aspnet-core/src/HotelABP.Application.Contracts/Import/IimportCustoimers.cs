@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace HotelABP.Import
 {
-    public interface IExcelDataHandler<TDto>
+    public interface IimportCustoimers
     {
-        Task<int> HandleAsync(Stream stream);
+        Task<int> ImportCustoimers(Stream stream);
     }
 }
