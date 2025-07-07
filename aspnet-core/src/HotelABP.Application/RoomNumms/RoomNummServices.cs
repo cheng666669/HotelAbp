@@ -182,6 +182,7 @@ namespace HotelABP.RoomNumms
                .WhereIf(!string.IsNullOrEmpty(input.RoomTypeId), x => x.RoomTypeId == input.RoomTypeId)
                .WhereIf(input.State != null, x => x.State == input.State)
                 .WhereIf(!string.IsNullOrEmpty(input.RoomNum), x => x.RoomNum == input.RoomNum);
+
             var res = listdto.PageResult(seach.PageIndex, seach.PageSize);
             return ApiResult<PageResult<RoomNummDto>>.Success(
                 new PageResult<RoomNummDto>
