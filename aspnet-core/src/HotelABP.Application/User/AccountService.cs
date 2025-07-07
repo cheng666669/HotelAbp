@@ -37,7 +37,36 @@ namespace HotelABP.User
             this.cache = cache;
         }
         /// <summary>
-        /// 添加用户及分配角色（支持事务，防止部分写入）
+        /// 添加用户
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> AddAccountno(AccountDto dto)
+        {
+            try
+            {
+                using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    var userexist = await userRep.FindAsync(x => x.NickName == dto.NickName);
+                    if (userexist != null)
+                    {
+                        return ApiResult.Fail("用户已存在", ResultCode.ValidationError);
+                    }
+                    dto.Password = dto.Mobile.ToString().Substring(7, 4);
+                    var data = ObjectMapper.Map<AccountDto, SysUser>(dto);
+                    var user = await userRep.InsertAsync(data);
+                    tran.Complete();
+                    return ApiResult.Success(ResultCode.Success);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("添加用户角色有误" + ex.Message);
+                throw;
+            }
+        }
+        /// <summary>
+        /// 添加用户角色
         /// </summary>
         /// <param name="dto">用户及角色信息DTO</param>
         /// <returns>操作结果</returns>

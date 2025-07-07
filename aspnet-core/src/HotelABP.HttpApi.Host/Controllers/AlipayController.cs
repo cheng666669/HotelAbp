@@ -11,6 +11,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.Domain.Repositories;
+using Microsoft.Extensions.Caching.Distributed;
+using HotelABP.DTos.ReserveRooms;
+using Volo.Abp.Caching;
+using System.Collections.Generic;
 
 namespace HotelABP.Controllers
 {
@@ -24,15 +28,13 @@ namespace HotelABP.Controllers
         private readonly IAlipayService _alipayService;
         private readonly AlipayOptions _options;
         IRepository<ReserveRoom, Guid> _roomReserveRepository;
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="alipayService"></param>
-        /// <param name="roomReserveRepository"></param>
-        public AlipayController(IAlipayService alipayService, IRepository<ReserveRoom, Guid> roomReserveRepository)
+        private readonly IDistributedCache<List<ReserveRoomShowDto>> _reserveRoomCache;
+
+        public AlipayController(IAlipayService alipayService, IRepository<ReserveRoom, Guid> roomReserveRepository, IDistributedCache<List<ReserveRoomShowDto>> reserveRoomCache)
         {
             _alipayService = alipayService;
             _roomReserveRepository = roomReserveRepository;
+            _reserveRoomCache = reserveRoomCache;
         }
 
         [HttpPost("pay")]
@@ -70,8 +72,9 @@ namespace HotelABP.Controllers
                 {
                     reserveRoom.PayStatus = 1;
                     await _roomReserveRepository.UpdateAsync(reserveRoom,true);
-                    //await CurrentUnitOfWork.SaveChangesAsync(); // ✅ 强烈建议添加，确保写入
-                    Logger.LogInformation("订单状态更新成功：" + outTradeNo);
+                    // 删除Redis缓存，保证数据库和缓存同步
+                    await _reserveRoomCache.RemoveAsync("GetReserRoom");
+                    Logger.LogInformation("订单状态更新成功并清理缓存：" + outTradeNo);
                 }
             }
 

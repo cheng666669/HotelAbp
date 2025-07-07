@@ -26,12 +26,7 @@ namespace HotelABP.Controllers
             this.webHost = webHost;
             _aliyunOssService = aliyunOssService;
         }
-        [HttpGet("error")]
-        public IActionResult ThrowError()
-        {
-            throw new Exception("测试异常");
-        }
-       
+
         [HttpPost]
         public async Task<IActionResult> UploadFiles(List<IFormFile> files)
         {

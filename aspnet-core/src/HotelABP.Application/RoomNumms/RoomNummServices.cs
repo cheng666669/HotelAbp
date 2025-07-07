@@ -41,9 +41,14 @@ namespace HotelABP.RoomNumms
         /// </remarks>
         public async Task<ApiResult<RoomNummDto>> CreateRoomNumAdd(CreateUpdataRoomNummDto input)
         {
-            var entity=ObjectMapper.Map<CreateUpdataRoomNummDto, RoomNummber>(input);
-            var entityDto=await _roomNummberRepository.InsertAsync(entity);
-            var dto=ObjectMapper.Map<RoomNummber, RoomNummDto>(entityDto);
+            var roomnum = await _roomNummberRepository.FindAsync(x => x.RoomNum == input.RoomNum);
+            if (roomnum != null)
+            {
+                return ApiResult<RoomNummDto>.Fail("此房号已存在", ResultCode.Error);
+            }
+            var entity = ObjectMapper.Map<CreateUpdataRoomNummDto, RoomNummber>(input);
+            var entityDto = await _roomNummberRepository.InsertAsync(entity);
+            var dto = ObjectMapper.Map<RoomNummber, RoomNummDto>(entityDto);
             return ApiResult<RoomNummDto>.Success(dto, ResultCode.Success);
         }
 
@@ -209,6 +214,7 @@ namespace HotelABP.RoomNumms
                .WhereIf(!string.IsNullOrEmpty(input.RoomTypeId), x => x.RoomTypeId == input.RoomTypeId)
                .WhereIf(input.State != null, x => x.State == input.State)
                 .WhereIf(!string.IsNullOrEmpty(input.RoomNum), x => x.RoomNum == input.RoomNum);
+
             var res = listdto.PageResult(seach.PageIndex, seach.PageSize);
             return ApiResult<PageResult<RoomNummDto>>.Success(
                 new PageResult<RoomNummDto>

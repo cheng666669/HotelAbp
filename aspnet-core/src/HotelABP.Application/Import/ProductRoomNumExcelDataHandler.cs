@@ -10,13 +10,13 @@ using Volo.Abp.Domain.Repositories;
 
 namespace HotelABP.Import
 {
-    
-    public class ProductExcelDataHandler :  IExcelDataHandler<RoomNummber>, ITransientDependency
+  
+    public class ProductRoomNumExcelDataHandler :  IRoomNumExcelDataHandler<RoomNummber>, ITransientDependency
     {
         
         private readonly IRepository<RoomNummber, Guid> _productRepository;
 
-        public ProductExcelDataHandler(IRepository<RoomNummber, Guid> productRepository)
+        public ProductRoomNumExcelDataHandler(IRepository<RoomNummber, Guid> productRepository)
         {
             _productRepository = productRepository;
         }
