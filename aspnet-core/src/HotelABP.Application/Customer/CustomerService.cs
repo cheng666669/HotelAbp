@@ -116,7 +116,6 @@ namespace HotelABP.Customer
             var endTime = cudto.EndTime?.Date.AddDays(1);
             list = list.WhereIf(cudto.StartTime != null, x => x.Birthday >= cudto.StartTime);
             list = list.WhereIf(cudto.EndTime != null, x => x.Birthday < cudto.EndTime.Value.AddDays(1));
-
             // 联表查询客户类型，组装DTO
             var type = from a in list
                        join b in types
