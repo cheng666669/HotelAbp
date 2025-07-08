@@ -105,7 +105,7 @@ namespace HotelABP.Customers
         /// <summary>
         ///  累计消费金额
         /// </summary>
-        public decimal? Accumulativeconsumption { get; set; }
+        public decimal? Accumulativeconsumption { get; set; } = 0;
         /// <summary>
         /// 累计积分
         /// </summary>

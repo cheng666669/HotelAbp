@@ -6,10 +6,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using System.Transactions;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.ObjectMapping;
+using Volo.Abp.Validation;
+using static Volo.Abp.Http.MimeTypes;
+using System.Transactions;
+
+
+
 
 namespace HotelABP.Customer
 {
@@ -73,7 +79,7 @@ namespace HotelABP.Customer
         /// 1. 查询所有客户类型。
         /// 2. 组装为DTO列表。
         /// </remarks>
-        public async Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustoimerTypeNameAsync()
+        public async Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustomerTypeNameAsync()
         {
             var list = await _customerTypeRepository.GetQueryableAsync();
             var result = list.Select(x => new GetCustoimerTypeNameDto
@@ -105,7 +111,9 @@ namespace HotelABP.Customer
             list = list.WhereIf(cudto.CustomerType != null, x => x.CustomerType == cudto.CustomerType);
             list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerName), x => x.CustomerName.Contains(cudto.CustomerName));
             list = list.WhereIf(!string.IsNullOrEmpty(cudto.PhoneNumber), x => x.PhoneNumber.Contains(cudto.PhoneNumber));
-            list = list.WhereIf(cudto.Gender >= 0, x => x.Gender == cudto.Gender);
+            // 性别判断逻辑
+            list = list.WhereIf(cudto.Gender.HasValue && cudto.Gender >= 0, x => x.Gender == cudto.Gender);
+           
             var startTime = cudto.StartTime?.Date;
             var endTime = cudto.EndTime?.Date.AddDays(1);
             list = list.WhereIf(cudto.StartTime != null, x => x.Birthday >= cudto.StartTime);
@@ -238,7 +246,7 @@ namespace HotelABP.Customer
                 {
                     { "Id", "客户ID" },
                     { "CustomerNickName", "客户昵称" },
-                    { "CustomerTypeName", "客户类型名称" },
+                    { "CustomerType", "客户类型" },
                     { "CustomerName", "客户姓名" },
                     { "PhoneNumber", "手机号" },
                     { "Gender", "性别" },
@@ -452,6 +460,18 @@ namespace HotelABP.Customer
             {
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
+        }
+
+        public async Task<ApiResult<GetCustomerDto>> GetCustomerByIdAsync(Guid id)
+        {
+            var customer = await _customerRepository.FirstOrDefaultAsync(c => c.Id == id);
+            if (customer == null)
+            {
+                return ApiResult<GetCustomerDto>.Fail("客户不存在", ResultCode.NotFound);
+            }
+
+            var customerDto = ObjectMapper.Map<HotelABPCustoimerss, GetCustomerDto>(customer);
+            return ApiResult<GetCustomerDto>.Success(customerDto, ResultCode.Success);
         }
     }
 }
