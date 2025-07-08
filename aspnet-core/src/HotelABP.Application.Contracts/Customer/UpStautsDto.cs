@@ -12,6 +12,6 @@ namespace HotelABP.Customer
         /// <summary>
         /// 状态
         /// </summary>
-        public bool? Status { get; set; } = true;
+        public bool Status { get; set; } 
     }
 }

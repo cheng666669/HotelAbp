@@ -4,6 +4,7 @@ using HotelABP.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace HotelABP.Migrations
 {
     [DbContext(typeof(HotelABPDbContext))]
-    partial class HotelABPDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250707085621_客户s")]
+    partial class 客户s
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,35 +75,37 @@ namespace HotelABP.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
 
-                    b.Property<decimal?>("Accumulativeconsumption")
+                    b.Property<decimal>("Accumulativeconsumption")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<decimal?>("Accumulativeintegral")
+                    b.Property<decimal>("Accumulativeintegral")
                         .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<decimal?>("AvailableBalance")
+                    b.Property<decimal>("AvailableBalance")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<decimal?>("AvailableGiftBalance")
+                    b.Property<decimal>("AvailableGiftBalance")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<decimal?>("AvailablePoints")
+                    b.Property<decimal>("AvailablePoints")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<DateTime?>("Birthday")
+                    b.Property<DateTime>("Birthday")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("ComsumerNumber")
+                    b.Property<int>("ComsumerNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("ConsumerDesc")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreationTime")
@@ -112,15 +117,18 @@ namespace HotelABP.Migrations
                         .HasColumnName("CreatorId");
 
                     b.Property<string>("CustomerDesc")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("CustomerName")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("CustomerNickName")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<Guid?>("CustomerType")
+                    b.Property<Guid>("CustomerType")
                         .HasColumnType("char(36)");
 
                     b.Property<Guid?>("DeleterId")
@@ -131,10 +139,10 @@ namespace HotelABP.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("DeletionTime");
 
-                    b.Property<int?>("Gender")
+                    b.Property<int>("Gender")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("GrowthValue")
+                    b.Property<decimal>("GrowthValue")
                         .HasColumnType("decimal(65,30)");
 
                     b.Property<bool>("IsDeleted")
@@ -152,18 +160,20 @@ namespace HotelABP.Migrations
                         .HasColumnName("LastModifierId");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Pointsmodifydesc")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<decimal?>("Rechargeamount")
+                    b.Property<decimal>("Rechargeamount")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<bool?>("Status")
+                    b.Property<bool>("Status")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<decimal?>("Sumofconsumption")
+                    b.Property<decimal>("Sumofconsumption")
                         .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");

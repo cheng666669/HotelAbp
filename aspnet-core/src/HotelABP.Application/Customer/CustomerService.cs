@@ -6,13 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using System.Transactions;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp.ObjectMapping;
-using Volo.Abp.Validation;
-using static Volo.Abp.Http.MimeTypes;
-using System.Transactions;
 
 namespace HotelABP.Customer
 {
@@ -22,7 +19,7 @@ namespace HotelABP.Customer
     [ApiExplorerSettings(GroupName = "customer")]
     public class CustomerService : ApplicationService, ICustomerServices
     {
-        private readonly IRepository<HotelABPCustoimers, Guid> _customerRepository;
+        private readonly IRepository<HotelABPCustoimerss, Guid> _customerRepository;
         private readonly IRepository<HotelABPCustoimerTypeName, Guid> _customerTypeRepository;
         // 声明一个只读字段来保存我们封装的导出服务实例
         private readonly IExportAppService _exportAppService;
@@ -30,7 +27,7 @@ namespace HotelABP.Customer
 
 
         public CustomerService(
-            IRepository<HotelABPCustoimers, Guid> customerRepository,
+            IRepository<HotelABPCustoimerss, Guid> customerRepository,
             IRepository<HotelABPCustoimerTypeName, Guid> customerTypeRepository,
             IExportAppService exportAppService)
         {
@@ -55,11 +52,11 @@ namespace HotelABP.Customer
             try
             {
                 // 将 CustomerDto 映射为 HotelABPCustoimers 实体对象
-                var entity = ObjectMapper.Map<CustomerDto, HotelABPCustoimers>(cudto);
+                var entity = ObjectMapper.Map<CustomerDto, HotelABPCustoimerss>(cudto);
                 // 插入实体对象到数据库，并返回插入后的实体
                 var entitydto = await _customerRepository.InsertAsync(entity);
                 // 将插入后的实体对象再次映射为 CustomerDto
-                var s = ObjectMapper.Map<HotelABPCustoimers, CustomerDto>(entitydto);
+                var s = ObjectMapper.Map<HotelABPCustoimerss, CustomerDto>(entitydto);
                 // 返回带有插入结果的 ApiResult
                 return ApiResult<CustomerDto>.Success(s, ResultCode.Success);
             }
@@ -113,7 +110,6 @@ namespace HotelABP.Customer
             var endTime = cudto.EndTime?.Date.AddDays(1);
             list = list.WhereIf(cudto.StartTime != null, x => x.Birthday >= cudto.StartTime);
             list = list.WhereIf(cudto.EndTime != null, x => x.Birthday < cudto.EndTime.Value.AddDays(1));
-
             // 联表查询客户类型，组装DTO
             var type = from a in list
                        join b in types
@@ -161,6 +157,7 @@ namespace HotelABP.Customer
             ResultCode.Success
             );
         }
+    
         /// <summary>
         /// 修改客户信息（批量，支持DTO映射和异常处理）
         /// </summary>
@@ -224,7 +221,15 @@ namespace HotelABP.Customer
                            GrowthValue = a.GrowthValue,
                            AvailableBalance = a.AvailableBalance,
                            AvailableGiftBalance = a.AvailableGiftBalance,
-                           AvailablePoints = a.AvailablePoints
+                           AvailablePoints = a.AvailablePoints,
+                           Rechargeamount = a.Rechargeamount,
+                           Sumofconsumption = a.Sumofconsumption,
+                           ComsumerNumber = a.ComsumerNumber,
+                           CustomerDesc = a.CustomerDesc,
+                           Status = a.Status,
+                           ConsumerDesc = a.ConsumerDesc,
+                           Accumulativeconsumption = a.Accumulativeconsumption
+
                        };
             // 构造导出数据结构
             var exportData = new ExportDataDto<GetCustomerDto>
@@ -311,7 +316,7 @@ namespace HotelABP.Customer
             try
             {
                 // 1. 校验参数
-                if (sumofconsumptionDto == null || sumofconsumptionDto.Id == Guid.Empty || sumofconsumptionDto.Sumofconsumption <= 0)
+                if (sumofconsumptionDto == null || sumofconsumptionDto.Id == Guid.Empty || sumofconsumptionDto.Sumofconsumption == null || sumofconsumptionDto.Sumofconsumption <= 0)
                 {
                     return ApiResult<bool>.Fail("参数无效", ResultCode.Error);
                 }
@@ -324,29 +329,31 @@ namespace HotelABP.Customer
                 }
 
                 // 3. 判断余额是否足够
-                decimal totalAvailable = customer.AvailableBalance + customer.AvailableGiftBalance;
-                if (totalAvailable < sumofconsumptionDto.Sumofconsumption)
+                decimal availableBalance = customer.AvailableBalance ?? 0;
+                decimal availableGiftBalance = customer.AvailableGiftBalance ?? 0;
+                decimal totalAvailable = availableBalance + availableGiftBalance;
+                decimal consume = sumofconsumptionDto.Sumofconsumption.Value;
+
+                if (totalAvailable < consume)
                 {
                     return ApiResult<bool>.Fail("余额不足", ResultCode.Error);
                 }
 
-                decimal consume = sumofconsumptionDto.Sumofconsumption;
-
                 // 优先扣减可用余额
-                if (customer.AvailableBalance >= consume)
+                if (availableBalance >= consume)
                 {
-                    customer.AvailableBalance -= consume;
+                    customer.AvailableBalance = availableBalance - consume;
                 }
                 else
                 {
                     // 可用余额不足，先扣完可用余额，再扣赠送余额
-                    decimal left = consume - customer.AvailableBalance;
+                    decimal left = consume - availableBalance;
                     customer.AvailableBalance = 0;
-                    customer.AvailableGiftBalance -= left;
+                    customer.AvailableGiftBalance = availableGiftBalance - left;
                 }
 
                 // 4. 增加累计消费金额和消费次数
-                customer.Sumofconsumption += consume;
+                customer.Accumulativeconsumption = (customer.Accumulativeconsumption ?? 0) + consume;
                 customer.ComsumerNumber = (customer.ComsumerNumber ?? 0) + 1;
                 customer.ConsumerDesc = sumofconsumptionDto.ConsumerDesc;
 
@@ -428,11 +435,11 @@ namespace HotelABP.Customer
                 // 5. 更新累计积分
                 if (upAvailable.Accumulativeintegral > 0)
                 {
-                    customer.Accumulativeintegral = (customer.Accumulativeintegral ?? 0) + upAvailable.Accumulativeintegral;
+                    customer.Accumulativeintegral = (customer.Accumulativeintegral ) + upAvailable.Accumulativeintegral;
                 }
                 else
                 {
-                    customer.Accumulativeintegral = (customer.Accumulativeintegral ?? 0) + upAvailable.Accumulativeintegral;
+                    customer.Accumulativeintegral = (customer.Accumulativeintegral ) + upAvailable.Accumulativeintegral;
                 }
 
                 // 6. 更新积分备注
