@@ -12,9 +12,9 @@ namespace HotelABP.Import
 {
     public class ImportCustoimers : ITransientDependency
     {
-        private readonly IRepository<HotelABPCustoimers, Guid> _customerRepository;
+        private readonly IRepository<HotelABPCustoimerss, Guid> _customerRepository;
 
-        public ImportCustoimers(IRepository<HotelABPCustoimers, Guid> customerRepository)
+        public ImportCustoimers(IRepository<HotelABPCustoimerss, Guid> customerRepository)
         {
             _customerRepository = customerRepository;
         }
@@ -23,7 +23,7 @@ namespace HotelABP.Import
         {
             var workbook = new XSSFWorkbook(stream);
             var sheet = workbook.GetSheetAt(0);
-            var entities = new List<HotelABPCustoimers>();
+            var entities = new List<HotelABPCustoimerss>();
 
             for (int i = 1; i <= sheet.LastRowNum; i++) // 假设第一行为表头
             {
@@ -36,14 +36,14 @@ namespace HotelABP.Import
                     customerName = customerName.Substring(0, 16); // 截断到16字符
                 }
 
-                var entity = new HotelABPCustoimers
+                var entity = new HotelABPCustoimerss
                 {
                     CustomerNickName = row.GetCell(1)?.ToString(),
-                    CustomerType = TryParseGuid(row.GetCell(2)),
+                 //   CustomerType = TryParseGuid(row.GetCell(2)),
                     CustomerName = customerName,
                     PhoneNumber = row.GetCell(4)?.ToString(),
-                    Gender = GetIntCellValue(row.GetCell(5)),
-                    Birthday = GetDateCellValue(row.GetCell(6)),
+                    //Gender = GetIntCellValue(row.GetCell(5)),
+                    //Birthday = GetDateCellValue(row.GetCell(6)),
                     City = row.GetCell(7)?.ToString(),
                     Address = row.GetCell(8)?.ToString(),
                     GrowthValue = GetDecimalCellValue(row.GetCell(9)),
@@ -53,8 +53,8 @@ namespace HotelABP.Import
                     Rechargeamount = GetDecimalCellValue(row.GetCell(21)),
                     Sumofconsumption = GetDecimalCellValue(row.GetCell(22)),
                     CustomerDesc = row.GetCell(20)?.ToString(),
-                    ComsumerNumber = GetIntCellValue(row.GetCell(23)),
-                    Status = GetBoolCellValue(row.GetCell(24)),
+                    //ComsumerNumber = GetIntCellValue(row.GetCell(23)),
+                    //Status = GetBoolCellValue(row.GetCell(24)),
                     ConsumerDesc = row.GetCell(25)?.ToString(),
                     Accumulativeconsumption = GetDecimalCellValue(row.GetCell(26))
                 };

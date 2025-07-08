@@ -4,6 +4,7 @@ using HotelABP.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace HotelABP.Migrations
 {
     [DbContext(typeof(HotelABPDbContext))]
-    partial class HotelABPDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250707104318_客户ss")]
+    partial class 客户ss
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,6 +82,7 @@ namespace HotelABP.Migrations
                         .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<decimal?>("AvailableBalance")
@@ -101,6 +105,7 @@ namespace HotelABP.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ConsumerDesc")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreationTime")
@@ -112,12 +117,15 @@ namespace HotelABP.Migrations
                         .HasColumnName("CreatorId");
 
                     b.Property<string>("CustomerDesc")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("CustomerName")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("CustomerNickName")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<Guid?>("CustomerType")
@@ -152,9 +160,11 @@ namespace HotelABP.Migrations
                         .HasColumnName("LastModifierId");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Pointsmodifydesc")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<decimal?>("Rechargeamount")

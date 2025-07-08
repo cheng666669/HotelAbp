@@ -29,13 +29,13 @@ namespace HotelABP.Customer
         /// <summary>
         /// 获取客户类型列表
         /// </summary>
-        Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustoimerTypeNameAsync();
+        Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustomerTypeNameAsync();
         /// <summary>
         /// 更新客户信息
         /// </summary>
         /// <param name="customerDto">包含更新客户信息相关信息的DTO</param>
         /// <returns></returns>
-        Task<ApiResult<bool>> UpdateCustomerAsync (UpCustomerDto customerDto);
+        Task<ApiResult<bool>> UpdateCustomerAsync(UpCustomerDto customerDto);
         /// <summary>
         /// 充值
         /// </summary>

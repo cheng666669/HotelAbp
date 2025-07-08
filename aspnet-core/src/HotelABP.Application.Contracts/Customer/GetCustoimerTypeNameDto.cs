@@ -12,6 +12,9 @@ namespace HotelABP.Customer
     /// </summary>
     public class GetCustoimerTypeNameDto: EntityDto<Guid>
     {
-        public string CustomerTypeName { get; set; }
+        /// <summary>
+        /// 客户类型名称
+        /// </summary>
+        public string? CustomerTypeName { get; set; }
     }
 }
