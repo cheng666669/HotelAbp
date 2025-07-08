@@ -39,24 +39,24 @@ namespace HotelABP.Import
                 var entity = new HotelABPCustoimerss
                 {
                     CustomerNickName = row.GetCell(1)?.ToString(),
-                 //   CustomerType = TryParseGuid(row.GetCell(2)),
+                    CustomerType = TryParseGuid(row.GetCell(2)),
                     CustomerName = customerName,
                     PhoneNumber = row.GetCell(4)?.ToString(),
-                    //Gender = GetIntCellValue(row.GetCell(5)),
-                    //Birthday = GetDateCellValue(row.GetCell(6)),
+                    Gender = GetIntCellValue(row.GetCell(5)),
+                    Birthday = GetDateCellValue(row.GetCell(6)),
                     City = row.GetCell(7)?.ToString(),
                     Address = row.GetCell(8)?.ToString(),
                     GrowthValue = GetDecimalCellValue(row.GetCell(9)),
                     AvailableBalance = GetDecimalCellValue(row.GetCell(10)),
                     AvailableGiftBalance = GetDecimalCellValue(row.GetCell(11)),
                     AvailablePoints = GetDecimalCellValue(row.GetCell(12)),
-                    Rechargeamount = GetDecimalCellValue(row.GetCell(21)),
-                    Sumofconsumption = GetDecimalCellValue(row.GetCell(22)),
-                    CustomerDesc = row.GetCell(20)?.ToString(),
+                    //  Rechargeamount = GetDecimalCellValue(row.GetCell(21)),
+                    // Sumofconsumption = GetDecimalCellValue(row.GetCell(22)),
+                    // CustomerDesc = row.GetCell(20)?.ToString(),
                     //ComsumerNumber = GetIntCellValue(row.GetCell(23)),
                     //Status = GetBoolCellValue(row.GetCell(24)),
-                    ConsumerDesc = row.GetCell(25)?.ToString(),
-                    Accumulativeconsumption = GetDecimalCellValue(row.GetCell(26))
+                    // ConsumerDesc = row.GetCell(25)?.ToString(),
+                    //  Accumulativeconsumption = GetDecimalCellValue(row.GetCell(26))
                 };
                 entities.Add(entity);
             }
