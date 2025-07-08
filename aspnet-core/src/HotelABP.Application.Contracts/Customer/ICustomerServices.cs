@@ -29,7 +29,7 @@ namespace HotelABP.Customer
         /// <summary>
         /// 获取客户类型列表
         /// </summary>
-        Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustoimerTypeNameAsync();
+        Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustomerTypeNameAsync();
         /// <summary>
         /// 更新客户信息
         /// </summary>
