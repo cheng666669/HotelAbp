@@ -227,7 +227,9 @@ public class HotelABPHttpApiHostModule : AbpModule
             // Including XML comments for Swagger documentation
             var basePath = AppDomain.CurrentDomain.BaseDirectory;
             var xmlPath = Path.Combine(basePath, "HotelABP.Application.xml"); // XML file name
+            var xmlPaths = Path.Combine(basePath, "HotelABP.HttpApi.Host.xml"); // XML file name
             options.IncludeXmlComments(xmlPath, true); // Ensuring controller comments are included
+            options.IncludeXmlComments(xmlPaths, true);
         });
     }
 
