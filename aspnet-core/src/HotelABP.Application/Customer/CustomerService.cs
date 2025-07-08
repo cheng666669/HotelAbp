@@ -62,7 +62,7 @@ namespace HotelABP.Customer
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustoimerTypeNameAsync()
+        public async Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustomerTypeNameAsync()
         {
             var list = await _customerTypeRepository.GetQueryableAsync();
             var result = list.Select(x => new GetCustoimerTypeNameDto
@@ -191,7 +191,15 @@ namespace HotelABP.Customer
                            GrowthValue = a.GrowthValue,
                            AvailableBalance = a.AvailableBalance,
                            AvailableGiftBalance = a.AvailableGiftBalance,
-                           AvailablePoints = a.AvailablePoints
+                           AvailablePoints = a.AvailablePoints,
+                           Rechargeamount = a.Rechargeamount,
+                           Sumofconsumption = a.Sumofconsumption,
+                           ComsumerNumber = a.ComsumerNumber,
+                           CustomerDesc = a.CustomerDesc,
+                           Status = a.Status,
+                           ConsumerDesc = a.ConsumerDesc,
+                           Accumulativeconsumption = a.Accumulativeconsumption
+
                        };
 
             // 修复 Items 的赋值问题
