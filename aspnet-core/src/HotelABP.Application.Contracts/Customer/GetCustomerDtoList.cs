@@ -37,7 +37,7 @@ namespace HotelABP.Customer
         /// <summary>
         /// 性别（0 = 未知，1 = 男，2 = 女；可为空）
         /// </summary>
-        public int? Gender { get; set; } = 0;
+        public int? Gender { get; set; } 
 
         /// <summary>
         /// 开始时间

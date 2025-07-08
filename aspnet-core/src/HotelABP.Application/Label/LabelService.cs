@@ -78,7 +78,7 @@ namespace HotelABP.Label
                 list = list.WhereIf(!string.IsNullOrEmpty(dtoList.LabelName), x => x.LabelName.Contains(dtoList.LabelName));
 
                 // 分页处理
-                var res = list.AsQueryable().PageResult(seach.PageIndex, seach.PageSize);
+                var res = list.PageResult(seach.PageIndex, seach.PageSize);
                 // DTO映射
                 var dto = ObjectMapper.Map<List<HotelABPLabelss>, List<GetLabelDto>>(list.ToList());
                 // 返回分页结果

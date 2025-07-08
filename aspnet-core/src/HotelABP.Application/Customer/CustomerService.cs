@@ -135,9 +135,7 @@ namespace HotelABP.Customer
                            Sumofconsumption = a.Sumofconsumption,
                            ComsumerNumber = a.ComsumerNumber,
                            Accumulativeconsumption = a.Accumulativeconsumption,
-                           Sumofconsumption = a.Sumofconsumption,
                            ConsumerDesc = a.ConsumerDesc,
-                           Status = a.Status,
                            CreationTime = a.CreationTime,
                            CustomerDesc = a.CustomerDesc,
                            Rechargeamount = a.Rechargeamount
