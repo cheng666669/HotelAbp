@@ -54,5 +54,7 @@ namespace HotelABP.Customer
         /// <param name="upStautsdto"></param>
         /// <returns></returns>
         Task<ApiResult<bool>> UpdateCustomerStatusAsync(UpStautsDto upStautsdto);
+        Task<ApiResult<bool>> UpdateAvailablePoints(UpAvailablePointsDto upAvailable);
+
     }
 }

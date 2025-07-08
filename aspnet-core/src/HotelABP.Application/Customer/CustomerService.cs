@@ -135,14 +135,20 @@ namespace HotelABP.Customer
                            AvailableBalance = a.AvailableBalance,
                            AvailableGiftBalance = a.AvailableGiftBalance,
                            AvailablePoints = a.AvailablePoints,
-                          Status = a.Status,
-                           Sumofconsumption = a.Sumofconsumption,
                            ComsumerNumber = a.ComsumerNumber,
+                           Accumulativeconsumption = a.Accumulativeconsumption,
+                           Sumofconsumption = a.Sumofconsumption,
                            ConsumerDesc = a.ConsumerDesc,
-                            Accumulativeconsumption=a.Accumulativeconsumption+a.Sumofconsumption
-
+                           Status = a.Status,
+                           CreationTime = a.CreationTime,
+                           CustomerDesc = a.CustomerDesc,
+                           Rechargeamount = a.Rechargeamount
                        };
-            var res = type.AsQueryable().PageResult(seach.PageIndex, seach.PageSize);
+
+
+
+            var res = type.PageResult(seach.PageIndex, seach.PageSize);
+
             return ApiResult<PageResult<GetCustomerDto>>.Success(
                 new PageResult<GetCustomerDto>
                 {
@@ -354,10 +360,10 @@ namespace HotelABP.Customer
         }
 
         /// <summary>
-        /// 批量修改客户状态，操作使用事务保证原子性
+        /// 批量修改客户状态（带事务）
         /// </summary>
         /// <param name="upStautsdto">包含客户ID列表和目标状态的DTO</param>
-        /// <returns>操作结果</returns>
+        /// <returns>操作结果，全部成功返回true，否则返回错误信息</returns>
         public async Task<ApiResult<bool>> UpdateCustomerStatusAsync(UpStautsDto upStautsdto)
         {
             try
@@ -378,7 +384,7 @@ namespace HotelABP.Customer
                             await _customerRepository.UpdateAsync(entity);
                         }
                     }
-                    // 提交事务，所有操作成功才会真正保存
+                    // 提交事务，所有操作成功才会真正写入数据库
                     tran.Complete();
                 }
                 // 返回成功结果
@@ -386,7 +392,57 @@ namespace HotelABP.Customer
             }
             catch (Exception ex)
             {
-                // 捕获异常并返回失败信息
+                // 捕获异常并返回失败结果，包含错误信息
+                return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
+            }
+        }
+        
+        public async Task<ApiResult<bool>> UpdateAvailablePoints(UpAvailablePointsDto upAvailable)
+        {
+            try
+            {
+                // 1. 校验参数
+                if (upAvailable == null || upAvailable.Id == Guid.Empty || upAvailable.Accumulativeintegral == 0)
+                {
+                    return ApiResult<bool>.Fail("参数无效", ResultCode.Error);
+                }
+
+                // 2. 获取客户实体
+                var customer = await _customerRepository.GetAsync(upAvailable.Id);
+                if (customer == null)
+                {
+                    return ApiResult<bool>.Fail("客户不存在", ResultCode.Error);
+                }
+
+                // 3. 更新客户的可用积分
+                customer.AvailablePoints += upAvailable.Accumulativeintegral;
+
+                // 4. 校验积分是否有效
+                if (customer.AvailablePoints < 0)
+                {
+                    return ApiResult<bool>.Fail("积分不足", ResultCode.Error);
+                }
+
+                // 5. 更新累计积分
+                if (upAvailable.Accumulativeintegral > 0)
+                {
+                    customer.Accumulativeintegral = (customer.Accumulativeintegral ?? 0) + upAvailable.Accumulativeintegral;
+                }
+                else
+                {
+                    customer.Accumulativeintegral = (customer.Accumulativeintegral ?? 0) + upAvailable.Accumulativeintegral;
+                }
+
+                // 6. 更新积分备注
+                customer.Pointsmodifydesc = upAvailable.Pointsmodifydesc;
+
+                // 7. 更新数据库
+                await _customerRepository.UpdateAsync(customer);
+
+                return ApiResult<bool>.Success(true, ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
