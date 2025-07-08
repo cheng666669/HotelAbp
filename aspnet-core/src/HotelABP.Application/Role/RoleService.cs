@@ -13,7 +13,11 @@ using Volo.Abp.Domain.Repositories;
 
 namespace HotelABP.Role
 {
+    /// <summary>
+    /// 角色服务
+    /// </summary>
     [IgnoreAntiforgeryToken]
+    [ApiExplorerSettings(GroupName = "role")]
     public class RoleService : ApplicationService, IRoleService
     {
         private readonly IRepository<Roles> roleRep;
@@ -33,23 +37,34 @@ namespace HotelABP.Role
         /// <summary>
         /// 添加角色权限
         /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
+        /// <param name="dto">角色及权限信息DTO</param>
+        /// <returns>操作结果</returns>
         /// <exception cref="NotImplementedException"></exception>
+        /// <remarks>
+        /// 1. 首先判断角色名是否已存在，若存在则返回失败。
+        /// 2. 否则开启事务，插入角色信息。
+        /// 3. 遍历权限ID集合，插入角色-权限中间表。
+        /// 4. 提交事务。
+        /// 5. 捕获异常并记录日志。
+        /// </remarks>
         public async Task<ApiResult> CreateRoleAsync([FromBody]CreateUpdateRoleDto dto)
         {
             try
             {
+                // 检查角色名是否已存在
                 var roleExist = await roleRep.FindAsync(x => x.RoleName == dto.RoleName);
                 if (roleExist != null)
                 {
                     return ApiResult.Fail("角色已存在",ResultCode.Error);
                 }
+                // 开启事务，保证角色和权限关系同时写入
                 using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
+                    // DTO映射为实体并插入角色表
                     var roledto = ObjectMapper.Map<CreateUpdateRoleDto, Roles>(dto);
                     var role = await roleRep.InsertAsync(roledto);
                     var roleid = role.Id;
+                    // 插入角色-权限中间表
                     foreach (var item in dto.PermissionIds)
                     {
                         var roleper = new RolePermission();
@@ -57,7 +72,7 @@ namespace HotelABP.Role
                         roleper.PermissionId = item;
                         await roleperRep.InsertAsync(roleper);
                     }
-                    tran.Complete();
+                    tran.Complete(); // 提交事务
                     return ApiResult.Success(ResultCode.Success);
                 }
             }
@@ -70,8 +85,13 @@ namespace HotelABP.Role
         /// <summary>
         /// 获取权限树
         /// </summary>
-        /// <returns></returns>
+        /// <returns>权限树结构</returns>
         /// <exception cref="NotImplementedException"></exception>
+        /// <remarks>
+        /// 1. 优先从分布式缓存获取权限树。
+        /// 2. 若缓存不存在则递归查询数据库并缓存结果。
+        /// 3. 缓存有效期10分钟。
+        /// </remarks>
         public async Task<ApiResult<List<PermissionTreeDto>>> GetPermissionTree()
         {
             try
@@ -79,27 +99,38 @@ namespace HotelABP.Role
                 //设置键名
                 var keys = "GetPermissionTree";
 
+                // 优先从缓存获取
                 var cacheResult = await cache.GetOrAddAsync(keys,async () =>
                 {
-                    var list = await GetPermission(Guid.Empty);
+                    var list = await GetPermission(Guid.Empty); // 递归获取权限树
                     return list;
                 }, () => new Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions
                 {
-                    SlidingExpiration = TimeSpan.FromMinutes(10)//设置缓存过期时间为5分钟
+                    SlidingExpiration = TimeSpan.FromMinutes(10)//设置缓存过期时间为10分钟
                 });
                 return ApiResult<List<PermissionTreeDto>>.Success(cacheResult,ResultCode.Success);
             }
             catch (Exception)
             {
-                
                 throw;
             }
         }
 
+        /// <summary>
+        /// 递归获取权限树（私有方法）
+        /// </summary>
+        /// <param name="parentid">父级权限ID</param>
+        /// <returns>权限树列表</returns>
+        /// <remarks>
+        /// 1. 查询所有parentid下的权限。
+        /// 2. 对每个权限递归获取其子权限。
+        /// 3. 组装为树结构。
+        /// </remarks>
         private async Task<List<PermissionTreeDto>> GetPermission(Guid parentid)
         {
             try
             {
+                // 查询所有父级为parentid的权限
                 var permissions = await perRep.GetListAsync(x => x.ParentId == parentid);
                 var permissionDtos = new List<PermissionTreeDto>();
                 foreach (var item in permissions)
@@ -107,6 +138,7 @@ namespace HotelABP.Role
                     var permissionDto = new PermissionTreeDto();
                     permissionDto.Id = item.Id;
                     permissionDto.PermissionName = item.PermissionName;
+                    // 递归获取子权限
                     permissionDto.Children = await GetPermission(item.Id);
                     permissionDtos.Add(permissionDto);
                 }
@@ -114,7 +146,6 @@ namespace HotelABP.Role
             }
             catch (Exception)
             {
-                
                 throw;
             }
         }
@@ -122,7 +153,12 @@ namespace HotelABP.Role
         /// <summary>
         /// 初始化权限数据
         /// </summary>
-        /// <returns></returns>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 按业务模块批量插入菜单和操作权限。
+        /// 2. 每个菜单下插入对应的操作权限。
+        /// 3. 捕获异常并记录日志。
+        /// </remarks>
         public async Task<ApiResult> InitData()
         {
             try
@@ -348,35 +384,49 @@ namespace HotelABP.Role
         /// <summary>
         /// 删除角色
         /// </summary>
-        /// <param name="Id"></param>
-        /// <returns></returns>
+        /// <param name="Id">角色ID</param>
+        /// <returns>操作结果</returns>
         /// <exception cref="NotImplementedException"></exception>
+        /// <remarks>
+        /// 1. 根据ID查找角色。
+        /// 2. 若不存在返回失败。
+        /// 3. 存在则删除。
+        /// </remarks>
         [HttpDelete]
         public async Task<ApiResult> DelRoleAsync(Guid Id)
         {
             try
             {
+                // 查找角色
                 var role = await roleRep.GetAsync(x => x.Id == Id);
                 if (role == null)
                 {
                     return ApiResult.Fail("角色不存在", ResultCode.NotFound);
                 }
+                // 删除角色
                 await roleRep.DeleteAsync(role);
                 return ApiResult.Success(ResultCode.Success);
             }
             catch ( Exception ex)
             {
-
                 throw;
             }
         }
         /// <summary>
         /// 修改角色
         /// </summary>
-        /// <param name="Id"></param>
-        /// <param name="dto"></param>
-        /// <returns></returns>
+        /// <param name="Id">角色ID</param>
+        /// <param name="dto">角色及权限信息DTO</param>
+        /// <returns>操作结果</returns>
         /// <exception cref="NotImplementedException"></exception>
+        /// <remarks>
+        /// 1. 开启事务。
+        /// 2. 查找角色，不存在返回失败。
+        /// 3. 删除原有角色-权限关系。
+        /// 4. 更新角色信息。
+        /// 5. 新增角色-权限关系。
+        /// 6. 提交事务。
+        /// </remarks>
         [HttpPut]
         public async Task<ApiResult> UpdateRoleAsync(Guid Id, CreateUpdateRoleDto dto)
         {
@@ -384,21 +434,22 @@ namespace HotelABP.Role
             {
                 using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
+                    // 查找角色
                     var role = await roleRep.GetAsync(x => x.Id == Id);
                     if (role == null)
                     {
                         return ApiResult.Fail("角色不存在", ResultCode.NotFound);
                     }
-             
-                    //删除中间表
+                    // 删除原有角色-权限关系
                     var roleperlist = await roleperRep.GetListAsync(x => x.RoleId == Id);
                     foreach (var item in roleperlist)
                     {
                         await roleperRep.DeleteAsync(item);
                     }
+                    // 更新角色信息
                     var roltlist = ObjectMapper.Map(dto,role);
                     var a = await roleRep.UpdateAsync(roltlist);
-                    //添加中间表
+                    // 添加新角色-权限关系
                     foreach (var item in dto.PermissionIds)
                     {
                         var roleper = new RolePermission
@@ -408,8 +459,7 @@ namespace HotelABP.Role
                         };
                         await roleperRep.InsertAsync(roleper);
                     }
-                    //提交事务
-                    tran.Complete();
+                    tran.Complete(); // 提交事务
                     return ApiResult.Success(ResultCode.Success);
                 }
             }
@@ -422,18 +472,29 @@ namespace HotelABP.Role
         /// <summary>
         /// 获取角色列表
         /// </summary>
-        /// <param name="seach"></param>
-        /// <param name="dto"></param>
-        /// <returns></returns>
+        /// <param name="seach">分页参数</param>
+        /// <param name="dto">查询条件</param>
+        /// <returns>分页后的角色列表</returns>
         /// <exception cref="NotImplementedException"></exception>
+        /// <remarks>
+        /// 1. 根据条件过滤角色。
+        /// 2. 分页查询。
+        /// 3. DTO映射。
+        /// 4. 返回分页结果。
+        /// </remarks>
         public async Task<ApiResult<PageResult<GetRoleResultDTO>>> GetRoleList(Seach seach, SearchRoleDTO dto)
         {
             try
             {
+                // 获取角色查询对象
                 var role = await roleRep.GetQueryableAsync();
+                // 按角色名过滤
                 role = (System.Linq.IQueryable<Roles>)role.WhereIf(!string.IsNullOrEmpty(dto.RoleName), x => x.RoleName.Contains(dto.RoleName));
+                // 分页
                 var list = role.PageResult(seach.PageIndex, seach.PageSize);
+                // DTO映射
                 var dtoList = ObjectMapper.Map<List<Roles>, List<GetRoleResultDTO>>(list.Queryable.ToList());
+                // 组装分页结果
                 var pageresult = new PageResult<GetRoleResultDTO>
                 {
                     TotleCount = list.RowCount,
@@ -451,9 +512,15 @@ namespace HotelABP.Role
         /// <summary>
         /// 根据角色id获取权限树
         /// </summary>
-        /// <param name="roleid"></param>
-        /// <returns></returns>
+        /// <param name="roleid">角色ID</param>
+        /// <returns>该角色拥有的权限树</returns>
         /// <exception cref="NotImplementedException"></exception>
+        /// <remarks>
+        /// 1. 查询角色拥有的所有权限ID。
+        /// 2. 若无权限直接返回空树。
+        /// 3. 查询所有权限详情。
+        /// 4. 递归构建权限树。
+        /// </remarks>
         public async Task<ApiResult<List<PermissionTreeDto>>> GetPermByRole(Guid roleid)
         {
             try
@@ -494,11 +561,16 @@ namespace HotelABP.Role
         }
 
         /// <summary>
-        /// 构建权限树节点
+        /// 构建权限树节点（递归）
         /// </summary>
         /// <param name="permission">当前权限</param>
         /// <param name="allPermissions">所有权限列表</param>
-        /// <returns></returns>
+        /// <returns>权限树节点</returns>
+        /// <remarks>
+        /// 1. 创建当前节点。
+        /// 2. 查找所有子权限，递归构建子节点。
+        /// 3. 返回树节点。
+        /// </remarks>
         private PermissionTreeDto BuildTreeNode(Permission permission, List<Permission> allPermissions)
         {
             try
@@ -533,9 +605,13 @@ namespace HotelABP.Role
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="guids"></param>
-        /// <returns></returns>
+        /// <param name="guids">角色ID集合</param>
+        /// <returns>操作结果</returns>
         /// <exception cref="NotImplementedException"></exception>
+        /// <remarks>
+        /// 1. 遍历ID集合，依次查找并删除角色。
+        /// 2. 捕获异常并记录日志。
+        /// </remarks>
         public async Task<ApiResult> DeleteRange(List<Guid> guids)
         {
             try

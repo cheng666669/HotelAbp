@@ -1,27 +1,13 @@
-﻿using AutoMapper;
-using HotelABP.Customers;
+﻿using HotelABP.Customers;
 using HotelABP.Export;
-using HotelABP.RoomTypes;
-using Microsoft.AspNetCore.Http;
-using NPOI.SS.Formula.Functions;
-using NPOI.SS.UserModel;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Volo.Abp;
-using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
-using Volo.Abp.Caching;
 using Volo.Abp.Content;
-using Volo.Abp.DependencyInjection;
-using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.ObjectMapping;
 using Volo.Abp.Validation;
@@ -33,6 +19,7 @@ namespace HotelABP.Customer
     /// <summary>
     /// 客户管理
     /// </summary>
+    [ApiExplorerSettings(GroupName = "customer")]
     public class CustomerService : ApplicationService, ICustomerServices
     {
         private readonly IRepository<HotelABPCustoimers, Guid> _customerRepository;
@@ -52,10 +39,17 @@ namespace HotelABP.Customer
             _exportAppService = exportAppService;
         }
         /// <summary>
-        /// 添加客户信息
+        /// 添加客户信息（支持DTO映射和异常处理）
         /// </summary>
-        /// <param name="cudto"></param>
-        /// <returns></returns>
+        /// <param name="cudto">客户DTO</param>
+        /// <returns>插入后的客户DTO</returns>
+        /// <remarks>
+        /// 1. 使用ObjectMapper将输入DTO映射为实体。
+        /// 2. 插入数据库。
+        /// 3. 将插入后的实体再次映射为DTO。
+        /// 4. 返回带有插入结果的ApiResult。
+        /// 5. 捕获异常并返回失败信息。
+        /// </remarks>
         public async Task<ApiResult<CustomerDto>> AddCustomerAsync(CustomerDto cudto)
         {
             try
@@ -71,15 +65,17 @@ namespace HotelABP.Customer
             }
             catch (Exception ex)
             {
-
                 return ApiResult<CustomerDto>.Fail(ex.Message, ResultCode.Error);
             }
         }
         /// <summary>
-        /// 获取客户类型列表
+        /// 获取客户类型列表（支持DTO组装）
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <returns>客户类型DTO列表</returns>
+        /// <remarks>
+        /// 1. 查询所有客户类型。
+        /// 2. 组装为DTO列表。
+        /// </remarks>
         public async Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustoimerTypeNameAsync()
         {
             var list = await _customerTypeRepository.GetQueryableAsync();
@@ -88,20 +84,26 @@ namespace HotelABP.Customer
                 Id = x.Id,
                 CustomerTypeName = x.CustomerTypeName
             }).ToList();
-
-
             return ApiResult<List<GetCustoimerTypeNameDto>>.Success(result, ResultCode.Success);
         }
         /// <summary>
-        /// 获取客户列表
+        /// 获取客户列表（支持多条件筛选、分页、DTO组装）
         /// </summary>
-        /// <param name="seach"></param>
-        /// <param name="cudto"></param>
-        /// <returns></returns>
+        /// <param name="seach">分页参数</param>
+        /// <param name="cudto">筛选条件DTO</param>
+        /// <returns>分页后的客户DTO列表</returns>
+        /// <remarks>
+        /// 1. 查询所有客户。
+        /// 2. 多条件筛选（昵称、类型、姓名、手机号、性别、生日区间）。
+        /// 3. 联表查询客户类型。
+        /// 4. DTO组装。
+        /// 5. 分页返回。
+        /// </remarks>
         public async Task<ApiResult<PageResult<GetCustomerDto>>> GetCustomerListAsync(Seach seach, GetCustomerDtoList cudto)
         {
             var list = await _customerRepository.GetQueryableAsync();
             var types = await _customerTypeRepository.GetQueryableAsync();
+            // 多条件筛选
             list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerNickName), x => x.CustomerNickName.Contains(cudto.CustomerNickName));
             list = list.WhereIf(cudto.CustomerType != null, x => x.CustomerType == cudto.CustomerType);
             list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerName), x => x.CustomerName.Contains(cudto.CustomerName));
@@ -112,6 +114,7 @@ namespace HotelABP.Customer
             list = list.WhereIf(cudto.StartTime != null, x => x.Birthday >= cudto.StartTime);
             list = list.WhereIf(cudto.EndTime != null, x => x.Birthday < cudto.EndTime.Value.AddDays(1));
 
+            // 联表查询客户类型，组装DTO
             var type = from a in list
                        join b in types
                        on a.CustomerType equals b.Id into temp
@@ -143,6 +146,7 @@ namespace HotelABP.Customer
                        };
 
 
+
             var res = type.PageResult(seach.PageIndex, seach.PageSize);
 
             return ApiResult<PageResult<GetCustomerDto>>.Success(
@@ -151,17 +155,21 @@ namespace HotelABP.Customer
                     Data = res.Queryable.ToList(),
                     TotleCount = list.Count(),
                     TotlePage = (int)Math.Ceiling(list.Count() / (double)seach.PageSize)
-
                 },
             ResultCode.Success
             );
         }
         /// <summary>
-        ///  修改客户信息（批量）
+        /// 修改客户信息（批量，支持DTO映射和异常处理）
         /// </summary>
-        /// <param name="ids"></param>
-        /// <param name="customerDto"></param>
-        /// <returns></returns>
+        /// <param name="customerDto">批量修改DTO，包含ID集合和要修改的字段</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 遍历ID集合，依次查找客户。
+        /// 2. DTO映射到实体。
+        /// 3. 更新数据库。
+        /// 4. 捕获异常并返回失败信息。
+        /// </remarks>
         public async Task<ApiResult<bool>> UpdateCustomerAsync(UpCustomerDto customerDto)
         {
             try
@@ -181,9 +189,15 @@ namespace HotelABP.Customer
             }
         }
         /// <summary>
-        /// 导出所有客户数据
+        /// 导出所有客户数据（支持DTO组装、字段映射、调用导出服务）
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Excel流内容</returns>
+        /// <remarks>
+        /// 1. 查询所有客户和客户类型。
+        /// 2. 联表组装DTO。
+        /// 3. 构造导出数据结构，设置字段映射。
+        /// 4. 调用导出服务生成Excel流。
+        /// </remarks>
         public async Task<IRemoteStreamContent> ExportAllCustomersAsync()
         {
             // 获取数据
@@ -210,8 +224,7 @@ namespace HotelABP.Customer
                            AvailableGiftBalance = a.AvailableGiftBalance,
                            AvailablePoints = a.AvailablePoints
                        };
-
-            // 修复 Items 的赋值问题
+            // 构造导出数据结构
             var exportData = new ExportDataDto<GetCustomerDto>
             {
                 FileName = "客户管理",
@@ -233,15 +246,21 @@ namespace HotelABP.Customer
                     { "AvailablePoints", "可用积分" }
                 }
             };
-
             // 返回导出的内容
             return await _exportAppService.ExportToExcelAsync(exportData);
         }
         /// <summary>
-        /// 更新客户可用余额
+        /// 更新客户可用余额（支持参数校验、异常处理）
         /// </summary>
-        /// <param name="balanceDto"></param>
-        /// <returns></returns>
+        /// <param name="balanceDto">余额变更DTO</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 校验参数。
+        /// 2. 查找客户。
+        /// 3. 增加可用余额，记录备注。
+        /// 4. 更新数据库。
+        /// 5. 捕获异常并返回失败信息。
+        /// </remarks>
         public async Task<ApiResult<bool>> UpAvailableBalance(UpAvailableBalanceDto balanceDto)
         {
             try
@@ -273,11 +292,18 @@ namespace HotelABP.Customer
             }
         }
         /// <summary>
-        /// 更新
+        /// 更新客户累计消费（支持余额扣减、赠送余额优先级、消费次数累计、异常处理）
         /// </summary>
-        /// <param name="sumofconsumptionDto"></param>
-        /// <returns></returns>
-
+        /// <param name="sumofconsumptionDto">消费变更DTO</param>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 校验参数。
+        /// 2. 查找客户。
+        /// 3. 判断余额是否足够，优先扣减可用余额，不足时扣赠送余额。
+        /// 4. 增加累计消费金额和消费次数，记录备注。
+        /// 5. 更新数据库。
+        /// 6. 捕获异常并返回失败信息。
+        /// </remarks>
         public async Task<ApiResult<bool>> UpSumofconsumption(UpSumofconsumptionDto sumofconsumptionDto)
         {
             try

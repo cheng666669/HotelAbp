@@ -8,7 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.IO;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +17,10 @@ using Volo.Abp.Domain.Repositories;
 
 namespace HotelABP.User
 {
-    //[ApiExplorerSettings(GroupName = "v1")]
+    /// <summary>
+    /// 用户管理
+    /// </summary>
+    [ApiExplorerSettings(GroupName = "user")]
     //[Authorize]
     [IgnoreAntiforgeryToken]
     public class UserService:ApplicationService
@@ -36,40 +38,58 @@ namespace HotelABP.User
             this.httpContextAccessor = httpContextAccessor;
         }
         /// <summary>
-        /// 生成验证码
+        /// 生成验证码图片并返回给前端，前端可通过id标识本次验证码会话
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">验证码会话唯一标识</param>
+        /// <returns>验证码图片（GIF格式）</returns>
+        /// <remarks>
+        /// 1. 调用ICaptcha服务生成验证码图片和字节流。
+        /// 2. 返回FileContentResult，前端可直接渲染为图片。
+        /// </remarks>
         [HttpGet]
         public IActionResult Captcha(string id)
         {
-            var info = captcha.Generate(id);
-            return new FileContentResult(info.Bytes, "image/gif");
+            var info = captcha.Generate(id); // 生成验证码图片和字节流
+            return new FileContentResult(info.Bytes, "image/gif"); // 返回图片内容
         }
         /// <summary>
         /// 演示时使用HttpGet传参方便，这里仅做返回处理
         /// </summary>
+        /// <param name="id">验证码会话唯一标识</param>
+        /// <param name="code">用户输入的验证码</param>
+        /// <returns>校验结果，true为正确，false为错误</returns>
+        /// <remarks>
+        /// 1. 调用ICaptcha服务校验验证码。
+        /// 2. 返回校验结果。
+        /// </remarks>
         [HttpGet("validate")]
         public bool Validate(string id, string code)
         {
-            return captcha.Validate(id, code);
+            return captcha.Validate(id, code); // 校验验证码
         }
         /// <summary>
-        /// 登录
+        /// 用户登录，校验验证码、用户名和密码，成功后返回JWT Token
         /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
+        /// <param name="dto">登录参数（用户名、密码、验证码等）</param>
+        /// <returns>登录结果，包含Token等信息</returns>
+        /// <remarks>
+        /// 1. 校验验证码是否正确。
+        /// 2. 查询用户是否存在。
+        /// 3. 校验密码是否正确。
+        /// 4. 生成并返回JWT Token。
+        /// </remarks>
         [HttpGet]
         [AllowAnonymous]
         public async Task<ApiResult<LoginResultDto>> LoginAsync(LoginDto dto)
         {
             try
             {
-                // 验证码校验
+                // 1. 校验验证码
                 if (!captcha.Validate(dto.CaptchaKey, dto.CaptchaCode))
                 {
                     return ApiResult<LoginResultDto>.Fail("验证码错误", ResultCode.Error);
                 }
+                // 2. 查询用户
                 var user = await userRep.FindAsync(x => x.UserName == dto.Username);
                 if (user == null)
                 {
@@ -77,30 +97,40 @@ namespace HotelABP.User
                 }
                 else
                 {
+                    // 3. 校验密码
                     if(user.Password != dto.Password)
                     {
                         return ApiResult<LoginResultDto>.Fail("密码错误", ResultCode.ValidationError);
                     }
                     else
                     {
+                        // 4. 生成Token并返回
                         return ApiResult<LoginResultDto>.Success(GenerateToken(user), ResultCode.Success);
                     }
                 }
             }
             catch (System.Exception)
             {
-
                 throw;
             }
         }
         /// <summary>
-        /// 生成token
+        /// 生成JWT Token，包含用户基本信息和过期时间
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
+        /// <param name="user">用户实体</param>
+        /// <returns>登录结果DTO，包含Token、过期时间、用户信息等</returns>
+        /// <remarks>
+        /// 1. 构造JWT声明（用户名、ID、昵称等）。
+        /// 2. 读取配置文件中的密钥，生成对称加密密钥。
+        /// 3. 选择HmacSha256算法。
+        /// 4. 设置Token过期时间（10小时）。
+        /// 5. 构造JwtSecurityToken对象。
+        /// 6. 生成Token字符串。
+        /// 7. 返回LoginResultDto。
+        /// </remarks>
         private LoginResultDto GenerateToken(SysUser user)
         {
-            //声明
+            // 1. 构造JWT声明
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
@@ -108,14 +138,14 @@ namespace HotelABP.User
                 new Claim("NickName", user.NickName),
             };
 
-            //JWT密钥转换字节对称密钥
+            // 2. JWT密钥转换字节对称密钥
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtConfig:Bearer:SecurityKey"]));
-            //算法
+            // 3. 算法
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            //过期时间
+            // 4. 过期时间
             var expires = DateTime.UtcNow.AddHours(10);
-            //payload负载
+            // 5. payload负载
             var token = new JwtSecurityToken(
                 configuration["JwtConfig:Bearer:Issuer"],
                 configuration["JwtConfig:Bearer:Audience"],
@@ -126,8 +156,9 @@ namespace HotelABP.User
             
             var handler = new JwtSecurityTokenHandler();
 
-            //生成token
+            // 6. 生成token
             string jwt = handler.WriteToken(token);
+            // 7. 返回结果
             return new LoginResultDto
             {
                 AccessToken = jwt,
@@ -140,25 +171,35 @@ namespace HotelABP.User
             };
         }
         /// <summary>
-        /// 获取用户信息
+        /// 获取所有用户信息列表
         /// </summary>
-        /// <returns></returns>
+        /// <returns>用户实体列表</returns>
+        /// <remarks>
+        /// 1. 查询所有用户。
+        /// 2. 返回ApiResult包装的用户列表。
+        /// </remarks>
         //[HttpGet("/api/v1/user/GetUser")]
         public async Task<ApiResult<List<SysUser>>> GetUserAsync()
         {
-            var user = await userRep.GetListAsync();
-            return ApiResult<List<SysUser>>.Success(user,ResultCode.Success);
+            var user = await userRep.GetListAsync(); // 查询所有用户
+            return ApiResult<List<SysUser>>.Success(user,ResultCode.Success); // 返回结果
         }
         /// <summary>
-        /// 初始化数据
+        /// 初始化用户数据，插入一个默认管理员账号
         /// </summary>
-        /// <returns></returns>
+        /// <returns>插入的用户实体</returns>
+        /// <remarks>
+        /// 1. 构造默认管理员用户对象。
+        /// 2. 插入数据库。
+        /// 3. 返回插入结果。
+        /// </remarks>
         //[AllowAnonymous]
        // [HttpGet("/api/v1/user/Init")]
         public async Task<ApiResult<SysUser>> InitDataAsync()
         {
             try
             {
+                // 构造默认管理员用户
                 SysUser sysUser = new SysUser
                 {
                     UserName = "admin",
@@ -169,12 +210,11 @@ namespace HotelABP.User
                     Status = Status.Enable,
                     Email = "admin@qq.com"
                 };
-                await userRep.InsertAsync(sysUser);
-                return ApiResult<SysUser>.Success(sysUser,ResultCode.Success);
+                await userRep.InsertAsync(sysUser); // 插入数据库
+                return ApiResult<SysUser>.Success(sysUser,ResultCode.Success); // 返回结果
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
