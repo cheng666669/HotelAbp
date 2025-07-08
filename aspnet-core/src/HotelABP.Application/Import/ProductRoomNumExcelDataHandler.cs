@@ -1,15 +1,10 @@
 ﻿using HotelABP.RoomNummbers;
-using HotelABP.RoomTypes;
 using Microsoft.AspNetCore.Mvc;
-using NPOI.SS.Formula.Functions;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Application.Services;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Repositories;
 
@@ -26,9 +21,22 @@ namespace HotelABP.Import
             _productRepository = productRepository;
         }
  
+        /// <summary>
+        /// 处理Excel流，批量导入房号数据（支持NPOI解析、DTO映射、批量插入）
+        /// </summary>
+        /// <param name="stream">Excel文件流</param>
+        /// <returns>成功导入的数据条数</returns>
+        /// <remarks>
+        /// 1. 使用NPOI解析Excel流，获取第一个Sheet。
+        /// 2. 跳过表头，从第二行开始遍历。
+        /// 3. 逐行读取单元格，映射为RoomNummber实体。
+        /// 4. 支持类型转换（int、bool等）。
+        /// 5. 收集所有实体后批量插入数据库。
+        /// 6. 返回导入的实体数量。
+        /// </remarks>
         public async Task<int> HandleAsync(Stream stream)
         {
-            var workbook = new XSSFWorkbook(stream);
+            var workbook = new XSSFWorkbook(stream); // 1. 解析Excel流
             var sheet = workbook.GetSheetAt(0);
             var entities = new List<RoomNummber>();
 
@@ -50,10 +58,19 @@ namespace HotelABP.Import
                 entities.Add(entity);
             }
 
-            await _productRepository.InsertManyAsync(entities, autoSave: true);
-            return entities.Count;
+            await _productRepository.InsertManyAsync(entities, autoSave: true); // 5. 批量插入数据库
+            return entities.Count; // 6. 返回导入数量
         }
 
+        /// <summary>
+        /// 获取单元格的int类型值（支持多种单元格类型）
+        /// </summary>
+        /// <param name="cell">Excel单元格</param>
+        /// <returns>转换后的int值，无法转换时返回0</returns>
+        /// <remarks>
+        /// 1. 支持数值型、字符串型单元格。
+        /// 2. 字符串型尝试int.TryParse。
+        /// </remarks>
         private int GetIntCellValue(NPOI.SS.UserModel.ICell cell)
         {
             if (cell == null) return 0;
@@ -62,6 +79,15 @@ namespace HotelABP.Import
             return 0;
         }
 
+        /// <summary>
+        /// 获取单元格的bool类型值（支持多种单元格类型）
+        /// </summary>
+        /// <param name="cell">Excel单元格</param>
+        /// <returns>转换后的bool值，无法转换时返回false</returns>
+        /// <remarks>
+        /// 1. 支持布尔型、数值型、字符串型单元格。
+        /// 2. 字符串型尝试bool.TryParse。
+        /// </remarks>
         private bool GetBoolCellValue(NPOI.SS.UserModel.ICell cell)
         {
             if (cell == null) return false;
