@@ -411,7 +411,6 @@ namespace HotelABP.Customer
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
-        
         /// <summary>
         /// 更新客户积分（支持积分增减、累计积分记录、备注说明）
         /// </summary>
@@ -427,6 +426,7 @@ namespace HotelABP.Customer
         /// 7. 更新数据库。
         /// 8. 捕获异常并返回失败信息。
         /// </remarks>
+
         public async Task<ApiResult<bool>> UpdateAvailablePoints(UpAvailablePointsDto upAvailable)
         {
             try
@@ -456,17 +456,9 @@ namespace HotelABP.Customer
                     return ApiResult<bool>.Fail("积分不足", ResultCode.Error);
                 }
 
-                // 5. 更新累计积分记录
-                // 如果是积分增加（正数），则累加到客户的累计积分中
-                if (upAvailable.Accumulativeintegral > 0)
-                {
-                    customer.Accumulativeintegral = (customer.Accumulativeintegral ) + upAvailable.Accumulativeintegral;
-                }
-                // 如果是积分减少（负数），也更新累计积分记录（通常用于记录消费或兑换）
-                else
-                {
-                    customer.Accumulativeintegral = (customer.Accumulativeintegral ) + upAvailable.Accumulativeintegral;
-                }
+
+                // 5. 更新累计积分
+                customer.Accumulativeintegral = (customer.Accumulativeintegral ?? 0) + upAvailable.Accumulativeintegral;
 
                 // 6. 更新积分变更备注：记录本次积分变动的原因或说明
                 customer.Pointsmodifydesc = upAvailable.Pointsmodifydesc;
@@ -483,7 +475,6 @@ namespace HotelABP.Customer
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
-
         /// <summary>
         /// 根据ID获取客户详细信息
         /// </summary>
@@ -495,22 +486,27 @@ namespace HotelABP.Customer
         /// 3. 使用ObjectMapper将实体映射为DTO。
         /// 4. 返回包含客户详细信息的ApiResult。
         /// </remarks>
-        public async Task<ApiResult<GetCustomerDto>> GetCustomerByIdAsync(Guid id)
+        
+        public async Task<ApiResult<FanCustomerDto>> GetCustomerByIdAsync(Guid id)
         {
-            // 1. 根据ID查询客户实体：使用FirstOrDefaultAsync方法查询，如果不存在则返回null
+            // 获取客户信息
             var customer = await _customerRepository.FirstOrDefaultAsync(c => c.Id == id);
             
             // 2. 检查客户是否存在：如果查询结果为null，则返回NotFound错误
             if (customer == null)
             {
-                return ApiResult<GetCustomerDto>.Fail("客户不存在", ResultCode.NotFound);
+                return ApiResult<FanCustomerDto>.Fail("客户不存在", ResultCode.NotFound);
             }
+            // 获取客户类型信息
+            var customerType = await _customerTypeRepository.FirstOrDefaultAsync(t => t.Id == customer.CustomerType);
 
-            // 3. 使用ObjectMapper将实体映射为DTO：将数据库实体转换为前端可用的DTO对象
-            var customerDto = ObjectMapper.Map<HotelABPCustoimerss, GetCustomerDto>(customer);
-            
-            // 4. 返回包含客户详细信息的ApiResult：成功状态码和映射后的DTO
-            return ApiResult<GetCustomerDto>.Success(customerDto, ResultCode.Success);
+            // 映射客户信息到 DTO
+            var customerDto = ObjectMapper.Map<HotelABPCustoimerss, FanCustomerDto>(customer);
+
+            // 设置客户类型名称
+            customerDto.CustomerTypeName = customerType?.CustomerTypeName;
+
+            return ApiResult<FanCustomerDto>.Success(customerDto, ResultCode.Success);
         }
     }
 }
