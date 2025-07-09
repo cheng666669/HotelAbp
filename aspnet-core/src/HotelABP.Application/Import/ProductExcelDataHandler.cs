@@ -26,7 +26,7 @@ namespace HotelABP.Import
             _productRepository = productRepository;
         }
  
-        public async Task<int> HandleAsync(Stream stream)
+      public async Task<int> HandleAsync(Stream stream)
         {
             var workbook = new XSSFWorkbook(stream);
             var sheet = workbook.GetSheetAt(0);
@@ -37,10 +37,16 @@ namespace HotelABP.Import
                 var row = sheet.GetRow(i);
                 if (row == null) continue;
 
+                var roomTypeIdCell = row.GetCell(1)?.ToString();
+                if (!Guid.TryParse(roomTypeIdCell, out Guid roomTypeId))
+                {
+                    // 如果无法解析为 Guid，可以选择跳过或抛出异常
+                    continue; // 或者 throw new Exception($"Invalid Guid format in row {i + 1}, column 2");
+                }
+
                 var entity = new RoomNummber
                 {
-                    // 假设第0列为房号，第1列为类型等，按实际字段映射
-                    RoomTypeId = row.GetCell(1)?.ToString(),
+                    RoomTypeId = roomTypeId,
                     RoomNum = row.GetCell(2)?.ToString(),
                     Order = GetIntCellValue(row.GetCell(3)),
                     Description = row.GetCell(4)?.ToString(),

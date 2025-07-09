@@ -78,7 +78,7 @@ namespace HotelABP.ReserveRooms
                         }
 
                         var reserveRoom = ObjectMapper.Map<CreateRoom, ReserveRoom>(room);
-                        reserveRoom.RoomTypeid = item.Id.ToString();
+                        reserveRoom.RoomTypeid = item.Id;
                         reserveRoom.Price = item.Price;
                         //reserveRoom.RoomNum = "未排房";
                         // 建议补充 BreakfastNum 字段赋值
@@ -138,7 +138,7 @@ namespace HotelABP.ReserveRooms
                 var roomTypes = await _roomTypeRepository.GetQueryableAsync();
 
                 var listdto = from reserveRoom in list
-                              join roomType in roomTypes on reserveRoom.RoomTypeid equals roomType.Id.ToString()
+                              join roomType in roomTypes on reserveRoom.RoomTypeid equals roomType.Id
                               select new ReserveRoomShowDto
                               {
                                   Id = reserveRoom.Id,
@@ -150,7 +150,7 @@ namespace HotelABP.ReserveRooms
                                   Sdate = reserveRoom.Sdate,
                                   Edate = reserveRoom.Edate,
                                   Day = reserveRoom.Day,
-                                  RoomTypeid = roomType.Id.ToString(),
+                                  RoomTypeid = roomType.Id,
                                   RoomTypeName = roomType.Name, // 房型名称
                                   BreakfastNum = reserveRoom.BreakfastNum,
                                   Price = reserveRoom.Price,
@@ -208,7 +208,7 @@ namespace HotelABP.ReserveRooms
         /// 房间号
         /// </summary>
         /// <returns></returns>
-        public async Task<ApiResult<List<RoomNumDto>>> GetRoomNmlist(string guid)
+        public async Task<ApiResult<List<RoomNumDto>>> GetRoomNmlist(Guid guid)
         {
             var list = await roomnumberreposi.GetListAsync(x => x.RoomTypeId == guid);
             var roomNumList = list.Select(x => new RoomNumDto
@@ -356,7 +356,7 @@ namespace HotelABP.ReserveRooms
             var roomTypes = await _roomTypeRepository.GetListAsync();
 
             var listdto = (from reserveRoom in list
-                           join roomType in roomTypes on reserveRoom.RoomTypeid equals roomType.Id.ToString()
+                           join roomType in roomTypes on reserveRoom.RoomTypeid equals roomType.Id
                            select new ReserveRoomShowDto
                            {
                                Id = reserveRoom.Id,
@@ -368,7 +368,7 @@ namespace HotelABP.ReserveRooms
                                Sdate = reserveRoom.Sdate,
                                Edate = reserveRoom.Edate,
                                Day = reserveRoom.Day,
-                               RoomTypeid = roomType.Id.ToString(),
+                               RoomTypeid = roomType.Id,
                                RoomTypeName = roomType.Name, // 房型名称
                                BreakfastNum = reserveRoom.BreakfastNum,
                                Price = reserveRoom.Price,

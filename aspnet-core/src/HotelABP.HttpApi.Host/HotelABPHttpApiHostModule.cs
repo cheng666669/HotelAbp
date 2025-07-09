@@ -1,5 +1,5 @@
 using HotelABP.EntityFrameworkCore;
-﻿using HotelABP.EntityFrameworkCore;
+using HotelABP.EntityFrameworkCore;
 using HotelABP.Import;
 using HotelABP.MultiTenancy;
 using HotelABP.MultiTenancy;
@@ -7,6 +7,7 @@ using HotelABP.Services;
 using HotelABP.MultiTenancy;
 using HotelABP.MultiTenancy;
 using HotelABP.RoomReserves;
+using Lazy.Captcha.Core.Generator;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Builder;
@@ -24,6 +25,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Validation.AspNetCore;
+using SkiaSharp;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.IO;
@@ -75,7 +77,7 @@ public class HotelABPHttpApiHostModule : AbpModule
             });
         });
     }
-   
+
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         //343443434334
@@ -84,13 +86,13 @@ public class HotelABPHttpApiHostModule : AbpModule
         Configure<AbpAntiForgeryOptions>(options =>
         {
             options.AutoValidate = false; // ⛔ 禁用全局防伪验证
-        }); 
+        });
         //context.Services.AddTransient(typeof(IExcelImporter<>), typeof(NpoiExcelImporter<>));
         // 绑定 Alipay 配置
         context.Services.Configure<AlipayOptions>(configuration.GetSection("Alipay"));
 
         ConfigureAuthentication(context);
-       
+
         context.Services.Configure<AliyunOptions>(context.Services.GetConfiguration().GetSection("Aliyun"));
         context.Services.AddTransient<AliyunOssService>();
         ConfigureBundles();
@@ -99,7 +101,14 @@ public class HotelABPHttpApiHostModule : AbpModule
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
-
+        context.Services.AddCaptcha(context.Services.GetConfiguration(), option =>
+        {
+            option.CaptchaType = CaptchaType.WORD;
+            option.CodeLength = 4;
+            option.ExpirySeconds = 60;
+            option.ImageOption.FontFamily = SKTypeface.FromFamilyName("DejaVu Sans");
+            // 不设置 FontFamily，使用系统默认字体
+        });
         // 注册全局异常过滤器
         context.Services.AddControllers(options =>
         {

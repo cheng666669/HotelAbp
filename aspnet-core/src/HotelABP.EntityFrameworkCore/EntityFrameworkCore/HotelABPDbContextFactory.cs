@@ -16,10 +16,15 @@ public class HotelABPDbContextFactory : IDesignTimeDbContextFactory<HotelABPDbCo
 
         var configuration = BuildConfiguration();
 
-        var builder = new DbContextOptionsBuilder<HotelABPDbContext>()
-            // .UseSqlServer(configuration.GetConnectionString("Default"));
-            .UseMySql(configuration.GetConnectionString("Default"), ServerVersion.Parse("5.7.39-mysql"));
-
+       var connectionString = configuration.GetConnectionString("Default");
+    
+    var builder = new DbContextOptionsBuilder<HotelABPDbContext>();
+    
+    // 自动检测 MySQL 服务器版本
+    builder.UseMySql(
+        connectionString, 
+        ServerVersion.AutoDetect(connectionString)
+    );
         return new HotelABPDbContext(builder.Options);
     }
 

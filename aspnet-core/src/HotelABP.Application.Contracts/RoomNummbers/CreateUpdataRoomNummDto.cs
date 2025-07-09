@@ -14,7 +14,7 @@ namespace HotelABP.RoomNummbers
         /// <summary>
         /// 房型Id
         /// </summary>
-        public string RoomTypeId { get; set; }
+        public Guid RoomTypeId { get; set; }
         /// <summary>
         /// 房号
         /// </summary>

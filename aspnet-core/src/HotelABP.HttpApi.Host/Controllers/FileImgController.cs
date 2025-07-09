@@ -22,6 +22,11 @@ namespace HotelABP.Controllers
             this.webHost = webHost;
             _aliyunOssService = aliyunOssService;
         }
+        /// <summary>
+        /// 异常测试接口
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         [HttpGet("error")]
         public IActionResult ThrowError()
         {
