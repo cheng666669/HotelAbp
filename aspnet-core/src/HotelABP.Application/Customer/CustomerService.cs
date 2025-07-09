@@ -411,7 +411,11 @@ namespace HotelABP.Customer
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
-        
+        /// <summary>
+        /// 更新客户可用积分
+        /// </summary>
+        /// <param name="upAvailable"></param>
+        /// <returns></returns>
         public async Task<ApiResult<bool>> UpdateAvailablePoints(UpAvailablePointsDto upAvailable)
         {
             try
@@ -439,14 +443,7 @@ namespace HotelABP.Customer
                 }
 
                 // 5. 更新累计积分
-                if (upAvailable.Accumulativeintegral > 0)
-                {
-                    customer.Accumulativeintegral = (customer.Accumulativeintegral ) + upAvailable.Accumulativeintegral;
-                }
-                else
-                {
-                    customer.Accumulativeintegral = (customer.Accumulativeintegral ) + upAvailable.Accumulativeintegral;
-                }
+                customer.Accumulativeintegral = (customer.Accumulativeintegral ?? 0) + upAvailable.Accumulativeintegral;
 
                 // 6. 更新积分备注
                 customer.Pointsmodifydesc = upAvailable.Pointsmodifydesc;
@@ -461,17 +458,30 @@ namespace HotelABP.Customer
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
-
-        public async Task<ApiResult<GetCustomerDto>> GetCustomerByIdAsync(Guid id)
+        /// <summary>
+        ///   获取客户详情（包含客户类型名称）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<FanCustomerDto>> GetCustomerByIdAsync(Guid id)
         {
+            // 获取客户信息
             var customer = await _customerRepository.FirstOrDefaultAsync(c => c.Id == id);
             if (customer == null)
             {
-                return ApiResult<GetCustomerDto>.Fail("客户不存在", ResultCode.NotFound);
+                return ApiResult<FanCustomerDto>.Fail("客户不存在", ResultCode.NotFound);
             }
 
-            var customerDto = ObjectMapper.Map<HotelABPCustoimerss, GetCustomerDto>(customer);
-            return ApiResult<GetCustomerDto>.Success(customerDto, ResultCode.Success);
+            // 获取客户类型信息
+            var customerType = await _customerTypeRepository.FirstOrDefaultAsync(t => t.Id == customer.CustomerType);
+
+            // 映射客户信息到 DTO
+            var customerDto = ObjectMapper.Map<HotelABPCustoimerss, FanCustomerDto>(customer);
+
+            // 设置客户类型名称
+            customerDto.CustomerTypeName = customerType?.CustomerTypeName;
+
+            return ApiResult<FanCustomerDto>.Success(customerDto, ResultCode.Success);
         }
     }
 }
