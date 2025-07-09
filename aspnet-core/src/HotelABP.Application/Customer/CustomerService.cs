@@ -73,7 +73,7 @@ namespace HotelABP.Customer
         /// 1. 查询所有客户类型。
         /// 2. 组装为DTO列表。
         /// </remarks>
-        public async Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustoimerTypeNameAsync()
+        public async Task<ApiResult<List<GetCustoimerTypeNameDto>>> GetCustomerTypeNameAsync()
         {
             var list = await _customerTypeRepository.GetQueryableAsync();
             var result = list.Select(x => new GetCustoimerTypeNameDto
