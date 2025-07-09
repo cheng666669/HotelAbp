@@ -99,5 +99,76 @@ namespace HotelABP.Label
                 return ApiResult<PageResult<GetLabelDto>>.Fail(ex.Message, ResultCode.Error);
             }
         }
+        /// <summary>
+        /// 删除标签（根据ID）
+        /// </summary>
+        /// <param name="guid">标签ID</param>
+        /// <returns>操作结果，成功返回Success状态码</returns>
+        /// <remarks>
+        /// 1. 根据ID查找标签实体。
+        /// 2. 从数据库中删除该标签。
+        /// 3. 返回操作结果。
+        /// 4. 捕获异常并向上抛出。
+        /// </remarks>
+        [HttpDelete]
+        public async Task<ApiResult> DelLabelAsync(Guid guid)
+        {
+            try
+            {
+                // 根据ID查找标签实体，确保要删除的标签存在
+                var res = await _labelRepository.FindAsync(x => x.Id == guid);
+                
+                // 如果找到标签，则从数据库中删除它
+                // 如果标签不存在，FindAsync会抛出异常，会被catch块捕获
+                await _labelRepository.DeleteAsync(res);
+                
+                // 删除成功，返回成功的ApiResult，状态码为Success
+                return ApiResult.Success(ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                // 捕获异常（如标签不存在、数据库操作失败等）
+                // 向上层抛出异常，由全局异常处理器或调用方处理
+                throw;
+            }
+        }
+        
+        /// <summary>
+        /// 修改标签信息（根据ID）
+        /// </summary>
+        /// <param name="guid">标签ID</param>
+        /// <param name="ldto">包含更新信息的标签DTO</param>
+        /// <returns>操作结果，成功返回Success状态码</returns>
+        /// <remarks>
+        /// 1. 根据ID查找标签实体。
+        /// 2. 使用ObjectMapper将DTO中的属性映射到实体。
+        /// 3. 更新数据库中的标签信息。
+        /// 4. 返回操作结果。
+        /// 5. 捕获异常并向上抛出。
+        /// </remarks>
+        public async Task<ApiResult> UpdateLabelAsync(Guid guid, LabelDto ldto)
+        {
+            try
+            {
+                // 根据ID查找标签实体，确保要更新的标签存在
+                var res = await _labelRepository.FindAsync(x => x.Id == guid);
+                
+                // 使用ObjectMapper将输入DTO的属性映射到找到的实体对象
+                // 这样可以只更新DTO中包含的字段，保留其他字段的原值
+                var dto = ObjectMapper.Map(ldto, res);
+                
+                // 将更新后的实体保存到数据库
+                await _labelRepository.UpdateAsync(dto);
+                
+                // 更新成功，返回成功的ApiResult，状态码为Success
+                return ApiResult.Success(ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                // 捕获异常（如标签不存在、数据库操作失败等）
+                // 向上层抛出异常，由全局异常处理器或调用方处理
+                throw;
+            }
+        }
     }
 }
