@@ -69,7 +69,7 @@ namespace HotelABP.RoomNumms
             var queryable = await _roomNummberRepository.GetQueryableAsync();
 
             queryable = queryable
-                .WhereIf(!string.IsNullOrWhiteSpace(input.RoomTypeId), x => x.RoomTypeId == input.RoomTypeId);
+                .WhereIf((input.RoomTypeId!=null), x => x.RoomTypeId == input.RoomTypeId);
 
             var dto=ObjectMapper.Map<List<RoomNummber>, List<RoomNummDto>>(queryable.ToList());
             var res = dto.AsQueryable().PageResult(seach.PageIndex, seach.PageSize);
@@ -198,11 +198,11 @@ namespace HotelABP.RoomNumms
             var roomTypes = await _roomTypeRepository.GetQueryableAsync();
 
             var listdto = from roomnum in list
-                          join roomType in roomTypes on roomnum.RoomTypeId equals roomType.Id.ToString()
+                          join roomType in roomTypes on roomnum.RoomTypeId equals roomType.Id
                           select new RoomNummDto
                           {
                               Id = roomnum.Id,
-                               RoomTypeId = roomType.Id.ToString(),
+                               RoomTypeId = roomType.Id,
                                TypeName = roomType.Name,
                                RoomNum = roomnum.RoomNum,
                                State = roomnum.State,
@@ -211,7 +211,7 @@ namespace HotelABP.RoomNumms
                           };
 
             listdto = listdto
-               .WhereIf(!string.IsNullOrEmpty(input.RoomTypeId), x => x.RoomTypeId == input.RoomTypeId)
+               .WhereIf((input.RoomTypeId!=null), x => x.RoomTypeId == input.RoomTypeId)
                .WhereIf(input.State != null, x => x.State == input.State)
                 .WhereIf(!string.IsNullOrEmpty(input.RoomNum), x => x.RoomNum == input.RoomNum);
 

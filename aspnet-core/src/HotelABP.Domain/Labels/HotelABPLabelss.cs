@@ -87,5 +87,9 @@ namespace HotelABP.Labels
         /// </summary>
         [Range(0, 990000, ErrorMessage = "累计消费请填写 0～99 万的小数")]
         public decimal? TotalSpentMax { get; set; }
+        /// <summary>
+        /// 人数
+        /// </summary>
+        public int? PeopleNumber { get; set; }
     }
 }

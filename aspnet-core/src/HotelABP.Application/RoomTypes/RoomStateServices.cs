@@ -57,7 +57,7 @@ namespace HotelABP.RoomTypes
 
             // 4. 组装DTO，房型与预定信息关联
             var dto = (from type in roomType
-                      join reserve in reserveRoom on type.Id.ToString() equals reserve.RoomTypeid
+                      join reserve in reserveRoom on type.Id equals reserve.RoomTypeid
                       select new RoomTypeOrReserveRoomDto
                       {
                           Id = type.Id,
@@ -109,7 +109,7 @@ namespace HotelABP.RoomTypes
             {
                 TypeName = type.Name,
                 //TypeState = type.State,
-                Rooms = roomNumms.Where(r => r.RoomTypeId == type.Id.ToString())
+                Rooms = roomNumms.Where(r => r.RoomTypeId == type.Id)
                     .Select(r => new RoomNummDto
                     {
                         Id = r.Id,

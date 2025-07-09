@@ -55,6 +55,11 @@ namespace HotelABP.Customer
         /// <returns></returns>
         Task<ApiResult<bool>> UpdateCustomerStatusAsync(UpStautsDto upStautsdto);
         Task<ApiResult<bool>> UpdateAvailablePoints(UpAvailablePointsDto upAvailable);
-
+        /// <summary>
+        /// 根据客户ID获取客户详情
+        /// </summary>
+        /// <param name="id">客户ID</param>
+        /// <returns>包含客户详情的DTO</returns>
+        Task<ApiResult<GetCustomerDto>> GetCustomerByIdAsync(Guid id);
     }
 }
