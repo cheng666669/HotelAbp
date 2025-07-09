@@ -80,7 +80,7 @@ namespace HotelABP.Label
                 // 分页处理
                 var res = list.PageResult(seach.PageIndex, seach.PageSize);
                 // DTO映射
-                var dto = ObjectMapper.Map<List<HotelABPLabelss>, List<GetLabelDto>>(list.ToList());
+                var dto = ObjectMapper.Map<List<HotelABPLabelss>, List<GetLabelDto>>(res.Queryable.ToList());
                 // 返回分页结果
                 return ApiResult<PageResult<GetLabelDto>>.Success(
              new PageResult<GetLabelDto>
