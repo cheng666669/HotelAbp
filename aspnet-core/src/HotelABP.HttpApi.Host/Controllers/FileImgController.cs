@@ -26,15 +26,17 @@ namespace HotelABP.Controllers
             this.webHost = webHost;
             _aliyunOssService = aliyunOssService;
         }
-
         /// <summary>
-        /// 上传多个文件（如图片），将文件保存到服务器本地uploads目录下，并返回文件的相对路径列表。
+        /// 异常测试接口
         /// </summary>
-        /// <param name="files">前端上传的文件列表，类型为List<IFormFile>，支持多文件上传。</param>
-        /// <returns>
-        /// 返回一个包含所有上传文件相对路径的JSON对象，如：{"filePaths": ["/uploads/2024-05-01/xxx.jpg", ...]}
-        /// 如果未上传文件，则返回400 BadRequest。
-        /// </returns>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        [HttpGet("error")]
+        public IActionResult ThrowError()
+        {
+            throw new Exception("测试异常");
+        }
+       
         [HttpPost]
         public async Task<IActionResult> UploadFiles(List<IFormFile> files)
         {

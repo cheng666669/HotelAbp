@@ -8,7 +8,7 @@ namespace HotelABP.RoomNummbers
         /// <summary>
         /// 房型Id
         /// </summary>
-        public string RoomTypeId { get; set; }
+        public Guid RoomTypeId { get; set; }
         public string TypeName { get; set; }
         public int TypeState { get; set; }
 

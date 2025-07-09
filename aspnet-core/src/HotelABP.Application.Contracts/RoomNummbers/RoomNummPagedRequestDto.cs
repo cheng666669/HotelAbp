@@ -1,7 +1,9 @@
+using System;
+
 namespace HotelABP.RoomNummbers
 {
     public class RoomNummRoomTypeRequestDto
     {
-        public string? RoomTypeId { get; set; }
+        public Guid? RoomTypeId { get; set; }
     }
 } 

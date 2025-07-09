@@ -46,7 +46,7 @@ namespace HotelABP.DTos.ReserveRooms
         /// <summary>
         ///房间类型ID
         /// </summary>
-        public string? RoomTypeid { get; set; }
+        public Guid? RoomTypeid { get; set; }
         public string? RoomTypeName { get; set; } // 房型名称
         /// <summary>
         /// 早餐数量
