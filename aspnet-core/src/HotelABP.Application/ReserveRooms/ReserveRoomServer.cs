@@ -1,4 +1,5 @@
 ﻿using HotelABP.DTos.ReserveRooms;
+using HotelABP.Export;
 using HotelABP.RoomNummbers;
 using HotelABP.RoomReserves;
 using HotelABP.RoomTypes;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
+using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
 
 namespace HotelABP.ReserveRooms
@@ -28,14 +30,16 @@ namespace HotelABP.ReserveRooms
         private readonly IRepository<RoomType, Guid> _roomTypeRepository;
         private readonly IRepository<RoomNummber, Guid> roomnumberreposi;
         private readonly IRepository<MoneyDetail, Guid>  monrydetails;
+        private readonly IExportAppService _exportAppService;
 
-        public ReserveRoomServer(IRepository<ReserveRoom, Guid> reserveRoomRepository, IDistributedCache<List<ReserveRoomShowDto>> reserveRoomCache, IRepository<RoomType, Guid> roomTypeRepository, IRepository<RoomNummber, Guid> roomnumberreposi, IRepository<MoneyDetail, Guid> monrydetails)
+        public ReserveRoomServer(IRepository<ReserveRoom, Guid> reserveRoomRepository, IDistributedCache<List<ReserveRoomShowDto>> reserveRoomCache, IRepository<RoomType, Guid> roomTypeRepository, IRepository<RoomNummber, Guid> roomnumberreposi, IRepository<MoneyDetail, Guid> monrydetails, IExportAppService exportAppService)
         {
             this.reserveRoomRepository = reserveRoomRepository;
             this.reserveRoomCache = reserveRoomCache;
             _roomTypeRepository = roomTypeRepository;
             this.roomnumberreposi = roomnumberreposi;
             this.monrydetails = monrydetails;
+            _exportAppService = exportAppService;
         }
 
 
@@ -453,6 +457,44 @@ namespace HotelABP.ReserveRooms
                            }).FirstOrDefault(); // 使用 FirstOrDefault 获取单个对象
 
             return ApiResult<ReserveRoomShowDto>.Success(listdto, ResultCode.Success);
+        }
+
+        /// <summary>
+        /// 导出所有住房记录数据（支持DTO组装、字段映射、调用导出服务）
+        /// </summary>
+        /// <returns>Excel流内容</returns>
+        /// <remarks>
+        /// 1. 查询所有客户和客户类型。
+        /// 2. 联表组装DTO。
+        /// 3. 构造导出数据结构，设置字段映射。
+        /// 4. 调用导出服务生成Excel流。
+        /// </remarks>
+        public async Task<IRemoteStreamContent> ExportAllReserverAsync()
+        {
+            // 获取数据
+            var list = await reserveRoomRepository.GetListAsync();
+            // 构造导出数据结构
+            var exportData = new ExportDataDto<ReserveRoom>
+            {
+                FileName = "住宿管理",
+                Items = list.ToList(), // 将查询结果转换为列表并赋值给 Items
+                ColumnMappings = new Dictionary<string, string>
+                {
+                    { "Id", "预定ID" },
+                    { "Infomation", "客源信息" },
+                    { "Ordersource", "订单来源" },
+                    { "ReserveName", "预定姓名" },
+                    { "Phone", "手机号" },
+                    { "Day", "入住天数" },
+                    { "RoomTypeName", "房型名称" },
+                    { "Price", "价格" },
+                    { "Status", "状态" },
+                    { "RoomNum", "房间号" },
+                    { "Message", "备注" }
+                }
+            };
+            // 返回导出的内容
+            return await _exportAppService.ExportToExcelAsync(exportData);
         }
     }
 }

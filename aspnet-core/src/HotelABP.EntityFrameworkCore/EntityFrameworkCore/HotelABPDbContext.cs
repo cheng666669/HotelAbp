@@ -14,6 +14,7 @@ using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
+using HotelABP.Store;
 
 
 namespace HotelABP.EntityFrameworkCore;
@@ -68,8 +69,10 @@ public class HotelABPDbContext :
     public DbSet<HotelAbpGrades> HotelAbpGrades { get; set; }
     public DbSet<HotelABPCustoimerTypeName> HotelABPCustoimerTypeName { get; set; }
     
-
-
+    /// <summary>
+    /// 门店表
+    /// </summary>
+    public DbSet<StoreInfo> StoreInfo { get; set; }
 
 
     public DbSet<MoneyDetail> MoneyDetails { get; set; }
