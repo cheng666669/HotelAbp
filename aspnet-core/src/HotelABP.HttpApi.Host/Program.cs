@@ -49,7 +49,7 @@ public class Program
 
             // 加载本地机密配置
             builder.Configuration
-                .AddJsonFile(@"C:\Users\13775\AppData\Roaming\Microsoft\UserSecrets\HotelABP-4681b4fd-151f-4221-84a4-929d86723e4c\secrets.json", optional: true, reloadOnChange: true);
+                .AddJsonFile(@"C:\Users\Administrator\AppData\Roaming\Microsoft\UserSecrets\HotelABP-4681b4fd-151f-4221-84a4-929d86723e4c\secrets.json", optional: true, reloadOnChange: true);
 
             // 支持环境变量
             builder.Configuration.AddEnvironmentVariables();
