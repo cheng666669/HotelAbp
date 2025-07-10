@@ -7,6 +7,9 @@ using Volo.Abp.Domain.Entities;
 
 namespace HotelABP.Customer
 {
+    /// <summary>
+    /// 更新客户可用余额
+    /// </summary>
     public class UpAvailableBalanceDto
     {
         public Guid Id { get; set; } // 客户ID

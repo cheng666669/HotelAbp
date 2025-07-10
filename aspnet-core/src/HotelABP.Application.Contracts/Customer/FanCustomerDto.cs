@@ -119,5 +119,9 @@ namespace HotelABP.Customer
         /// 累计积分
         /// </summary>
         public decimal? Accumulativeintegral { get; set; }
+        /// <summary>
+        /// 标签
+        /// </summary>
+        public string? CustomerLabel { get; set; } = string.Empty;
     }
 }

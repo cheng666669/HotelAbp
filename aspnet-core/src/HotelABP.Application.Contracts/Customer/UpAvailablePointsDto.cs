@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace HotelABP.Customer
 {
+    /// <summary>
+    /// 修改会员可用积分
+    /// </summary>
     public class UpAvailablePointsDto
     {
         public Guid Id { get; set; }

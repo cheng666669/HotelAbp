@@ -79,5 +79,9 @@ namespace HotelABP.Customer
         /// </summary>
       //  [Range(1, 1000000000, ErrorMessage = "积分必须大于0且不超过10亿")]
         public decimal? AvailablePoints { get; set; }
+        /// <summary>
+        /// 标签
+        /// </summary>
+        public string? CustomerLabel { get; set; } = string.Empty;
     }
 }

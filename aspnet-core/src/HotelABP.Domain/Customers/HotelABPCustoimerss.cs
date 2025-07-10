@@ -114,6 +114,10 @@ namespace HotelABP.Customers
         /// 积分备注
         /// </summary>
         public string? Pointsmodifydesc { get; set; } = string.Empty;
+        /// <summary>
+        /// 标签
+        /// </summary>
+        public string?  CustomerLabel { get; set; }= string.Empty;
        
     }
 }
