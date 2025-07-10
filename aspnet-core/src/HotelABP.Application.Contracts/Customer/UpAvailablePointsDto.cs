@@ -9,14 +9,18 @@ namespace HotelABP.Customer
     public class UpAvailablePointsDto
     {
         public Guid Id { get; set; }
-        public decimal AvailablePoints { get; set; } = 1;
+        /// <summary>
+        /// 可用积分（必须大于0，最多10亿，仅会员有效）
+        /// </summary>
+        //  [Range(1, 1000000000, ErrorMessage = "积分必须大于0且不超过10亿")]
+        public decimal? AvailablePoints { get; set; }
         /// <summary>
         /// 累计积分
         /// </summary>
-        public decimal Accumulativeintegral { get; set; } = 0;
+        public decimal? Accumulativeintegral { get; set; } = 1;
         /// <summary>
         /// 积分备注
         /// </summary>
-        public string Pointsmodifydesc { get; set; } = string.Empty;
+        public string? Pointsmodifydesc { get; set; } = string.Empty;
     }
 }

@@ -46,5 +46,6 @@ public class HotelABPApplicationAutoMapperProfile : Profile
         CreateMap<MoneyDetail, MoneyDetailDto>().ReverseMap();
         CreateMap<HotelABPCustoimerss, GetCustomerDto>().ReverseMap();
         CreateMap<CreateUpdateStoreDto, StoreInfo>().ReverseMap();
+        CreateMap<HotelABPCustoimerss, FanCustomerDto>().ReverseMap();
     }
 }
