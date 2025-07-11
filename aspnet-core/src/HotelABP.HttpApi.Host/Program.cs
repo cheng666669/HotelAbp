@@ -8,7 +8,6 @@ using Serilog.Events;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Features; // 需要加上这个命名空间
 namespace HotelABP;
 
 public class Program
@@ -57,9 +56,6 @@ public class Program
             // 替换 ABP 使用的配置
             builder.Services.ReplaceConfiguration(builder.Configuration);
 
-
-
-           
 
             builder.Host.AddAppSettingsSecretsJson()
                 .UseAutofac()
