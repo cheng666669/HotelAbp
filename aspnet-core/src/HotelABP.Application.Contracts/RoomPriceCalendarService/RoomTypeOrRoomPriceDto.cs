@@ -8,6 +8,7 @@ namespace HotelABP.RoomPriceCalendarService
 {
     public class RoomTypeOrRoomPriceDto
     {
+        public Guid Id { get; set;}
         /// <summary>
         /// 房间类型ID
         /// </summary>
