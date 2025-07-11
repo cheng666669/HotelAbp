@@ -14,6 +14,7 @@ using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
+using HotelABP.RoomPriceCalendar;
 
 
 namespace HotelABP.EntityFrameworkCore;
@@ -73,8 +74,6 @@ public class HotelABPDbContext :
 
 
     public DbSet<MoneyDetail> MoneyDetails { get; set; }
-
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
