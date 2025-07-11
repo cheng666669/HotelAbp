@@ -13,5 +13,8 @@ namespace HotelABP.Label
     {
         Task<ApiResult<LabelDto>> AddLabelAsync(LabelDto ldto);
         Task<ApiResult<PageResult<GetLabelDto>>> GetCustomerListAsync(Seach seach, GetLabeDtoList dtoList);
+        Task<ApiResult> DelLabelAsync(Guid guid);
+        Task<ApiResult> UpdateLabelAsync(Guid guid,LabelDto ldto);
+        Task<ApiResult<FanLabelDto>>  GetLabelByIdAsync(Guid id);
     }
 }

@@ -9,10 +9,14 @@ using HotelABP.Role;
 using HotelABP.RoomNummbers;
 using HotelABP.RoomReserves;
 using HotelABP.RoomTypes;
-using HotelABP.Users;
 using HotelABP.RoomTypes.Types;
+
 using HotelABP.RoomPriceCalendarService;
 using HotelABP.RoomPriceCalendar;
+
+using HotelABP.Store;
+using HotelABP.Users;
+
 
 namespace HotelABP;
 
@@ -43,12 +47,18 @@ public class HotelABPApplicationAutoMapperProfile : Profile
         CreateMap<LabelDto,HotelABPLabelss>().ReverseMap();
         CreateMap<GetLabeDtoList, HotelABPLabelss>().ReverseMap();
         CreateMap<GetLabelDto, HotelABPLabelss>().ReverseMap();
-
+        CreateMap<StoreInfo, StoreResultDto>().ReverseMap();
         CreateMap<MoneyDetail, MoneyDetailDto>().ReverseMap();
         CreateMap<HotelABPCustoimerss, GetCustomerDto>().ReverseMap();
+
         // 房间价格日历
         CreateMap<RoomPrice, RoomTypeOrRoomPriceDto>().ReverseMap();
         CreateMap<RoomPrice,CreateRoomPriceDto>().ReverseMap();
+
+
+        CreateMap<CreateUpdateStoreDto, StoreInfo>().ReverseMap();
+        CreateMap<HotelABPCustoimerss, FanCustomerDto>().ReverseMap();
+        CreateMap<HotelABPLabelss, FanLabelDto>().ReverseMap();
 
     }
 }

@@ -7,6 +7,11 @@ using Volo.Abp.Application.Dtos;
 
 namespace HotelABP.Customer
 {
+    /// <summary>
+    /// <summary>
+    /// 修改客户信息
+    /// </summary>
+    /// </summary>
     public class UpCustomerDto
     {
         public List<Guid> ids { get; set; }
