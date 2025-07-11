@@ -43,6 +43,7 @@ using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using SqlSugarSetup;
 
 namespace HotelABP;
 
@@ -55,7 +56,8 @@ namespace HotelABP;
     typeof(AbpAccountWebOpenIddictModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule),
-    typeof(AbpCachingStackExchangeRedisModule)
+    typeof(AbpCachingStackExchangeRedisModule),
+    typeof(SqlSugarModule) 
 )]
 public class HotelABPHttpApiHostModule : AbpModule
 {
@@ -71,7 +73,7 @@ public class HotelABPHttpApiHostModule : AbpModule
             });
         });
     }
-
+  
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         //343443434334
@@ -223,7 +225,10 @@ public class HotelABPHttpApiHostModule : AbpModule
             options.SwaggerDoc("roomstate", new OpenApiInfo { Title = "房态管理API", Version = "v1" });
             options.SwaggerDoc("roomtype", new OpenApiInfo { Title = "房型管理API", Version = "v1" });
             options.SwaggerDoc("user", new OpenApiInfo { Title = "用户登录管理API", Version = "v1" });
+            options.SwaggerDoc("roomPriceCalendar", new OpenApiInfo { Title = "房型价格日历API", Version = "v1" });
+
             options.SwaggerDoc("store", new OpenApiInfo { Title = "门店管理API", Version = "v1" });
+
             options.DocInclusionPredicate((docName, apiDesc) =>
             {
                 if (apiDesc.GroupName == null) return docName == "v1"; // 没有分组的归到v1
@@ -278,7 +283,8 @@ public class HotelABPHttpApiHostModule : AbpModule
     {
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
-
+        var initService = context.ServiceProvider.GetRequiredService<DatabaseInitService>();
+        initService.InitTables();
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
@@ -323,7 +329,10 @@ public class HotelABPHttpApiHostModule : AbpModule
             c.SwaggerEndpoint("/swagger/roomstate/swagger.json", "房态管理API");
             c.SwaggerEndpoint("/swagger/roomtype/swagger.json", "房型管理API");
             c.SwaggerEndpoint("/swagger/user/swagger.json", "用户登录管理API");
+            c.SwaggerEndpoint("/swagger/roomPriceCalendar/swagger.json", "房型价格日历API");
+
             c.SwaggerEndpoint("/swagger/store/swagger.json", "门店管理API");
+
             c.RoutePrefix = string.Empty;
             var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
             c.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
