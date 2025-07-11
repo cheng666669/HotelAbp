@@ -170,5 +170,27 @@ namespace HotelABP.Label
                 throw;
             }
         }
+
+        public async Task<ApiResult<FanLabelDto>> GetLabelByIdAsync(Guid id)
+        {
+            // 参数校验
+            if (id == Guid.Empty)
+            {
+                return ApiResult<FanLabelDto>.Fail("ID无效", ResultCode.Error);
+            }
+
+            // 查询数据库中的标签实体
+            var entity = await _labelRepository.GetAsync(id);
+            if (entity == null)
+            {
+                return ApiResult<FanLabelDto>.Fail("未找到对应标签", ResultCode.Error);
+            }
+
+            // 使用 ObjectMapper 将实体反填到 FanLabelDto
+            var dto = ObjectMapper.Map<HotelABPLabelss, FanLabelDto>(entity);
+
+            // 返回成功结果
+            return ApiResult<FanLabelDto>.Success(dto, ResultCode.Success);
+        }
     }
 }

@@ -13,6 +13,7 @@ using Volo.Abp.ObjectMapping;
 using Volo.Abp.Validation;
 using static Volo.Abp.Http.MimeTypes;
 using System.Transactions;
+using HotelABP.Labels;
 
 
 
@@ -27,6 +28,7 @@ namespace HotelABP.Customer
     {
         private readonly IRepository<HotelABPCustoimerss, Guid> _customerRepository;
         private readonly IRepository<HotelABPCustoimerTypeName, Guid> _customerTypeRepository;
+        private readonly IRepository<HotelABPLabelss, Guid> _labelRepository;
         // 声明一个只读字段来保存我们封装的导出服务实例
         private readonly IExportAppService _exportAppService;
         // 声明一个只读字段来保存导入服务实例
@@ -35,10 +37,12 @@ namespace HotelABP.Customer
         public CustomerService(
             IRepository<HotelABPCustoimerss, Guid> customerRepository,
             IRepository<HotelABPCustoimerTypeName, Guid> customerTypeRepository,
+            IRepository<HotelABPLabelss, Guid> labelRepository,
             IExportAppService exportAppService)
         {
             _customerRepository = customerRepository;
             _customerTypeRepository = customerTypeRepository;
+            _labelRepository = labelRepository;
             _exportAppService = exportAppService;
         }
         /// <summary>
@@ -106,9 +110,13 @@ namespace HotelABP.Customer
         {
             var list = await _customerRepository.GetQueryableAsync();
             var types = await _customerTypeRepository.GetQueryableAsync();
+            var labels = await _labelRepository.GetQueryableAsync();
             // 多条件筛选
             list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerNickName), x => x.CustomerNickName.Contains(cudto.CustomerNickName));
             list = list.WhereIf(cudto.CustomerType != null, x => x.CustomerType == cudto.CustomerType);
+            // Guid模糊查询
+            list = list.WhereIf(cudto.Id != null, x => x.Id.ToString().Contains(cudto.Id.ToString()));
+     
             list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerName), x => x.CustomerName.Contains(cudto.CustomerName));
             list = list.WhereIf(!string.IsNullOrEmpty(cudto.PhoneNumber), x => x.PhoneNumber.Contains(cudto.PhoneNumber));
             // 性别判断逻辑
@@ -146,7 +154,8 @@ namespace HotelABP.Customer
                            ConsumerDesc = a.ConsumerDesc,
                            CreationTime = a.CreationTime,
                            CustomerDesc = a.CustomerDesc,
-                           Rechargeamount = a.Rechargeamount
+                           Rechargeamount = a.Rechargeamount,
+                         
                        };
 
 
@@ -475,6 +484,193 @@ namespace HotelABP.Customer
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
+
+        /// <summary>
+        /// 获取标签列表
+        /// </summary>
+        public async Task<ApiResult<List<LabelListDto>>> GetLabelListAsync()
+        {
+            try
+            {
+                var labels = await _labelRepository.GetListAsync();
+                var result = labels.Select(l => new LabelListDto
+                {
+                    Id = l.Id,
+                    LabelName = l.LabelName,
+                    TagType = l.TagType,
+                    PeopleNumber = l.PeopleNumber
+                }).ToList();
+
+                return ApiResult<List<LabelListDto>>.Success(result, ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<List<LabelListDto>>.Fail(ex.Message, ResultCode.Error);
+            }
+        }
+
+        /// <summary>
+        /// 为客户添加标签
+        /// </summary>
+        public async Task<ApiResult<bool>> AddCustomerLabelsAsync(CustomerLabelDto dto)
+        {
+            try
+            {
+                // 参数校验
+                if (dto.CustomerIds == null || !dto.CustomerIds.Any() ||
+                    dto.LabelIds == null || !dto.LabelIds.Any())
+                {
+                    return ApiResult<bool>.Fail("参数无效", ResultCode.Error);
+                }
+
+                // 验证标签是否存在
+                var labels = await _labelRepository.GetListAsync(l => dto.LabelIds.Contains(l.Id));
+                if (labels.Count != dto.LabelIds.Count)
+                {
+                    return ApiResult<bool>.Fail("部分标签不存在", ResultCode.Error);
+                }
+
+                // 获取客户列表
+                var customers = await _customerRepository.GetListAsync(c => dto.CustomerIds.Contains(c.Id));
+
+                // 更新每个客户的标签
+                foreach (var customer in customers)
+                {
+                    // 如果客户当前没有标签，初始化为空字符串
+                    if (string.IsNullOrEmpty(customer.CustomerLabel))
+                    {
+                        customer.CustomerLabel = "";
+                    }
+
+                    // 将现有标签转换为列表
+                    var currentLabels = customer.CustomerLabel.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                                     .Select(l => Guid.Parse(l))
+                                                     .ToList();
+
+                    // 添加新标签（避免重复）
+                    foreach (var labelId in dto.LabelIds)
+                    {
+                        if (!currentLabels.Contains(labelId))
+                        {
+                            currentLabels.Add(labelId);
+                        }
+                    }
+
+                    // 更新客户的标签字段
+                    customer.CustomerLabel = string.Join(",", currentLabels);
+                    await _customerRepository.UpdateAsync(customer);
+
+                    // 更新标签的人数统计
+                    foreach (var label in labels)
+                    {
+                        label.PeopleNumber = (label.PeopleNumber ?? 0) + 1;
+                        await _labelRepository.UpdateAsync(label);
+                    }
+                }
+
+                return ApiResult<bool>.Success(true, ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
+            }
+        }
+
+        /// <summary>
+        /// 移除客户标签
+        /// </summary>
+        public async Task<ApiResult<bool>> RemoveCustomerLabelsAsync(CustomerLabelDto dto)
+        {
+            try
+            {
+                // 参数校验
+                if (dto.CustomerIds == null || !dto.CustomerIds.Any() ||
+                    dto.LabelIds == null || !dto.LabelIds.Any())
+                {
+                    return ApiResult<bool>.Fail("参数无效", ResultCode.Error);
+                }
+
+                // 获取标签列表（用于更新人数）
+                var labels = await _labelRepository.GetListAsync(l => dto.LabelIds.Contains(l.Id));
+
+                // 获取客户列表
+                var customers = await _customerRepository.GetListAsync(c => dto.CustomerIds.Contains(c.Id));
+
+                // 更新每个客户的标签
+                foreach (var customer in customers)
+                {
+                    // 检查是否存在 CustomerLabel 属性
+                    if (string.IsNullOrEmpty(customer.CustomerLabel))
+                    {
+                        continue;
+                    }
+
+                    // 将现有标签转换为列表
+                    var currentLabels = customer.CustomerLabel.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                                             .Select(l => Guid.Parse(l))
+                                                             .Where(l => !dto.LabelIds.Contains(l))
+                                                             .ToList();
+
+                    // 更新客户的标签字段
+                    customer.CustomerLabel = string.Join(",", currentLabels);
+                    await _customerRepository.UpdateAsync(customer);
+
+                    // 更新标签的人数统计
+                    foreach (var label in labels)
+                    {
+                        label.PeopleNumber = Math.Max(0, (label.PeopleNumber ?? 1) - 1);
+                        await _labelRepository.UpdateAsync(label);
+                    }
+                }
+
+                return ApiResult<bool>.Success(true, ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
+            }
+        }
+
+        /// <summary>
+        /// 获取客户的所有标签
+        /// </summary>
+        public async Task<ApiResult<List<CustomerLabelResultDto>>> GetCustomerLabelsAsync(Guid customerId)
+        {
+            try
+            {
+                // 获取客户
+                var customer = await _customerRepository.GetAsync(customerId);
+                if (string.IsNullOrEmpty(customer.CustomerLabel))
+                {
+                    return ApiResult<List<CustomerLabelResultDto>>.Success(
+                        new List<CustomerLabelResultDto>(), 
+                        ResultCode.Success
+                    );
+                }
+
+                // 获取标签ID列表
+                var labelIds = customer.CustomerLabel.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                            .Select(l => Guid.Parse(l))
+                                            .ToList();
+
+                // 获取标签详细信息
+                var labels = await _labelRepository.GetListAsync(l => labelIds.Contains(l.Id));
+
+                // 转换为DTO
+                var result = labels.Select(l => new CustomerLabelResultDto
+                {
+                    LabelId = l.Id,
+                    LabelName = l.LabelName,
+                    TagType = l.TagType
+                }).ToList();
+
+                return ApiResult<List<CustomerLabelResultDto>>.Success(result, ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<List<CustomerLabelResultDto>>.Fail(ex.Message, ResultCode.Error);
+            }
+        }
         /// <summary>
         /// 根据ID获取客户详细信息
         /// </summary>
@@ -509,5 +705,6 @@ namespace HotelABP.Customer
             return ApiResult<FanCustomerDto>.Success(customerDto, ResultCode.Success);
         }
     }
+   
 }
 
