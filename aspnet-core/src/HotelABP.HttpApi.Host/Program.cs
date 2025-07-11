@@ -57,6 +57,7 @@ public class Program
             // 替换 ABP 使用的配置
             builder.Services.ReplaceConfiguration(builder.Configuration);
 
+
             // 注册CORS
             //builder.Services.AddCors(options =>
             //{
