@@ -22,6 +22,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["NuGet.Config", "."]
 COPY ["src/HotelABP.HttpApi.Host/HotelABP.HttpApi.Host.csproj", "src/HotelABP.HttpApi.Host/"]
+COPY ["SqlSugarSetup/SqlSugarSetup.csproj", "SqlSugarSetup/"]
 COPY ["src/HotelABP.Application/HotelABP.Application.csproj", "src/HotelABP.Application/"]
 COPY ["src/HotelABP.Domain/HotelABP.Domain.csproj", "src/HotelABP.Domain/"]
 COPY ["src/HotelABP.Domain.Shared/HotelABP.Domain.Shared.csproj", "src/HotelABP.Domain.Shared/"]
