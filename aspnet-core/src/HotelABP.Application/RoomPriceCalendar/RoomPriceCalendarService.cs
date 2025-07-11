@@ -40,7 +40,9 @@ namespace HotelABP.RoomPriceCalendar
             var roomTypes = await typeRep.GetListAsync();
 
             // 2. 用 SqlSugar 查询 RoomPrice
-            var roomPrices = await db.Queryable<RoomPrice>().ToListAsync();
+            var roomPrices = await db.Queryable<RoomPrice>()
+                .Where(x => x.IsDeleted == false)
+                .ToListAsync();
 
             // 3. 根据 TypeName 过滤
             if (!string.IsNullOrEmpty(TypeName))
@@ -53,6 +55,7 @@ namespace HotelABP.RoomPriceCalendar
                         join rp in roomPrices on rt.Id equals rp.RoomTypeId
                         select new RoomTypeOrRoomPriceDto
                         {
+                            Id = rp.Id,
                             RoomTypeId = rt.Id,
                             TypeName = rt.Name,
                             TypePrice = rt.Price,
@@ -131,24 +134,59 @@ namespace HotelABP.RoomPriceCalendar
             else
                 return ApiResult<int>.Fail("新增房价失败",ResultCode.Error);
         }
+        /// <summary>
+        /// 修改房价状态
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="CalendarStatus"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<bool>> UpdateRoomPriceState(Guid id, bool CalendarStatus)
+        {
+            // 1. 查询 RoomPrice 是否存在
+            var roomPrice = await db.Queryable<RoomPrice>().FirstAsync(x => x.Id == id);
+            if (roomPrice == null)
+            {
+                return ApiResult<bool>.Fail("未找到对应房价", ResultCode.Error);
+            }
 
-        //public async Task<ApiResult<int>> UpdateRoomPriceAsync(UpdateRoomPriceDto dto)
-        //{
-        //    1.根据 CalendarsId 查询对应的 RoomPriceCalendars 记录
-        //    var entity = await db.Queryable<RoomPriceCalendars>()
-        //        .FirstAsync(x => x.Id == dto.CalendarsId);
-        //    if (entity == null)
-        //    {
-        //        return ApiResult<int>.Fail(ResultCode.NotFound, "未找到对应的日历价格记录");
-        //    }
+            // 使用 SqlSugar 的 Updateable 进行房价状态的更新
+            // SetColumns 用于设置需要更新的字段，这里将 CalendarStatus 字段更新为传入的 CalendarStatus 参数
+            // Where 用于指定更新条件，这里根据房价的主键 Id 进行定位
+            // ExecuteCommandAsync 执行更新操作，返回受影响的行数
+            var updateCount = await db.Updateable<RoomPrice>()
+                .SetColumns(x => x.CalendarStatus == CalendarStatus) // 设置房价状态
+                .Where(x => x.Id == id) // 指定要更新的房价记录
+                .ExecuteCommandAsync(); // 执行更新操作
 
-        //    2.修改价格
-        //    entity.CalendarPrice = dto.NewPrice;
-
-        //    3.更新到数据库
-        //    var result = await db.Updateable(entity).ExecuteCommandAsync();
-        //    return ApiResult<int>.Success(result, ResultCode.Success);
-        //}
+            if (updateCount > 0)
+            {
+                return ApiResult<bool>.Success(true, ResultCode.Success);
+            }
+            else
+            {
+                return ApiResult<bool>.Fail("状态更新失败", ResultCode.Error);
+            }
+        }
+        /// <summary>
+        /// 删除房价
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<bool>> DeleteRoomPrice(Guid id)
+        {
+           var roomPrice= await db.Updateable<RoomPrice>()
+                .SetColumns(x => x.IsDeleted == true)
+                .Where(x => x.Id == id)
+                .ExecuteCommandAsync();
+            if (roomPrice > 0)
+            {
+                return ApiResult<bool>.Success(true, ResultCode.Success);
+            }
+            else
+            {
+                return ApiResult<bool>.Fail("删除失败", ResultCode.Error);
+            }
+        }
         /// <summary>
         /// 获取房型价格日历
         /// </summary>
@@ -164,7 +202,7 @@ namespace HotelABP.RoomPriceCalendar
             return ApiResult<List<RoomPriceCalendars>>.Success(list, ResultCode.Success);
         }
 
-     
+        
 
     }
 }

@@ -57,6 +57,9 @@ public class Program
             builder.Services.ReplaceConfiguration(builder.Configuration);
 
 
+
+           
+
             builder.Host.AddAppSettingsSecretsJson()
                 .UseAutofac()
                 .UseSerilog();

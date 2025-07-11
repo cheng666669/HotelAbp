@@ -83,7 +83,7 @@ namespace HotelABP.Customers
         /// </summary>
         public decimal? Rechargeamount { get; set; }  // 充值金额，默认为0元
         /// <summary>
-        ///  消费金额（默认为0元）
+        ///  变动金额
         /// </summary>
         public decimal? Sumofconsumption { get; set; }  
         /// <summary>
