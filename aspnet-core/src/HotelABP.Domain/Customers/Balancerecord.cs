@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace HotelABP.Customers
 {
-    internal class Balancerecord
+    public class Balancerecord: FullAuditedEntity<Guid>
     {
+
     }
 }
