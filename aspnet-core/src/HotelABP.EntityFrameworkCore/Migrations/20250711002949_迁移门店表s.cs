@@ -6,32 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HotelABP.Migrations
 {
     /// <inheritdoc />
-    public partial class 迁移门店表 : Migration
+    public partial class 迁移门店表s : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<Guid>(
-                name: "RoomTypeId",
-                table: "RoomNummbers",
-                type: "char(36)",
-                nullable: false,
-                collation: "ascii_general_ci",
-                oldClrType: typeof(string),
-                oldType: "longtext")
-                .OldAnnotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.AlterColumn<Guid>(
-                name: "RoomTypeid",
-                table: "ReserveRooms",
-                type: "char(36)",
-                nullable: true,
-                collation: "ascii_general_ci",
-                oldClrType: typeof(string),
-                oldType: "longtext",
-                oldNullable: true)
-                .OldAnnotation("MySql:CharSet", "utf8mb4");
-
             migrationBuilder.CreateTable(
                 name: "StoreInfo",
                 columns: table => new
@@ -51,6 +30,10 @@ namespace HotelABP.Migrations
                     Introduction = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Note = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ExtraProperties = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ConcurrencyStamp = table.Column<string>(type: "varchar(40)", maxLength: 40, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreationTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     CreatorId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
@@ -72,27 +55,6 @@ namespace HotelABP.Migrations
         {
             migrationBuilder.DropTable(
                 name: "StoreInfo");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "RoomTypeId",
-                table: "RoomNummbers",
-                type: "longtext",
-                nullable: false,
-                oldClrType: typeof(Guid),
-                oldType: "char(36)")
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .OldAnnotation("Relational:Collation", "ascii_general_ci");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "RoomTypeid",
-                table: "ReserveRooms",
-                type: "longtext",
-                nullable: true,
-                oldClrType: typeof(Guid),
-                oldType: "char(36)",
-                oldNullable: true)
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .OldAnnotation("Relational:Collation", "ascii_general_ci");
         }
     }
 }

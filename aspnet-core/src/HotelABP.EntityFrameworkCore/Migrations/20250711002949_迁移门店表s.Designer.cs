@@ -13,8 +13,8 @@ using Volo.Abp.EntityFrameworkCore;
 namespace HotelABP.Migrations
 {
     [DbContext(typeof(HotelABPDbContext))]
-    [Migration("20250710013747_调整门店继承审计字段")]
-    partial class 调整门店继承审计字段
+    [Migration("20250711002949_迁移门店表s")]
+    partial class 迁移门店表s
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
