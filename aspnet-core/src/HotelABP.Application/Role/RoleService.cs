@@ -630,6 +630,86 @@ namespace HotelABP.Role
             }
         }
 
+        /// <summary>
+        /// 添加门店权限数据
+        /// </summary>
+        /// <returns>操作结果</returns>
+        /// <remarks>
+        /// 1. 创建门店一级菜单
+        /// 2. 创建门店管理二级菜单
+        /// 3. 创建门店列表三级菜单
+        /// 4. 添加门店列表下的操作权限
+        /// </remarks>
+        public async Task<ApiResult> AddStorePermissionData()
+        {
+            try
+            {
+                // 创建门店一级菜单（顶级菜单）
+                var store = new Permission { 
+                    PermissionName = "门店", 
+                    Path = "/store", 
+                    Icon = "icon-store", 
+                    Order = 8, 
+                    IsMenu = true, 
+                    IsVisible = true 
+                };
+                await perRep.InsertAsync(store);
+
+                // 创建门店管理二级菜单（门店的子菜单）
+                var storeManage = new Permission { 
+                    PermissionName = "门店管理", 
+                    ParentId = store.Id, 
+                    Path = "/store/manage", 
+                    Icon = "icon-store-manage", 
+                    Order = 1, 
+                    IsMenu = true, 
+                    IsVisible = true 
+                };
+                await perRep.InsertAsync(storeManage);
+
+                // 创建门店列表三级菜单（门店管理的子菜单）
+                var storeList = new Permission { 
+                    PermissionName = "门店列表", 
+                    ParentId = storeManage.Id, 
+                    Path = "/store/manage/list", 
+                    Icon = "icon-store-list", 
+                    Order = 1, 
+                    IsMenu = true, 
+                    IsVisible = true 
+                };
+                await perRep.InsertAsync(storeList);
+
+                // 添加门店列表下的操作权限（非菜单）
+                var storeOperations = new[] { 
+                    "相册编辑", 
+                    "编辑", 
+                    "启用开关", 
+                    "设置管理员", 
+                    "新增门店" 
+                };
+                
+                int operationOrder = 1;
+                foreach (var name in storeOperations)
+                {
+                    await perRep.InsertAsync(new Permission { 
+                        PermissionName = name, 
+                        ParentId = storeList.Id, 
+                        Path = string.Empty, 
+                        Icon = string.Empty, 
+                        Order = operationOrder++, 
+                        IsMenu = false, 
+                        IsVisible = true 
+                    });
+                }
+
+                return ApiResult.Success(ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("添加门店权限数据有误" + ex.Message);
+                throw;
+            }
+        }
         
     }
 }
