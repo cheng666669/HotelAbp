@@ -49,12 +49,27 @@ public class Program
 
             // 加载本地机密配置
             builder.Configuration
-                .AddJsonFile(@"C:\Users\10351\AppData\Roaming\Microsoft\UserSecrets\HotelABP-4681b4fd-151f-4221-84a4-929d86723e4c\secrets.json", optional: true, reloadOnChange: true);
+                .AddJsonFile(@"C:\Users\Administrator\AppData\Roaming\Microsoft\UserSecrets\HotelABP-4681b4fd-151f-4221-84a4-929d86723e4c\secrets.json", optional: true, reloadOnChange: true);
+
             // 支持环境变量
             builder.Configuration.AddEnvironmentVariables();
 
             // 替换 ABP 使用的配置
             builder.Services.ReplaceConfiguration(builder.Configuration);
+
+
+            // 注册CORS
+            //builder.Services.AddCors(options =>
+            //{
+            //    options.AddPolicy("AllowFrontend", policy =>
+            //    {
+            //        policy
+            //            .WithOrigins("http://8.152.98.56:3030") // 允许前端地址
+            //            .AllowAnyHeader()
+            //            .AllowAnyMethod()
+            //            .AllowCredentials(); // 如果前端有带cookie或认证信息
+            //    });
+            //});
 
             builder.Host.AddAppSettingsSecretsJson()
                 .UseAutofac()

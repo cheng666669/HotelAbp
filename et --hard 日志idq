@@ -1,0 +1,1111 @@
+[33mcommit 83155279c2172420eba7fd1349d460bd12f22ba5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mcheng[m[33m, [m[1;31morigin/cheng[m[33m)[m
+Merge: 78f228e 18b0c32
+Author: cheng666669 <1035107202@qq.com>
+Date:   Fri Jul 11 09:15:00 2025 +0800
+
+    Merge pull request #34 from cheng666669/cheng
+    
+    迁移标签
+
+[33mcommit 18b0c328729d85c60fb3d86a6de80a82063fd692[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Fri Jul 11 09:14:12 2025 +0800
+
+    迁移标签
+
+[33mcommit 78f228e27b0de62f0cd8b97a5e00fabeb38cfbd4[m
+Merge: c4a99da c4d8b2d
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jul 11 09:13:06 2025 +0800
+
+    Merge pull request #33 from cheng666669/tong
+    
+    Tong房价管理
+
+[33mcommit c4d8b2dead968e0c973abb5181b4108a1b139c6b[m[33m ([m[1;31morigin/tong[m[33m, [m[1;32mtong[m[33m)[m
+Merge: aed7897 c4a99da
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jul 11 09:12:55 2025 +0800
+
+    Merge branch 'main' into tong
+
+[33mcommit aed7897b344d4298137155f6fdb4680d43fa5731[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jul 11 09:03:21 2025 +0800
+
+    房价管理
+
+[33mcommit c4a99dad10772b6c67a56e512a6b80cfa96fd4a2[m
+Merge: 290b08c a1ea600
+Author: cheng666669 <1035107202@qq.com>
+Date:   Fri Jul 11 08:26:51 2025 +0800
+
+    Merge pull request #32 from cheng666669/cheng
+    
+    Cheng修改
+
+[33mcommit a1ea600b75934673675a25938012b9365707f694[m
+Merge: 28f5c6c 290b08c
+Author: cheng666669 <1035107202@qq.com>
+Date:   Fri Jul 11 08:26:43 2025 +0800
+
+    Merge branch 'main' into cheng
+
+[33mcommit 28f5c6c8c9948367a3305fe1720356ad558731f5[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Thu Jul 10 22:36:04 2025 +0800
+
+    标签显示修改
+
+[33mcommit 290b08cae1aeb473afa6d191c26c554567bb268d[m
+Merge: 572d3b1 69a495c
+Author: 324paopao <2184968217@qq.com>
+Date:   Thu Jul 10 22:16:09 2025 +0800
+
+    Merge pull request #31 from cheng666669/jin
+    
+    Jin门店列表
+
+[33mcommit 69a495c5fdf426df0866492e45b0f5b746715195[m
+Merge: c23c35b 428b666
+Author: 324paopao <2184968217@qq.com>
+Date:   Thu Jul 10 22:15:06 2025 +0800
+
+    Merge branch 'jin' of https://github.com/cheng666669/HotelAbp into jin
+
+[33mcommit c23c35bd09f9d689c890adf9090da1cad2dfc409[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Thu Jul 10 21:57:40 2025 +0800
+
+    门店列表
+
+[33mcommit 69f2f206f81511c0ffb419e20aff13b70b52d78e[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Wed Jul 9 22:11:04 2025 +0800
+
+    标签d
+
+[33mcommit 572d3b19419f8a57adfe69fa633ea6e1a8afa474[m
+Merge: f202de0 428b666
+Author: 324paopao <2184968217@qq.com>
+Date:   Wed Jul 9 16:25:03 2025 +0800
+
+    Merge pull request #30 from cheng666669/jin
+    
+    Jin标签修改删除
+
+[33mcommit 428b6663944480be16cfe54c3287880b56b2b6b8[m
+Merge: c1946bd f202de0
+Author: 324paopao <2184968217@qq.com>
+Date:   Wed Jul 9 16:24:50 2025 +0800
+
+    Merge branch 'main' into jin
+
+[33mcommit c1946bd6e8fcc36dbec9d9947531bc99d4203946[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Wed Jul 9 16:19:34 2025 +0800
+
+    标签管理删除修改
+
+[33mcommit f202de009fe42eb1a281742933912067afd81e65[m
+Merge: d822b66 ae5b9ba
+Author: cheng666669 <1035107202@qq.com>
+Date:   Wed Jul 9 15:38:15 2025 +0800
+
+    Merge pull request #29 from cheng666669/cheng
+    
+    客户积分修改s
+
+[33mcommit ae5b9ba230475ac92fdc8cccb275a2409b080c36[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Wed Jul 9 15:37:34 2025 +0800
+
+    客户积分修改s
+
+[33mcommit a8072aa83f157ff23b8d0cb75dc79e6374688c20[m
+Merge: 96ab728 d822b66
+Author: 324paopao <2184968217@qq.com>
+Date:   Wed Jul 9 09:56:15 2025 +0800
+
+    Merge branch 'main' into jin
+
+[33mcommit 96ab728ebbe0039e10e31c46bfaaee2e942d0281[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Wed Jul 9 09:54:10 2025 +0800
+
+    修改标签显示方法
+
+[33mcommit 0ff4061f6385e50c79ae5c9e903f24667607100f[m
+Merge: db400df d822b66
+Author: tongjieqing <1377574698@qq.com>
+Date:   Wed Jul 9 08:34:13 2025 +0800
+
+    Merge branch 'main' into tong
+
+[33mcommit db400dfc549a4ed9f04595d83f479e585b3f5d7f[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Wed Jul 9 08:33:09 2025 +0800
+
+    是是是
+
+[33mcommit d822b66a23d842e0d4ab9ffda201384d39b696cf[m
+Merge: be81d3a ec83abf
+Author: 1dangdang <2698997479@qq.com>
+Date:   Wed Jul 9 08:22:04 2025 +0800
+
+    Merge branch 'dang'
+
+[33mcommit ec83abf52d2078f24cb5679f090ca04055ab9db8[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Wed Jul 9 08:15:55 2025 +0800
+
+    更新部署
+
+[33mcommit 4be7d62fed242fe072a323604fb6d0cb10b3cc2d[m
+Merge: 8a58123 be81d3a
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jul 8 16:34:29 2025 +0800
+
+    Merge branch 'main' into jin
+
+[33mcommit 8a581232fea6e57cc314c1a33fab6f818865a904[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jul 8 16:33:13 2025 +0800
+
+    哈哈
+
+[33mcommit be81d3a81b105a7d8dff75b0d9fcf6b28a9ce740[m
+Merge: 9733cd4 bf8c819
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jul 8 16:31:17 2025 +0800
+
+    Merge pull request #27 from cheng666669/cheng
+    
+    Chengn
+
+[33mcommit bf8c819997045658570265ddb8fe9ad819fa4e68[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jul 8 16:29:56 2025 +0800
+
+    详情
+
+[33mcommit 9733cd4d17fcbb9ba5bbd02ead1d72855f81f66b[m
+Merge: 41ea385 7060945
+Author: tongjieqing <1377574698@qq.com>
+Date:   Tue Jul 8 09:56:37 2025 +0800
+
+    Merge pull request #26 from cheng666669/tong
+    
+    Tong122333
+
+[33mcommit 706094563ba07f43aca85847bee43a4f859e7cc5[m
+Merge: 541a89b 0f05abf
+Author: tongjieqing <1377574698@qq.com>
+Date:   Tue Jul 8 09:54:42 2025 +0800
+
+    Merge branch 'main' into tong
+
+[33mcommit 541a89b97222c5f0d5436f30929e1bdb04e14c92[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Tue Jul 8 09:52:54 2025 +0800
+
+    33333
+
+[33mcommit 19a295b2d7309c43cb3e51954e3410ee244353d0[m
+Merge: cfc7554 41ea385
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jul 8 09:10:22 2025 +0800
+
+    Merge branch 'main' into jin
+
+[33mcommit cfc7554f3279c457a06b91643098cccd67cd4f18[m
+Merge: 6f4d715 c9e1d5e
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jul 8 09:09:30 2025 +0800
+
+    Merge branch 'jin' of https://github.com/cheng666669/HotelAbp into jin
+
+[33mcommit 6f4d7150a89545fcddddfd126a05058b0ddac259[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jul 8 09:07:44 2025 +0800
+
+    更改类型
+
+[33mcommit b4e5a786c0f2267b057fa19f2bc027d09f5c2031[m
+Merge: f0b3fc6 610edf9
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jul 8 08:58:05 2025 +0800
+
+    Merge branch 'cheng' of https://github.com/cheng666669/HotelAbp into cheng
+
+[33mcommit f0b3fc6b8b2b000f49a1b5dc63d956ba0446bc58[m
+Merge: dfc9f11 25c89eb
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jul 8 08:56:43 2025 +0800
+
+    Merge branch 'main' into cheng
+
+[33mcommit 41ea385f1fb3fb2865559b492fe494646b03d941[m
+Merge: 25c89eb 610edf9
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jul 8 08:45:41 2025 +0800
+
+    Merge pull request #25 from cheng666669/cheng
+    
+    客户类型修改
+
+[33mcommit 610edf92f8cc5117b8b9bc828abda9130ece9152[m
+Merge: dfc9f11 25c89eb
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jul 8 08:45:31 2025 +0800
+
+    Merge branch 'main' into cheng
+
+[33mcommit dfc9f1175e9a6a0291479108dd31c9b6f5bbb7f1[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jul 8 08:40:54 2025 +0800
+
+    客户类型修改
+
+[33mcommit 25c89ebc7a1b1af22c024454ee1b3753646e205d[m
+Merge: 0f05abf c9e1d5e
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jul 8 08:37:50 2025 +0800
+
+    Merge pull request #24 from cheng666669/jin
+    
+    Jin添加注释及Swagger分类
+
+[33mcommit c9e1d5eeca907868f7875957e47629c7e666df77[m
+Merge: 107906e 0f05abf
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jul 8 08:37:34 2025 +0800
+
+    Merge branch 'main' into jin
+
+[33mcommit 107906e8b1e27a0119f2abc80fd0b6abc34c8dcf[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jul 8 08:30:31 2025 +0800
+
+    补充注释
+
+[33mcommit 0aac5ab294bff6b3ebfcf4992c4d2a7c6f7e8343[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Mon Jul 7 20:51:32 2025 +0800
+
+    更改
+
+[33mcommit a12a73750343805486ce3e62760eff91ba6afd10[m
+Merge: b6e9931 e1779f3
+Author: 324paopao <2184968217@qq.com>
+Date:   Mon Jul 7 14:59:09 2025 +0800
+
+    Merge branch 'main' into jin
+
+[33mcommit 0f05abfdbb30d0e77d73a01ef7f6ec8033081559[m
+Merge: e1779f3 5337562
+Author: cheng666669 <1035107202@qq.com>
+Date:   Mon Jul 7 14:57:30 2025 +0800
+
+    Merge pull request #23 from cheng666669/cheng
+    
+    修改积分
+
+[33mcommit 53375620ec32c1f4d3415e5de3742a62e12978bc[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Mon Jul 7 14:56:10 2025 +0800
+
+    修改积分
+
+[33mcommit b6e9931be4ec03111391a673def928562205aef4[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Mon Jul 7 14:47:06 2025 +0800
+
+    添加注释及swagger显示下拉
+
+[33mcommit e1779f3efff613741aed3476477f2f94e78a9e8a[m
+Merge: 45e25dc e2fd858
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jul 7 14:47:00 2025 +0800
+
+    Merge pull request #21 from cheng666669/tong
+    
+    客户导入
+
+[33mcommit e2fd85841ad150ce237b3409584e672bde61b765[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jul 7 14:37:25 2025 +0800
+
+    客户导入
+
+[33mcommit 45e25dc0051940266c18d1aac8619e88a7d0e3e1[m
+Merge: a6c79dd 9b221a6
+Author: 1dangdang <2698997479@qq.com>
+Date:   Mon Jul 7 08:05:17 2025 +0800
+
+    Merge branch 'dang'
+
+[33mcommit 9b221a6791876c25047bddcd7d18355dd4605065[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Mon Jul 7 08:04:27 2025 +0800
+
+    最新update
+
+[33mcommit 85a4f93a96e8031f35a21c8c78ec2c13acc8baae[m
+Merge: 310bbe2 a6c79dd
+Author: tongjieqing <1377574698@qq.com>
+Date:   Sat Jul 5 09:55:30 2025 +0800
+
+    Merge branch 'main' into tong
+
+[33mcommit 310bbe2b122c2efb1012cbf0585e81527d2e10a1[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Sat Jul 5 09:54:27 2025 +0800
+
+    导入
+
+[33mcommit a6c79dd651a93802c830a94b3374391134e61286[m
+Merge: 921e171 89784e1
+Author: cheng666669 <1035107202@qq.com>
+Date:   Sat Jul 5 08:13:38 2025 +0800
+
+    Merge pull request #20 from cheng666669/cheng
+    
+    更新
+
+[33mcommit 89784e15df42ecd4f0f360bc45cceb072aa54fda[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Sat Jul 5 08:11:18 2025 +0800
+
+    更新
+
+[33mcommit d567db506c89d842ce949b40736636f26631f799[m
+Merge: 4b7006f 040a23c
+Author: cheng666669 <1035107202@qq.com>
+Date:   Fri Jul 4 22:18:39 2025 +0800
+
+    Merge branch 'cheng' of https://github.com/cheng666669/HotelAbp into cheng
+
+[33mcommit 4b7006fa8fc625ec16c961a34aced55e466d0cf4[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Fri Jul 4 22:18:27 2025 +0800
+
+    冻结
+
+[33mcommit 81a7a642af72a1b95e573584b70f1d1bd16aa149[m
+Merge: 7ed2c44 921e171
+Author: 1dangdang <2698997479@qq.com>
+Date:   Fri Jul 4 21:48:44 2025 +0800
+
+    Merge branch 'main' into dang
+
+[33mcommit 7ed2c44195f71dfbd8cd5e3cff4daf7e44a7ed88[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Fri Jul 4 21:48:01 2025 +0800
+
+    3211232321
+
+[33mcommit 921e17172457bd2d2b25751b080ecb8446539c03[m
+Merge: 3a8cfbf 9b83b1b
+Author: 324paopao <2184968217@qq.com>
+Date:   Fri Jul 4 21:31:31 2025 +0800
+
+    Merge pull request #19 from cheng666669/jin
+    
+    Jin12324354566778
+
+[33mcommit 9b83b1b7e542064de430552ef25e6955d248c5de[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Fri Jul 4 21:27:21 2025 +0800
+
+    上传一张图片
+
+[33mcommit 1302742173058fc572d619fac4f9160b42e1bff5[m
+Merge: 75dccc2 3a8cfbf
+Author: 324paopao <2184968217@qq.com>
+Date:   Fri Jul 4 20:52:31 2025 +0800
+
+    Merge branch 'main' into jin
+
+[33mcommit 75dccc2e37df34ccf4747fc63a01589254602636[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Fri Jul 4 20:51:09 2025 +0800
+
+    更正端口号
+
+[33mcommit 3a8cfbf2dd4daee8492d2935261c9918b2272673[m
+Merge: 14e23e3 4732806
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jul 4 20:39:36 2025 +0800
+
+    Merge pull request #17 from cheng666669/tong
+    
+    Tong能男男女女
+
+[33mcommit 4732806fce82b2f6d6aa1cf57d0cd91c9e3dd080[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jul 4 20:38:48 2025 +0800
+
+    1212
+
+[33mcommit 5be1b8dafd6f1765487c87b36fb5584804f085b9[m
+Merge: ec08be1 14e23e3
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jul 4 20:35:19 2025 +0800
+
+    Merge branch 'main' into tong
+
+[33mcommit ec08be1b195e9ce5d37a5e0baa6d1e85609e4f2f[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jul 4 16:32:20 2025 +0800
+
+    房态预定修改状态
+
+[33mcommit ce8c343c4eee72938f5546718b4824e9cdf50c65[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jul 4 16:32:01 2025 +0800
+
+    房态预定修改状态
+
+[33mcommit 75c79fd9ee8e7211d1364f8d3d797502dc56fdcb[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jul 4 15:15:36 2025 +0800
+
+    导入
+
+[33mcommit 869a1bad814998c632097b51dab9886bbb8bc023[m
+Merge: d99747a 14e23e3
+Author: 324paopao <2184968217@qq.com>
+Date:   Fri Jul 4 15:03:16 2025 +0800
+
+    Merge branch 'main' into jin
+
+[33mcommit d99747a20d9dacb51fbf18e9a91952ad122045ad[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Fri Jul 4 14:58:51 2025 +0800
+
+    操作权限
+
+[33mcommit 14e23e3bc14013962d0a24f1eee56545da87d82f[m
+Merge: 52cf39a 040a23c
+Author: cheng666669 <1035107202@qq.com>
+Date:   Fri Jul 4 14:58:02 2025 +0800
+
+    Merge pull request #15 from cheng666669/cheng
+    
+    客户充值消费
+
+[33mcommit 040a23c6a1aad137cae76d59ba3db9ec79fe3f3a[m
+Merge: 4f2c910 52cf39a
+Author: cheng666669 <1035107202@qq.com>
+Date:   Fri Jul 4 14:57:25 2025 +0800
+
+    Merge branch 'main' into cheng
+
+[33mcommit 4f2c910964902b69973369cbe5bbbab047705c24[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Fri Jul 4 14:39:36 2025 +0800
+
+    客户充值,消费
+
+[33mcommit 16ecf5d1b865e166d07176c33b0fc609c50abe50[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jul 4 09:28:35 2025 +0800
+
+    上传视频
+
+[33mcommit 4000ee72a865f149bab613b5594f3ecfb2850b3c[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Thu Jul 3 20:21:54 2025 +0800
+
+    动态菜单
+
+[33mcommit 52cf39a5d4e050ab6de870b09bf90f4f8255036c[m
+Merge: 850e38d 72804b4
+Author: 1dangdang <2698997479@qq.com>
+Date:   Thu Jul 3 19:04:52 2025 +0800
+
+    Merge pull request #14 from cheng666669/dang
+    
+    支付
+
+[33mcommit 72804b4a4ea2ab5ab59ceaca525d0debd529a7cd[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Thu Jul 3 19:03:39 2025 +0800
+
+    支付
+
+[33mcommit facd65309ed2256625e246658e9078f384fdc8d6[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Wed Jul 2 21:52:34 2025 +0800
+
+    更新权限表及数据
+
+[33mcommit 02abb46aec694ddcc2838500bdd85a14475faa8a[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Wed Jul 2 20:05:36 2025 +0800
+
+    上传
+
+[33mcommit ea72e6e4838cf4a02ef24c1ec7c106bfd750d28d[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Wed Jul 2 19:44:01 2025 +0800
+
+    标签
+
+[33mcommit 234a0247b5072dc3b2a4b2585cad0dac5fcfc30b[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Wed Jul 2 09:58:36 2025 +0800
+
+    更新验证码
+
+[33mcommit d9bdcb7cbaa68a0b1dff2b0be75a4c43777f9250[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jul 1 21:13:25 2025 +0800
+
+    角色管理
+
+[33mcommit 850e38d09fd6a3c6d2f2ecc0d8d318a9530a8206[m
+Merge: 282f1a9 be3761b
+Author: 1dangdang <2698997479@qq.com>
+Date:   Tue Jul 1 15:40:08 2025 +0800
+
+    Merge pull request #13 from cheng666669/dang
+    
+    支付功能
+
+[33mcommit be3761bed47dd2e51271c63fa3e2ca0a7b049c54[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Tue Jul 1 15:38:35 2025 +0800
+
+    支付功能
+
+[33mcommit 2cb17daff4625248d052281c47510db90ac7a709[m
+Merge: f414df3 282f1a9
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jun 30 15:59:30 2025 +0800
+
+    Merge branch 'main' into tong
+
+[33mcommit f414df3df206507284cc01da0a470db1e974ff4e[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jun 30 15:54:57 2025 +0800
+
+    房态
+
+[33mcommit 34bcf5d6604b9cb7dfdce9810bc0b381ad363d11[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Mon Jun 30 15:23:31 2025 +0800
+
+    导出
+
+[33mcommit 282f1a9b2d1f7a3c7f21a58e1a29c620980632f4[m
+Merge: be45141 65c1943
+Author: 1dangdang <2698997479@qq.com>
+Date:   Sun Jun 29 22:04:48 2025 +0800
+
+    Merge pull request #12 from cheng666669/dang
+    
+    Dang合并
+
+[33mcommit 65c1943de3285a50e9f0a9a03c81a424497283da[m
+Merge: 597dd89 be45141
+Author: 1dangdang <2698997479@qq.com>
+Date:   Sun Jun 29 22:04:25 2025 +0800
+
+    Merge branch 'main' into dang
+
+[33mcommit 597dd894424001aaa73d8fc751709da2d20e44a1[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Sun Jun 29 22:02:07 2025 +0800
+
+    最新提交
+
+[33mcommit 43d7baedbe1630d3c4508d17ed69741cc4b5161d[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Sun Jun 29 21:44:49 2025 +0800
+
+    11
+
+[33mcommit aa5db2b1e2c11d0d9e3392eb979dab29708fd652[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Sun Jun 29 21:43:52 2025 +0800
+
+    11
+
+[33mcommit 0e3b7fe0b2e20aa5c9f034b744fef7da3b756a92[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Sun Jun 29 21:42:05 2025 +0800
+
+    123123123
+
+[33mcommit e1251aa3f9745a9380f5e595917abfaa8bf3ef9a[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Sun Jun 29 21:39:59 2025 +0800
+
+    提交
+
+[33mcommit 8f28c826dee401067fec3e1edb1b775b9f858d6d[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Sun Jun 29 21:36:33 2025 +0800
+
+    提交
+
+[33mcommit edd85c0cacf7f441a3abb6105d3f304007009839[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Sun Jun 29 21:36:26 2025 +0800
+
+    提交
+
+[33mcommit dec2660d541dda72e0bb285a4df129f93c3cf51a[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Sun Jun 29 21:35:47 2025 +0800
+
+    提交
+    
+    213123
+
+[33mcommit 6c856471bbf6c70ef0e1dc2fca41fd4773d47265[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Sun Jun 29 21:35:41 2025 +0800
+
+    提交
+    
+    213123
+
+[33mcommit a94f1862b453fd9dd8204a79b44e2d961b48bc36[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Sun Jun 29 21:12:52 2025 +0800
+
+    修改客户等级
+
+[33mcommit 103645fcded540ed4a80716fbb58b2a86795be6a[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Sun Jun 29 19:17:08 2025 +0800
+
+    根据角色编号反填权限
+
+[33mcommit 9b5fb2865e81d9f46ee71bb49eaf65851608c434[m
+Merge: 9caf4db be45141
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jun 27 20:11:30 2025 +0800
+
+    Merge branch 'main' into tong
+
+[33mcommit 9caf4dbc00fc0ff6ca12f68c9c9eb6a7a131840d[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jun 27 20:08:02 2025 +0800
+
+    房号显示
+
+[33mcommit 7cb0ca0d349c1e6fe1ef19d901198c854decab56[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Fri Jun 27 19:02:22 2025 +0800
+
+    退房
+
+[33mcommit 9757b09f149cfff6764056fa429510d564e2916f[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Fri Jun 27 19:02:02 2025 +0800
+
+    房号设置页面
+
+[33mcommit be451410d3722fad3b814644e5478e13a29058d1[m
+Merge: d101035 8d40c75
+Author: cheng666669 <1035107202@qq.com>
+Date:   Thu Jun 26 19:19:49 2025 +0800
+
+    Merge pull request #11 from cheng666669/cheng
+    
+    客户
+
+[33mcommit 8d40c7503cfdc95cf632a889b73030eb05f70814[m
+Merge: f33d72c d101035
+Author: cheng666669 <1035107202@qq.com>
+Date:   Thu Jun 26 19:14:26 2025 +0800
+
+    Merge branch 'main' into cheng
+
+[33mcommit d101035bd2b20b07252578c1de878a37153e02ec[m
+Merge: fdcf058 bef38af
+Author: 324paopao <2184968217@qq.com>
+Date:   Thu Jun 26 19:11:35 2025 +0800
+
+    Merge pull request #10 from cheng666669/jin
+    
+    显示账户角色
+
+[33mcommit bef38af06596fcd5bab4d0e882e715b4f809bf14[m
+Merge: f5934da fdcf058
+Author: 324paopao <2184968217@qq.com>
+Date:   Thu Jun 26 19:08:48 2025 +0800
+
+    Merge branch 'main' into jin
+
+[33mcommit f33d72c89591bccf4a0e91d3c0a79c4a3f7cecf8[m
+Merge: 29328ff fdcf058
+Author: cheng666669 <1035107202@qq.com>
+Date:   Thu Jun 26 19:08:47 2025 +0800
+
+    Merge branch 'main' into cheng
+
+[33mcommit f5934da6d42db2d7bdae9519d30847b437da3420[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Thu Jun 26 19:05:31 2025 +0800
+
+    显示账号角色
+
+[33mcommit 29328ffdf161e7a3fcb12706961730f0e76117b6[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Thu Jun 26 17:29:51 2025 +0800
+
+    2
+
+[33mcommit fdcf058987000d114c16ec1c0b2b193946582697[m
+Merge: 6d5e937 daeb8be
+Author: 1dangdang <2698997479@qq.com>
+Date:   Thu Jun 26 17:14:10 2025 +0800
+
+    Merge pull request #9 from cheng666669/dang
+    
+    预约订单的排房取消预订
+
+[33mcommit daeb8be555e39f5db7a240ea38550dba3551e557[m
+Merge: 80285f1 6d5e937
+Author: 1dangdang <2698997479@qq.com>
+Date:   Thu Jun 26 17:09:05 2025 +0800
+
+    Merge branch 'main' into dang
+
+[33mcommit 6d5e937ad9107e3b8e323aea7cf03525e2625458[m
+Merge: 1acb71d e1bb0e4
+Author: tongjieqing <1377574698@qq.com>
+Date:   Thu Jun 26 17:05:02 2025 +0800
+
+    Merge pull request #8 from cheng666669/tong
+    
+    ABP业务-房型设置
+
+[33mcommit 80285f1d8c38816ff397477d074fdeaf19d1539d[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Thu Jun 26 16:58:05 2025 +0800
+
+    订单的排房，取消预订
+
+[33mcommit e1bb0e4650f0a8141d2ed266c1eac76f1a219f43[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Thu Jun 26 16:32:30 2025 +0800
+
+    业务-房型设置
+
+[33mcommit ea7760385cc204a19a9e03fc55e365aaa4e9c84d[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Thu Jun 26 08:46:48 2025 +0800
+
+    RBAC增删改后端
+
+[33mcommit e6c6468489bb149e98301433ff3f02dab5682028[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jun 24 20:23:25 2025 +0800
+
+    qianyi
+    
+    迁移
+
+[33mcommit 2c2fd91b042d4f09a269074266409094c41aba3f[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jun 24 20:16:50 2025 +0800
+
+    1
+    
+    1
+
+[33mcommit 422c8abf829791ac009ceb04a22096c1a4602e30[m
+Merge: 9b02a1e 6857f25
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jun 24 20:14:44 2025 +0800
+
+    Merge branch 'cheng' of https://github.com/cheng666669/HotelAbp into cheng
+
+[33mcommit 9b02a1e87f3835d64decf01c94532f06646e7fd2[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jun 24 20:14:01 2025 +0800
+
+    类型1
+
+[33mcommit 6857f256f0341ef97f96e7b6b0f82ae402fd9500[m
+Merge: 40db1bf 1acb71d
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jun 24 20:11:24 2025 +0800
+
+    Merge branch 'main' into cheng
+
+[33mcommit dfad4a23fb2f02c9a609cac48059af55306451ea[m
+Merge: 6ce5642 b76e878
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jun 24 20:03:30 2025 +0800
+
+    Merge remote-tracking branch 'origin/tong' into jin
+
+[33mcommit 6ce56429fe5d4ed72e4ce560da0c7d8e4ecd8d05[m
+Merge: 170cfdf e5ee17b
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jun 24 20:01:43 2025 +0800
+
+    Merge remote-tracking branch 'origin/tong' into jin
+
+[33mcommit 1acb71d00f83382b41699da70f56763874a0d1e5[m
+Merge: 751becc b76e878
+Author: tongjieqing <1377574698@qq.com>
+Date:   Tue Jun 24 20:01:10 2025 +0800
+
+    Merge pull request #6 from cheng666669/tong
+    
+    房型数量
+
+[33mcommit 170cfdf3f9282f3aae96970ed4f757d0e2e662cc[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jun 24 19:57:45 2025 +0800
+
+    用户角色管理
+
+[33mcommit b76e878ad582ecc33b492b8412277869eadcc064[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Tue Jun 24 19:57:33 2025 +0800
+
+    房型数量
+
+[33mcommit 40db1bfa018882b12c7fa99d191e271b2a0b4a33[m
+Merge: 7377bfe 831e409
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jun 24 19:48:57 2025 +0800
+
+    45646
+
+[33mcommit 7377bfe3f548e882ed3eaef3eb751e3aea9f0004[m
+Merge: 1f25243 751becc
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jun 24 19:33:09 2025 +0800
+
+    Merge branch 'main' into cheng
+
+[33mcommit 831e4095ad3de0a5d0715dad810087f50a32de24[m
+Merge: 1f25243 751becc
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jun 24 19:13:07 2025 +0800
+
+    Merge branch 'main' into cheng
+
+[33mcommit 1f25243bec93b956ec29a5f75f3ff0baec880126[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jun 24 19:03:46 2025 +0800
+
+    类型
+
+[33mcommit 751becc095675f7edcb0469de29eb3abb0e6d041[m
+Merge: 26bb5d0 e5ee17b
+Author: tongjieqing <1377574698@qq.com>
+Date:   Tue Jun 24 16:53:53 2025 +0800
+
+    Merge pull request #5 from cheng666669/tong
+    
+    http更改
+
+[33mcommit e5ee17bd23140d30a496d24f68e2f897b9de4dc4[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Tue Jun 24 16:51:49 2025 +0800
+
+    http更改
+
+[33mcommit 00b6abd958fbb6c13a2bd0436665cafd4465dbda[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Tue Jun 24 15:21:09 2025 +0800
+
+    客户类型
+
+[33mcommit 30ec92f84eaae5f29af6ed7ed065ce80385207f3[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Tue Jun 24 11:55:40 2025 +0800
+
+    用户角色的添加
+
+[33mcommit f68ad9fc4b238b7200e8a7087573729fd2d17e23[m
+Merge: ea9a67d 26bb5d0
+Author: 1dangdang <2698997479@qq.com>
+Date:   Tue Jun 24 11:43:01 2025 +0800
+
+    Merge branch 'main' into dang
+
+[33mcommit 26bb5d059273529de59be9dc6caf8a9193ade74e[m
+Merge: abed8bd 092d7a3
+Author: tongjieqing <1377574698@qq.com>
+Date:   Tue Jun 24 11:37:59 2025 +0800
+
+    Merge pull request #4 from cheng666669/tong
+    
+    Tong
+
+[33mcommit 092d7a3094b69eb83a4700236b2a9ffb72c095d1[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Tue Jun 24 11:18:14 2025 +0800
+
+    Update appsettings.json
+    
+    前端端口
+
+[33mcommit 544fa7369ef37c1e30b5abdae8d324a0ca22f6ad[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jun 23 19:49:36 2025 +0800
+
+    能运行的
+
+[33mcommit 4b4ecb4bd91d6db509386840ab82ba9c584cbfb3[m
+Merge: ff0a230 31b55cb
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jun 23 19:44:07 2025 +0800
+
+    Merge branch 'tong' of https://github.com/cheng666669/HotelAbp into tong
+
+[33mcommit ff0a230cbc09abaa800667e805bd24ed40098c17[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jun 23 19:40:34 2025 +0800
+
+    根据mian更新
+
+[33mcommit ea9a67dfed9b873a303fa9aa1ff40ce1a0fb966f[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Mon Jun 23 19:38:20 2025 +0800
+
+    更改
+
+[33mcommit 2e5dc6594e2f6128a3d00da4ce2ee38f8cfd6f59[m
+Merge: d17c00e abed8bd
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jun 23 19:24:37 2025 +0800
+
+    Merge branch 'main' into tong
+
+[33mcommit f5cb947db8d7cacd4691863ae1813ade389a22c6[m
+Merge: 060ccdc abed8bd
+Author: cheng666669 <1035107202@qq.com>
+Date:   Mon Jun 23 19:20:04 2025 +0800
+
+    Merge branch 'main' into cheng
+
+[33mcommit 5c4fbc3c11f230d380507e54bdb89299de2e6dc5[m
+Merge: 72bbd2c abed8bd
+Author: 1dangdang <2698997479@qq.com>
+Date:   Mon Jun 23 19:09:26 2025 +0800
+
+    Merge branch 'main' into dang
+
+[33mcommit 72bbd2c2e8486c414646a83e2d34bcd6f91db428[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Mon Jun 23 19:04:19 2025 +0800
+
+    订单
+
+[33mcommit d17c00e97de2b21057e1f80ca84d05fcd668e94d[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jun 23 17:32:29 2025 +0800
+
+    保留更新
+
+[33mcommit 31b55cb15338e2ba3adbf07f65a8e6b2a33dcc74[m
+Merge: b86c880 4ba0f40
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jun 23 17:20:57 2025 +0800
+
+    Merge branch 'tong' of https://github.com/cheng666669/HotelAbp into tong
+
+[33mcommit b86c8806c95f6d240c1fdf9725cbe596abd2b5df[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jun 23 17:19:49 2025 +0800
+
+    appsetting
+
+[33mcommit 4ba0f407c2d5f01d38467fc83dad1a3e93da1c66[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jun 23 17:02:37 2025 +0800
+
+    1221
+
+[33mcommit fcec05d12c49fe5f7d769199f6d7bf445fa655b6[m
+Merge: eb45c50 abed8bd
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jun 23 16:59:06 2025 +0800
+
+    Merge branch 'main' into tong
+
+[33mcommit eb45c5072e09290fc75fb8593d6f45693e301772[m
+Author: tongjieqing <1377574698@qq.com>
+Date:   Mon Jun 23 16:52:09 2025 +0800
+
+    房态
+
+[33mcommit 060ccdc35a60da170926e4c7978b55c96c07d11a[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Mon Jun 23 16:33:33 2025 +0800
+
+    客户
+    
+    客户信息
+
+[33mcommit abed8bd7a0f501b310664811918bee8a0a9a2535[m
+Merge: 559ce97 35f6aff
+Author: 324paopao <2184968217@qq.com>
+Date:   Mon Jun 23 16:31:53 2025 +0800
+
+    Merge pull request #3 from cheng666669/jin
+    
+    登录JWT
+
+[33mcommit 35f6aff5f6b9630902c86361048fd916ed996711[m
+Author: 324paopao <2184968217@qq.com>
+Date:   Mon Jun 23 16:29:56 2025 +0800
+
+    登录JWT
+
+[33mcommit 6efd37589dbb6c16e81b5f3bc9852fe4a42ac67c[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Sun Jun 22 19:42:16 2025 +0800
+
+    添加客户
+    
+    添加客户
+
+[33mcommit 559ce972eb4a49281c5d7b5ac003f66d07ae6f44[m
+Merge: da4d232 6c28876
+Author: 1dangdang <2698997479@qq.com>
+Date:   Fri Jun 20 20:05:32 2025 +0800
+
+    Merge pull request #2 from cheng666669/dang
+    
+    数据库更改
+
+[33mcommit 6c28876ff86bb59e1409831120187636370572c1[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Fri Jun 20 20:05:11 2025 +0800
+
+    数据库更改
+
+[33mcommit da4d2321121a64e38ad5877076e5918be1537c6a[m
+Merge: 008f00a e466c96
+Author: 1dangdang <2698997479@qq.com>
+Date:   Fri Jun 20 19:57:51 2025 +0800
+
+    Merge pull request #1 from cheng666669/dang
+    
+    更新
+
+[33mcommit e466c96f8188630d2f95cf699979a2bf513c04e6[m
+Author: 1dangdang <2698997479@qq.com>
+Date:   Fri Jun 20 19:57:24 2025 +0800
+
+    更新
+
+[33mcommit 008f00ac6cecf47f149f381efc131a643f88ec1b[m
+Author: cheng666669 <1035107202@qq.com>
+Date:   Fri Jun 20 17:27:25 2025 +0800
+
+    Initial commit
