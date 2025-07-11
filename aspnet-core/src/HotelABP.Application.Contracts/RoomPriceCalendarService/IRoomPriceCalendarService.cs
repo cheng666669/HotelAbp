@@ -16,5 +16,6 @@ namespace HotelABP.RoomPriceCalendarService
         Task<ApiResult<List<RoomPriceCalendars>>> GetRoomPriceCalendarsAsync(GetRoomPriceCalendarsDto dto);
         Task<ApiResult<bool>> UpdateRoomPriceState(Guid id, bool CalendarStatus);
         Task<ApiResult<bool>> DeleteRoomPrice(Guid id);
+        Task<ApiResult<bool>> UpdateRoomPriceCalendarsAsync(UpdateRoomPriceCalendarsDto dto);
     }
 }

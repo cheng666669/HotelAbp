@@ -9,30 +9,58 @@ namespace HotelABP.RoomPriceCalendarService
 {
     public class UpdateRoomPriceDto
     {
-        
-        public  Guid PriceId { get;  set; }
-        /// <summary>
-        /// 最低价
-        /// </summary>
-        public decimal? MinPrice { get; set; }
-
-        /// <summary>最高价</summary>
-        public decimal? MaxPrice { get; set; }
+        public  Guid Id { get; protected set; }
         /// <summary>
         /// 房间类型ID
         /// </summary>
         public Guid RoomTypeId { get; set; }
-        /// <summary>
-        /// 价格日历ID
+        /// 产品名称
         /// </summary>
-        public  Guid CalendarsId { get; set; }
+        public string ProductName { get; set; }
+
         /// <summary>
-        /// 日历日期
+        /// 早餐数量
         /// </summary>
-        public DateTime CalendarDate { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public int BreakfastCount { get; set; }
+
         /// <summary>
-        /// 日历价格
+        /// 销售策略（如“提前7天预订”、“无”）
         /// </summary>
-        public decimal CalendarPrice { get; set; }
+        [SugarColumn(IsNullable = true)]
+        public string SaleStrategy { get; set; }
+        /// <summary>
+        /// 付款方式（如“预订付费”、“到店付费”）
+        /// </summary>
+        [SugarColumn(IsNullable = true)]
+        public string PaymentType { get; set; }
+        /// <summary>
+        /// 住宿优惠
+        /// </summary>
+        [SugarColumn(IsNullable = true)]
+        public string Preferential { get; set; }
+        /// <summary>
+        /// 会员差价
+        /// </summary>
+        [SugarColumn(IsNullable = true)]
+        public string MemberPriceSpread { get; set; }
+
+        /// <summary>最低价</summary>
+        [SugarColumn(IsNullable = true)]
+        public decimal MinPrice { get; set; }
+
+        /// <summary>最高价</summary>
+        [SugarColumn(IsNullable = true)]
+        public decimal MaxPrice { get; set; }
+
+        /// <summary>状态（如“启用”、“停用”）</summary>
+        [SugarColumn(IsNullable = true)]
+        public bool CalendarStatus { get; set; }
+
+        /// <summary>
+        /// 排序
+        /// </summary>
+        [SugarColumn(IsNullable = true)]
+        public int Sort { get; set; }
     }
 }
