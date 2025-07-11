@@ -29,19 +29,19 @@ namespace HotelABP.Label
         /// <summary>
         /// 开卡时间（可选）
         /// </summary>
-        public string StartTime { get; set; } = string.Empty;
+        public string? StartTime { get; set; } = string.Empty;
 
         /// <summary>
         /// 交易时间（可选）
         /// </summary>
-        public string TradeTime { get; set; } = string.Empty;
+        public string? TradeTime { get; set; } = string.Empty;
 
         // ---------------- 会员条件 ----------------
 
         /// <summary>
         /// 会员等级（如普通会员）
         /// </summary>
-        public string MemberLevel { get; set; } = string.Empty;
+        public string? MemberLevel { get; set; } = string.Empty;
 
         /// <summary>
         /// 会员性别（如 男、女）
@@ -85,5 +85,9 @@ namespace HotelABP.Label
         /// </summary>
         [Range(0, 990000, ErrorMessage = "累计消费请填写 0～99 万的小数")]
         public decimal? TotalSpentMax { get; set; }
+        /// <summary>
+        /// 人数
+        /// </summary>
+        public int? PeopleNumber { get; set; }
     }
 }

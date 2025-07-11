@@ -4,14 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.Application.Dtos;
 
 namespace HotelABP.Label
 {
-    /// <summary>
-    ///  标签数据
-    /// </summary>
-    public class GetLabelDto:FullAuditedEntity<Guid>
+    public class FanLabelDto : EntityDto<Guid> 
     {
         /// <summary>
         /// 标签名称
@@ -33,12 +30,12 @@ namespace HotelABP.Label
         /// <summary>
         /// 开卡时间（可选）
         /// </summary>
-        public string StartTime { get; set; } = string.Empty;
+        public string? StartTime { get; set; } = string.Empty;
 
         /// <summary>
         /// 交易时间（可选）
         /// </summary>
-        public string? TradeTime { get; set; } = string.Empty;
+        public string TradeTime { get; set; } = string.Empty;
 
         // ---------------- 会员条件 ----------------
 

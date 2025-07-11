@@ -4,14 +4,17 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Application.Dtos;
+using Volo.Abp.Domain.Entities;
 
 namespace HotelABP.Customer
 {
     /// <summary>
     /// 客户列表查询参数
     /// </summary>
-    public class GetCustomerDtoList
+    public class GetCustomerDtoList 
     {
+        public Guid? Id { get; set;}
         /// <summary>
         ///   客户昵称
         /// </summary>

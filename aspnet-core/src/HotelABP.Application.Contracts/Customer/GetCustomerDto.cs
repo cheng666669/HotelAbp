@@ -119,6 +119,10 @@ namespace HotelABP.Customer
         ///  累计消费金额
         /// </summary>
         public decimal? Accumulativeconsumption { get; set; }
-
+        /// <summary>
+        /// 标签
+        /// </summary>
+        public string? CustomerLabel { get; set; } = string.Empty;
+        public string? CustomerLabelName { get; set; } = string.Empty;
     }
 }

@@ -41,22 +41,31 @@ namespace HotelABP.User
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        /// TransactionScope本身支持自动回滚机制，
+        /// 只要代码块内发生异常且没有调用 tran.Complete()，事务就会自动回滚，不需要手动写回滚代码。
         public async Task<ApiResult> AddAccountno(AccountDto dto)
         {
             try
             {
                 using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var userexist = await userRep.FindAsync(x => x.NickName == dto.NickName);
-                    if (userexist != null)
+                    try
                     {
-                        return ApiResult.Fail("用户已存在", ResultCode.ValidationError);
+                        var userexist = await userRep.FindAsync(x => x.NickName == dto.NickName);
+                        if (userexist != null)
+                        {
+                            return ApiResult.Fail("用户已存在", ResultCode.ValidationError);
+                        }
+                        dto.Password = dto.Mobile.ToString().Substring(7, 4);
+                        var data = ObjectMapper.Map<AccountDto, SysUser>(dto);
+                        var user = await userRep.InsertAsync(data);
+                        tran.Complete();
+                        return ApiResult.Success(ResultCode.Success);
                     }
-                    dto.Password = dto.Mobile.ToString().Substring(7, 4);
-                    var data = ObjectMapper.Map<AccountDto, SysUser>(dto);
-                    var user = await userRep.InsertAsync(data);
-                    tran.Complete();
-                    return ApiResult.Success(ResultCode.Success);
+                    catch (Exception ex)
+                    {
+                        throw;
+                    }
                 }
             }
             catch (Exception ex)

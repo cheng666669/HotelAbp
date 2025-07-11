@@ -60,6 +60,6 @@ namespace HotelABP.Customer
         /// </summary>
         /// <param name="id">客户ID</param>
         /// <returns>包含客户详情的DTO</returns>
-        Task<ApiResult<GetCustomerDto>> GetCustomerByIdAsync(Guid id);
+        Task<ApiResult<FanCustomerDto>> GetCustomerByIdAsync(Guid id);
     }
 }

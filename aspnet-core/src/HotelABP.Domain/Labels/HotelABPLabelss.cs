@@ -31,7 +31,7 @@ namespace HotelABP.Labels
         /// <summary>
         /// 开卡时间（可选）
         /// </summary>
-        public string  StartTime { get; set; }= string.Empty;
+        public string?  StartTime { get; set; }= string.Empty;
 
         /// <summary>
         /// 交易时间（可选）
@@ -43,7 +43,7 @@ namespace HotelABP.Labels
         /// <summary>
         /// 会员等级（如普通会员）
         /// </summary>
-        public string MemberLevel { get; set; } = string.Empty;
+        public string? MemberLevel { get; set; } = string.Empty;
 
         /// <summary>
         /// 会员性别（如 男、女）
