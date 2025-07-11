@@ -41,6 +41,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\SqlSugarSetup\SqlSugarSetup.csproj" />
 		<ProjectReference Include="..\HotelABP.Application\HotelABP.Application.csproj" />
 		<ProjectReference Include="..\HotelABP.EntityFrameworkCore\HotelABP.EntityFrameworkCore.csproj" />
 	</ItemGroup>

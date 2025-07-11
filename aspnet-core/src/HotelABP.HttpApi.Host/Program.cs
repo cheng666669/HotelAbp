@@ -56,11 +56,28 @@ public class Program
             // 替换 ABP 使用的配置
             builder.Services.ReplaceConfiguration(builder.Configuration);
 
+            // 注册CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy
+                        .WithOrigins("http://8.152.98.56:3030") // 允许前端地址
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials(); // 如果前端有带cookie或认证信息
+                });
+            });
+
             builder.Host.AddAppSettingsSecretsJson()
                 .UseAutofac()
                 .UseSerilog();
             await builder.AddApplicationAsync<HotelABPHttpApiHostModule>();
             var app = builder.Build();
+
+            // 启用CORS
+            app.UseCors("AllowFrontend");
+
             await app.InitializeApplicationAsync();
             await app.RunAsync();
             return 0;

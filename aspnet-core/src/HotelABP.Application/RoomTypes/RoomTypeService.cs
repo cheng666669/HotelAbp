@@ -83,7 +83,7 @@ namespace HotelABP.RoomTypes
                 return ApiResult<PageResult<RoomTypeDto>>.Success(
                     new PageResult<RoomTypeDto>
                     {
-                        Data = a.Queryable.ToList(),
+                        Data = a.Queryable.OrderByDescending(x=>x.Order).ToList(),
                         TotleCount = a.RowCount,
                         TotlePage = (int)Math.Ceiling(a.RowCount / (double)seach.PageSize)
                     }, ResultCode.Success);
