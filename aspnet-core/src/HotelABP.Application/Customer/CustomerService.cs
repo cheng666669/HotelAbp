@@ -31,19 +31,22 @@ namespace HotelABP.Customer
         private readonly IRepository<HotelABPLabelss, Guid> _labelRepository;
         // 声明一个只读字段来保存我们封装的导出服务实例
         private readonly IExportAppService _exportAppService;
-        // 声明一个只读字段来保存导入服务实例
+        
+        private readonly IRepository<Balancerecord, Guid> _balancerecordRepository;
 
 
         public CustomerService(
             IRepository<HotelABPCustoimerss, Guid> customerRepository,
             IRepository<HotelABPCustoimerTypeName, Guid> customerTypeRepository,
             IRepository<HotelABPLabelss, Guid> labelRepository,
-            IExportAppService exportAppService)
+            IExportAppService exportAppService,
+            IRepository<Balancerecord, Guid> balancerecordRepository)
         {
             _customerRepository = customerRepository;
             _customerTypeRepository = customerTypeRepository;
             _labelRepository = labelRepository;
             _exportAppService = exportAppService;
+            _balancerecordRepository = balancerecordRepository;
         }
         /// <summary>
         /// 添加客户信息（支持DTO映射和异常处理）
@@ -272,12 +275,12 @@ namespace HotelABP.Customer
             return await _exportAppService.ExportToExcelAsync(exportData);
         }
         /// <summary>
-        /// 更新客户可用余额（支持参数校验、异常处理）
+        /// 更新客户可用余额（支持参数校验、异常处理，并记录日志）
         /// </summary>
         /// <param name="balanceDto">余额变更DTO</param>
         /// <returns>操作结果</returns>
         /// <remarks>
-        /// 1. 校验参数。
+        /// 1. 校验参数，开启事务。
         /// 2. 查找客户。
         /// 3. 增加可用余额，记录备注。
         /// 4. 更新数据库。
@@ -293,18 +296,45 @@ namespace HotelABP.Customer
                     return ApiResult<bool>.Fail("参数无效", ResultCode.Error);
                 }
 
-                // 2. 获取客户实体
-                var customer = await _customerRepository.GetAsync(balanceDto.Id);
-                if (customer == null)
+                // 使用事务，确保操作的原子性
+                using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    return ApiResult<bool>.Fail("客户不存在", ResultCode.Error);
-                }
-                // 4. 更新客户的可用余额
-                customer.AvailableBalance += balanceDto.Rechargeamount;
-                customer.CustomerDesc = balanceDto.CustomerDesc;
+                    // 2. 获取客户实体
+                    var customer = await _customerRepository.GetAsync(balanceDto.Id);
+                    if (customer == null)
+                    {
+                        return ApiResult<bool>.Fail("客户不存在", ResultCode.Error);
+                    }
 
-                // 5. 更新数据库
-                await _customerRepository.UpdateAsync(customer);
+                    // 3. 更新客户的可用余额
+                    customer.AvailableBalance += balanceDto.Rechargeamount;
+                    customer.CustomerDesc = balanceDto.CustomerDesc;
+
+                    // 4. 更新数据库
+                    await _customerRepository.UpdateAsync(customer);
+
+                    // 5. 记录日志到 Balancerecord
+                    var balanceRecord = new Balancerecord
+                    {
+                        Id = customer.Id,
+                        Phone = customer.PhoneNumber,
+                        CustomerNockName = customer.CustomerNickName,
+                        CustomerName = customer.CustomerName,
+                        SlidingPrice = balanceDto.Rechargeamount,
+                        ChangePrice = customer.AvailableBalance += balanceDto.Rechargeamount,
+
+                        Ordernumber = "C" + Guid.NewGuid().ToString("N").Substring(0, 19),
+                        Operator = CurrentUser.UserName,
+
+                        OperatorId = CurrentUser.Id
+
+
+                    };
+                    await _balancerecordRepository.InsertAsync(balanceRecord);
+
+                    // 提交事务
+                    tran.Complete();
+                }
 
                 return ApiResult<bool>.Success(true, ResultCode.Success);
             }
@@ -331,7 +361,7 @@ namespace HotelABP.Customer
             try
             {
                 // 1. 校验参数
-                if (sumofconsumptionDto == null || sumofconsumptionDto.Id == Guid.Empty || sumofconsumptionDto.Sumofconsumption == null || sumofconsumptionDto.Sumofconsumption <= 0)
+                if (sumofconsumptionDto == null || sumofconsumptionDto.Id == Guid.Empty || sumofconsumptionDto.Sumofconsumption == null )
                 {
                     return ApiResult<bool>.Fail("参数无效", ResultCode.Error);
                 }
@@ -374,6 +404,20 @@ namespace HotelABP.Customer
 
                 // 5. 更新数据库
                 await _customerRepository.UpdateAsync(customer);
+                // 5. 记录日志到 Balancerecord
+                var balanceRecord = new Balancerecord
+                {
+                    Id = customer.Id,
+                    Phone = customer.PhoneNumber,
+                    CustomerNockName = customer.CustomerNickName,
+                    CustomerName = customer.CustomerName,
+                    SlidingPrice = sumofconsumptionDto.Sumofconsumption,
+                    ChangePrice = sumofconsumptionDto.AvailableGiftBalance += sumofconsumptionDto.AvailableGiftBalance,
+
+                    Ordernumber = "C" + Guid.NewGuid().ToString("N").Substring(0, 19),
+                    Operator = "如家酒店"
+                };
+                await _balancerecordRepository.InsertAsync(balanceRecord);
 
                 return ApiResult<bool>.Success(true, ResultCode.Success);
             }
@@ -475,6 +519,20 @@ namespace HotelABP.Customer
                 // 7. 更新数据库：将修改后的客户实体保存到数据库
                 await _customerRepository.UpdateAsync(customer);
 
+                // 5. 记录日志到 Balancerecord
+                var balanceRecord = new Balancerecord
+                {
+                    Id = customer.Id,
+                    Phone = customer.PhoneNumber,
+                    CustomerNockName = customer.CustomerNickName,
+                    CustomerName = customer.CustomerName,
+                    SlidingPrice = upAvailable.Accumulativeintegral,
+                    ChangePrice = upAvailable.AvailablePoints,
+
+                    Ordernumber = "J" + Guid.NewGuid().ToString("N").Substring(0, 19),
+                    Operator = "如家酒店"
+                };
+                await _balancerecordRepository.InsertAsync(balanceRecord);
                 // 操作成功，返回成功结果
                 return ApiResult<bool>.Success(true, ResultCode.Success);
             }
@@ -704,7 +762,65 @@ namespace HotelABP.Customer
 
             return ApiResult<FanCustomerDto>.Success(customerDto, ResultCode.Success);
         }
+        /// <summary>
+        /// 获取余额列表,查询
+        /// </summary>
+        /// <param name="seach"></param>
+        /// <param name="listDto"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<PageResult<Balancerecord>>> GetBalancerecordListAsync(Seach seach, GetBalancerecordListDto listDto)
+        {
+            var list = await _balancerecordRepository.GetQueryableAsync();
+         
+            // 多条件筛选
+            list = list.WhereIf(!string.IsNullOrEmpty(listDto.Phone), x => x.Phone.Contains(listDto.Phone));
+            list = list.WhereIf(!string.IsNullOrEmpty(listDto.Ordernumber), x => x.Ordernumber.Contains(listDto.Ordernumber));
+            var startTime = listDto.StartTime?.Date;
+            var endTime = listDto.EndTime?.Date.AddDays(1);
+            list = list.WhereIf(listDto.StartTime != null, x => x.CreationTime >= listDto.StartTime);
+            list = list.WhereIf(listDto.EndTime != null, x => x.CreationTime < listDto.EndTime.Value.AddDays(1));
+            var res = list.PageResult(seach.PageIndex, seach.PageSize);
+
+            return ApiResult<PageResult<Balancerecord>>.Success(
+                new PageResult<Balancerecord>
+                {
+                    Data = res.Queryable.ToList(),
+                    TotleCount = list.Count(),
+                    TotlePage = (int)Math.Ceiling(list.Count() / (double)seach.PageSize)
+                },
+            ResultCode.Success
+            );
+        }
+        /// <summary>
+        /// 导出所有余额流水
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IRemoteStreamContent> ExportAllBalancerecordAsync()
+        {
+            // 获取数据
+            var list = await _balancerecordRepository.GetListAsync();
+           
+            // 构造导出数据结构
+            var exportData = new ExportDataDto<Balancerecord>
+            {
+                FileName = "余额流水",
+                Items = list.ToList(), // 将查询结果转换为列表并赋值给 Items
+                ColumnMappings = new Dictionary<string, string>
+                {
+                    { "Id", "流水ID" },
+                    { "Phone", "手机号" },
+                    { "CustomerNockName", "客户昵称" },
+                    { "CustomerName", "客户名称" },
+                    { "SlidingPrice", "变动金额" },
+                    { "ChangePrice", "变动后金额" },
+                    { "Ordernumber", "订单号" },
+                    { "Operator", "操作人" }
+                }
+            };
+            // 返回导出的内容
+            return await _exportAppService.ExportToExcelAsync(exportData);
+        }
     }
-   
 }
+   
 

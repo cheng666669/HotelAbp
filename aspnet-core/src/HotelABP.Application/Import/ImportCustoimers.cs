@@ -25,7 +25,7 @@ namespace HotelABP.Import
             var sheet = workbook.GetSheetAt(0);
             var entities = new List<HotelABPCustoimerss>();
 
-            for (int i = 1; i <= sheet.LastRowNum; i++) // 假设第一行为表头
+            for (int i = 2; i <= sheet.LastRowNum; i++) // 假设第一行为表头
             {
                 var row = sheet.GetRow(i);
                 if (row == null) continue;

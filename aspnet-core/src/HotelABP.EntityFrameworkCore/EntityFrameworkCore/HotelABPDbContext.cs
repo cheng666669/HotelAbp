@@ -72,6 +72,7 @@ public class HotelABPDbContext :
     public DbSet<HotelABPLabelss> HotelABPLabelss { get; set; }
     public DbSet<HotelAbpGrades> HotelAbpGrades { get; set; }
     public DbSet<HotelABPCustoimerTypeName> HotelABPCustoimerTypeName { get; set; }
+    public DbSet<Balancerecord> Balancerecord { get; set; }
     
     /// <summary>
     /// 门店表
