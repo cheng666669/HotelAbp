@@ -38,5 +38,6 @@ namespace HotelABP.Customer
         /// </summary>
         public decimal? Accumulativeconsumption { get; set; }
 
+
     }
 }

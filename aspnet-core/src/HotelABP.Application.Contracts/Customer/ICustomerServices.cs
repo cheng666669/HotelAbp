@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HotelABP.Customers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -61,5 +62,6 @@ namespace HotelABP.Customer
         /// <param name="id">客户ID</param>
         /// <returns>包含客户详情的DTO</returns>
         Task<ApiResult<FanCustomerDto>> GetCustomerByIdAsync(Guid id);
+        Task<ApiResult<PageResult<Balancerecord>>> GetBalancerecordListAsync(Seach seach, GetBalancerecordListDto listDto);
     }
 }
