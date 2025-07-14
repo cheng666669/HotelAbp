@@ -41,7 +41,7 @@ namespace HotelABP.RoomPriceCalendar
 
             // 2. 用 SqlSugar 查询 RoomPrice
             var roomPrices = await db.Queryable<RoomPrice>()
-                .Where(x => x.IsDeleted == false)
+                .Where(x => x.IsDeleted == false).OrderByDescending(x => x.Sort)
                 .ToListAsync();
 
             // 3. 根据 TypeName 过滤
@@ -52,25 +52,25 @@ namespace HotelABP.RoomPriceCalendar
 
             // 4. 在内存中用 LINQ join
             var result = (from rt in roomTypes
-                        join rp in roomPrices on rt.Id equals rp.RoomTypeId
-                        select new RoomTypeOrRoomPriceDto
-                        {
-                            Id = rp.Id,
-                            RoomTypeId = rt.Id,
-                            TypeName = rt.Name,
-                            TypePrice = rt.Price,
-                            MaxOccupancy = rt.MaxOccupancy,
-                            ProductName = rp.ProductName,
-                            BreakfastCount = rp.BreakfastCount,
-                            SaleStrategy = rp.SaleStrategy,
-                            PaymentType = rp.PaymentType,
-                            Preferential = rp.Preferential,
-                            MemberPriceSpread = rp.MemberPriceSpread,
-                            MinPrice = rp.MinPrice,
-                            MaxPrice = rp.MaxPrice,
-                            CalendarStatus = rp.CalendarStatus,
-                            Sort = rp.Sort
-                        }).ToList();
+                          join rp in roomPrices on rt.Id equals rp.RoomTypeId
+                          select new RoomTypeOrRoomPriceDto
+                          {
+                              Id = rp.Id,
+                              RoomTypeId = rt.Id,
+                              TypeName = rt.Name,
+                              TypePrice = rt.Price,
+                              MaxOccupancy = rt.MaxOccupancy,
+                              ProductName = rp.ProductName,
+                              BreakfastCount = rp.BreakfastCount,
+                              SaleStrategy = rp.SaleStrategy,
+                              PaymentType = rp.PaymentType,
+                              Preferential = rp.Preferential,
+                              MemberPriceSpread = rp.MemberPriceSpread,
+                              MinPrice = rp.MinPrice,
+                              MaxPrice = rp.MaxPrice,
+                              CalendarStatus = rp.CalendarStatus,
+                              Sort = rp.Sort
+                          }).ToList();
 
 
             return ApiResult<List<RoomTypeOrRoomPriceDto>>.Success(result, ResultCode.Success);
@@ -80,7 +80,7 @@ namespace HotelABP.RoomPriceCalendar
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult<int>> AddRoomPriceAsync(CreateRoomPriceDto input)
+        public async Task<ApiResult<int>> AddRoomPriceaddAsync(CreateRoomPriceDto input)
         {
             // 1. 查询该房型最早的日历日期
             var minCalendarDate = await db.Queryable<RoomPriceCalendars>()
@@ -154,14 +154,27 @@ namespace HotelABP.RoomPriceCalendar
                 return ApiResult<int>.Fail("新增房价失败",ResultCode.Error);
         }
         /// <summary>
-        /// 修改房价
+        /// 编辑房价
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<ApiResult<int>> UpdataRoomPriceAsync(UpdateRoomPriceDto dto)
+        public async Task<ApiResult<int>> UpdateRoomPriceupdateAsync(UpdateRoomPriceDto input)
         {
 
+            var priceId=await db.Queryable<RoomPrice>().FirstAsync(x=>x.Id==input.Id);
+            priceId.ProductName = input.ProductName;
+            priceId.BreakfastCount = input.BreakfastCount;
+            priceId.SaleStrategy = input.SaleStrategy;
+            priceId.PaymentType = input.PaymentType;
+            priceId.Preferential = input.Preferential;
+            priceId.MemberPriceSpread = input.MemberPriceSpread;
+            priceId.CalendarStatus = input.CalendarStatus;
+            priceId.Sort = input.Sort;
+            var result= db.Updateable(priceId).ExecuteCommandAsync();
+            return ApiResult<int>.Success(await result, ResultCode.Success);
         }
+
+
         /// <summary>
         /// 修改房价状态
         /// </summary>
@@ -269,6 +282,22 @@ namespace HotelABP.RoomPriceCalendar
             else
                 return ApiResult<bool>.Fail(result.ErrorMessage, ResultCode.Error);
         }
-
+        /// <summary>
+        /// 修改房型价格排序
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<int>> UpdateRoomPriceSort(Guid id, int sort)
+        {
+            var roomPrice = await db.Queryable<RoomPrice>().FirstAsync(x => x.Id == id);
+            if (roomPrice == null)
+            {
+                return ApiResult<int>.Fail("未找到对应的房型价格", ResultCode.Error);
+            }
+            roomPrice.Sort = sort;
+           var result=  await db.Updateable(roomPrice).ExecuteCommandAsync();
+            return ApiResult<int>.Success(result, ResultCode.Success);
+        }
     }
 }

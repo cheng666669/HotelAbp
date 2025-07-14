@@ -1,11 +1,14 @@
-﻿using HotelABP.Services;
+﻿using Aliyun.OSS;
+using HotelABP.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Web;
 using Volo.Abp;
 
 namespace HotelABP.Controllers
@@ -19,12 +22,18 @@ namespace HotelABP.Controllers
     [ApiExplorerSettings(GroupName = "fileimg")]
     public class FileImgController : ControllerBase
     {
-        IWebHostEnvironment webHost;
+        private readonly IWebHostEnvironment _webHost;
         private readonly AliyunOssService _aliyunOssService;
-        public FileImgController(IWebHostEnvironment webHost, AliyunOssService aliyunOssService)
+        private readonly AliyunOptions _options;
+
+        public FileImgController(
+            IWebHostEnvironment webHost,
+            AliyunOssService aliyunOssService,
+            IOptions<AliyunOptions> options)
         {
-            this.webHost = webHost;
+            _webHost = webHost;
             _aliyunOssService = aliyunOssService;
+            _options = options.Value; // 正确方式
         }
         /// <summary>
         /// 异常测试接口
@@ -50,7 +59,7 @@ namespace HotelABP.Controllers
             // 用于存储所有上传后文件的相对路径
             var resultList = new List<string>();
             // 获取Web根目录（wwwroot），用于保存文件
-            var webRootPath = webHost.WebRootPath;
+            var webRootPath = _webHost.WebRootPath;
             // 如果WebRootPath为空（某些环境下可能为null），则手动拼接wwwroot路径
             if (string.IsNullOrEmpty(webRootPath))
             {
@@ -118,6 +127,35 @@ namespace HotelABP.Controllers
             return result;
         }
 
-        
+     
+
+[HttpGet("GetVideoList")]
+        public List<string> GetVideoList()
+        {
+            var client = new OssClient(_options.Endpoint, _options.AccessKeyId, _options.AccessKeySecret);
+            var videoList = new List<string>();
+
+            var listRequest = new ListObjectsRequest(_options.BucketName)
+            {
+                Prefix = _options.VideoFolder
+            };
+
+            var result = client.ListObjects(listRequest);
+
+            foreach (var summary in result.ObjectSummaries)
+            {
+                // 生成带签名的 URL，有效期比如 1 年
+                var expiration = DateTime.Now.AddYears(1);
+
+                var signedUri = client.GeneratePresignedUri(_options.BucketName, summary.Key, expiration);
+
+                // signedUri 是 Uri 类型，ToString() 就是完整带签名的 URL
+                videoList.Add(signedUri.ToString());
+            }
+
+            return videoList;
+        }
+
+
     }
 }

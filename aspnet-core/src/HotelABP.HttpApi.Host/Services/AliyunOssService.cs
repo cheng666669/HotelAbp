@@ -28,7 +28,7 @@ namespace HotelABP.Services
             // 上传
             client.PutObject(_options.BucketName, objectKey, videoStream);
             // 设置过期时间
-            var expiration = DateTime.Now.AddMinutes(expireMinutes);
+            var expiration = DateTime.Now.AddYears(expireMinutes);
 
             // 生成签名 URL 请求
             var req = new GeneratePresignedUriRequest(_options.BucketName, objectKey, SignHttpMethod.Get)

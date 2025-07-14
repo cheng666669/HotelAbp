@@ -57,10 +57,8 @@ namespace HotelABP.RoomPriceCalendarService
 
         /// <summary>最高价</summary>
         public decimal? MaxPrice { get; set; }
-
         /// <summary>状态（如“启用”、“停用”）</summary>
         public bool? CalendarStatus { get; set; }
-
         /// <summary>
         /// 排序
         /// </summary>
