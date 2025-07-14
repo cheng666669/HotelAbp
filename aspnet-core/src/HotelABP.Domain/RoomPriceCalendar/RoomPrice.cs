@@ -38,7 +38,7 @@ namespace HotelABP.RoomPriceCalendar
         /// 付款方式（如“预订付费”、“到店付费”）
         /// </summary>
         [SugarColumn(IsNullable = true)]
-        public string    PaymentType { get; set; }
+        public string PaymentType { get; set; }
         /// <summary>
         /// 住宿优惠
         /// </summary>
@@ -48,7 +48,7 @@ namespace HotelABP.RoomPriceCalendar
         /// 会员差价
         /// </summary>
         [SugarColumn(IsNullable = true)]
-        public string MemberPriceSpread { get; set;}
+        public string MemberPriceSpread { get; set; }
 
         /// <summary>最低价</summary>
         [SugarColumn(IsNullable = true)]
@@ -61,15 +61,11 @@ namespace HotelABP.RoomPriceCalendar
         /// <summary>状态（如“启用”、“停用”）</summary>
         [SugarColumn(IsNullable = true)]
         public bool CalendarStatus { get; set; }
-
         /// <summary>
         /// 排序
         /// </summary>
         [SugarColumn(IsNullable = true)]
         public int Sort { get; set; }
-
-
-
         [SugarColumn(IsIgnore = true)]
         public new Volo.Abp.Data.ExtraPropertyDictionary ExtraProperties { get; set; }
 

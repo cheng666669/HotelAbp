@@ -20,7 +20,6 @@ namespace HotelABP.RoomPriceCalendarService
         /// 早餐数量
         /// </summary>
         public int BreakfastCount { get; set; }
-
         /// <summary>
         /// 销售策略（如“提前7天预订”、“无”）
         /// </summary>
@@ -37,12 +36,6 @@ namespace HotelABP.RoomPriceCalendarService
         /// 会员差价
         /// </summary>
         public string MemberPriceSpread { get; set; }
-
-        /// <summary>最低价</summary>
-        public decimal MinPrice { get; set; }
-
-        /// <summary>最高价</summary>
-        public decimal MaxPrice { get; set; }
 
         /// <summary>状态（如“启用”、“停用”）</summary>
         public bool CalendarStatus { get; set; }
