@@ -1,19 +1,22 @@
 ﻿using HotelABP.Customers;
 using HotelABP.Export;
+using HotelABP.Labels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using System.Transactions;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Caching;
 using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.ObjectMapping;
 using Volo.Abp.Validation;
 using static Volo.Abp.Http.MimeTypes;
-using System.Transactions;
-using HotelABP.Labels;
 
 
 
@@ -31,22 +34,26 @@ namespace HotelABP.Customer
         private readonly IRepository<HotelABPLabelss, Guid> _labelRepository;
         // 声明一个只读字段来保存我们封装的导出服务实例
         private readonly IExportAppService _exportAppService;
-        
+        private readonly ILogger <CustomerService>_logger;
         private readonly IRepository<Balancerecord, Guid> _balancerecordRepository;
-
+        private readonly IDistributedCache<List<GetCustomerDto>> cache;
 
         public CustomerService(
             IRepository<HotelABPCustoimerss, Guid> customerRepository,
             IRepository<HotelABPCustoimerTypeName, Guid> customerTypeRepository,
             IRepository<HotelABPLabelss, Guid> labelRepository,
             IExportAppService exportAppService,
-            IRepository<Balancerecord, Guid> balancerecordRepository)
+            IRepository<Balancerecord, Guid> balancerecordRepository,
+            IDistributedCache<List<GetCustomerDto>> cache,
+            ILogger<CustomerService> logger)
         {
             _customerRepository = customerRepository;
             _customerTypeRepository = customerTypeRepository;
             _labelRepository = labelRepository;
             _exportAppService = exportAppService;
             _balancerecordRepository = balancerecordRepository;
+            this.cache = cache;
+            _logger = logger;
         }
         /// <summary>
         /// 添加客户信息（支持DTO映射和异常处理）
@@ -111,69 +118,115 @@ namespace HotelABP.Customer
         /// </remarks>
         public async Task<ApiResult<PageResult<GetCustomerDto>>> GetCustomerListAsync(Seach seach, GetCustomerDtoList cudto)
         {
-            var list = await _customerRepository.GetQueryableAsync();
-            var types = await _customerTypeRepository.GetQueryableAsync();
-            var labels = await _labelRepository.GetQueryableAsync();
-            // 多条件筛选
-            list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerNickName), x => x.CustomerNickName.Contains(cudto.CustomerNickName));
-            list = list.WhereIf(cudto.CustomerType != null, x => x.CustomerType == cudto.CustomerType);
-            // Guid模糊查询
-            list = list.WhereIf(cudto.Id != null, x => x.Id.ToString().Contains(cudto.Id.ToString()));
-     
-            list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerName), x => x.CustomerName.Contains(cudto.CustomerName));
-            list = list.WhereIf(!string.IsNullOrEmpty(cudto.PhoneNumber), x => x.PhoneNumber.Contains(cudto.PhoneNumber));
-            // 性别判断逻辑
-            list = list.WhereIf(cudto.Gender.HasValue && cudto.Gender >= 0, x => x.Gender == cudto.Gender);
-           
-            var startTime = cudto.StartTime?.Date;
-            var endTime = cudto.EndTime?.Date.AddDays(1);
-            list = list.WhereIf(cudto.StartTime != null, x => x.Birthday >= cudto.StartTime);
-            list = list.WhereIf(cudto.EndTime != null, x => x.Birthday < cudto.EndTime.Value.AddDays(1));
-            // 联表查询客户类型，组装DTO
-            var type = from a in list
-                       join b in types
-                       on a.CustomerType equals b.Id into temp
-                       from b in temp.DefaultIfEmpty()
-                       select new GetCustomerDto
-                       {
-                           Id = a.Id,
-                           CustomerNickName = a.CustomerNickName,
-                           CustomerType = a.CustomerType,
-                           CustomerTypeName = b.CustomerTypeName,
-                           Gender = a.Gender,
-                           CustomerName = a.CustomerName,
-                           PhoneNumber = a.PhoneNumber,
-                           Birthday = a.Birthday,
-                           Address = a.Address,
-                           City = a.City,
-                           GrowthValue = a.GrowthValue,
-                           AvailableBalance = a.AvailableBalance,
-                           AvailableGiftBalance = a.AvailableGiftBalance,
-                           AvailablePoints = a.AvailablePoints,
-                           Status = a.Status,
-                           Sumofconsumption = a.Sumofconsumption,
-                           ComsumerNumber = a.ComsumerNumber,
-                           Accumulativeconsumption = a.Accumulativeconsumption,
-                           ConsumerDesc = a.ConsumerDesc,
-                           CreationTime = a.CreationTime,
-                           CustomerDesc = a.CustomerDesc,
-                           Rechargeamount = a.Rechargeamount,
-                         
-                       };
-
-
-
-            var res = type.PageResult(seach.PageIndex, seach.PageSize);
-
-            return ApiResult<PageResult<GetCustomerDto>>.Success(
-                new PageResult<GetCustomerDto>
+            try
+            {
+                // 生成缓存键，根据查询参数变化
+                var cacheKey = $"CustomerList:{cudto.CustomerNickName}:{cudto.CustomerType}:{cudto.Id}:{cudto.CustomerName}:{cudto.PhoneNumber}:{cudto.Gender}:{cudto.StartTime}:{cudto.EndTime}:{seach.PageIndex}:{seach.PageSize}";
+                
+                // 尝试从Redis缓存获取数据
+                var cachedResult = await cache.GetAsync(cacheKey);
+                if (cachedResult != null)
                 {
-                    Data = res.Queryable.ToList(),
-                    TotleCount = list.Count(),
-                    TotlePage = (int)Math.Ceiling(list.Count() / (double)seach.PageSize)
-                },
-            ResultCode.Success
-            );
+                    _logger.LogInformation("从缓存获取客户列表数据");
+                    return ApiResult<PageResult<GetCustomerDto>>.Success(
+                        new PageResult<GetCustomerDto>
+                        {
+                            Data = cachedResult,
+                            TotleCount = cachedResult.Count,
+                            TotlePage = (int)Math.Ceiling(cachedResult.Count / (double)seach.PageSize)
+                        },
+                        ResultCode.Success
+                    );
+                }
+
+                // 缓存未命中，从数据库查询
+                _logger.LogInformation("从数据库查询客户列表数据");
+                var list = await _customerRepository.GetQueryableAsync();
+                var types = await _customerTypeRepository.GetQueryableAsync();
+                var labels = await _labelRepository.GetQueryableAsync();
+                
+                // 多条件筛选
+                list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerNickName), x => x.CustomerNickName.Contains(cudto.CustomerNickName));
+                list = list.WhereIf(cudto.CustomerType != null, x => x.CustomerType == cudto.CustomerType);
+                // Guid模糊查询
+                list = list.WhereIf(cudto.Id != null, x => x.Id==cudto.Id);
+         
+                list = list.WhereIf(!string.IsNullOrEmpty(cudto.CustomerName), x => x.CustomerName.Contains(cudto.CustomerName));
+                list = list.WhereIf(!string.IsNullOrEmpty(cudto.PhoneNumber), x => x.PhoneNumber.Contains(cudto.PhoneNumber));
+                // 性别判断逻辑
+                list = list.WhereIf(cudto.Gender.HasValue && cudto.Gender >= 0, x => x.Gender == cudto.Gender);
+               
+                var startTime = cudto.StartTime?.Date;
+                var endTime = cudto.EndTime?.Date.AddDays(1);
+                list = list.WhereIf(cudto.StartTime != null, x => x.Birthday >= cudto.StartTime);
+                list = list.WhereIf(cudto.EndTime != null, x => x.Birthday < cudto.EndTime.Value.AddDays(1));
+                
+                // 联表查询客户类型，组装DTO
+                var type = from a in list
+                           join b in types
+                           on a.CustomerType equals b.Id into temp
+                           from b in temp.DefaultIfEmpty()
+                           select new GetCustomerDto
+                           {
+                               Id = a.Id,
+                               CustomerNickName = a.CustomerNickName,
+                               CustomerType = a.CustomerType,
+                               CustomerTypeName = b.CustomerTypeName,
+                               Gender = a.Gender,
+                               CustomerName = a.CustomerName,
+                               PhoneNumber = a.PhoneNumber,
+                               Birthday = a.Birthday,
+                               Address = a.Address,
+                               City = a.City,
+                               GrowthValue = a.GrowthValue,
+                               AvailableBalance = a.AvailableBalance,
+                               AvailableGiftBalance = a.AvailableGiftBalance,
+                               AvailablePoints = a.AvailablePoints,
+                               Status = a.Status,
+                               Sumofconsumption = a.Sumofconsumption,
+                               ComsumerNumber = a.ComsumerNumber,
+                               Accumulativeconsumption = a.Accumulativeconsumption,
+                               ConsumerDesc = a.ConsumerDesc,
+                               CreationTime = a.CreationTime,
+                               CustomerDesc = a.CustomerDesc,
+                               Rechargeamount = a.Rechargeamount,
+                           };
+                
+                // 执行分页
+                var res = type.PageResult(seach.PageIndex, seach.PageSize);
+                var resultData = res.Queryable.ToList();
+                
+                // 将结果存入Redis缓存
+                await cache.SetAsync(
+                    cacheKey, 
+                    resultData, 
+                    new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) // 设置缓存10分钟过期
+                    }
+                );
+
+                return ApiResult<PageResult<GetCustomerDto>>.Success(
+                    new PageResult<GetCustomerDto>
+                    {
+                        Data = resultData,
+                        TotleCount = list.Count(),
+                        TotlePage = (int)Math.Ceiling(list.Count() / (double)seach.PageSize)
+                    },
+                    ResultCode.Success
+                );
+            }
+            catch (Exception ex)
+            {
+                // 记录异常信息到日志
+                _logger.LogError($"获取客户列表时发生异常: {ex.Message}", ex);
+                
+                // 返回错误信息
+                return ApiResult<PageResult<GetCustomerDto>>.Fail(
+                    $"获取客户列表失败: {ex.Message}",
+                    ResultCode.Error
+                );
+            }
         }
     
         /// <summary>
@@ -290,56 +343,55 @@ namespace HotelABP.Customer
         {
             try
             {
-                // 1. 校验参数
+                // 1. 校验参数：验证DTO对象是否为空、ID是否有效、充值金额是否为负数
                 if (balanceDto == null || balanceDto.Id == Guid.Empty || balanceDto.Rechargeamount < 0)
                 {
                     return ApiResult<bool>.Fail("参数无效", ResultCode.Error);
                 }
 
-                // 使用事务，确保操作的原子性
+                // 使用事务，确保操作的原子性（充值和记录日志要么都成功，要么都失败）
                 using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    // 2. 获取客户实体
+                    // 2. 获取客户实体：根据ID查询客户信息
                     var customer = await _customerRepository.GetAsync(balanceDto.Id);
                     if (customer == null)
                     {
                         return ApiResult<bool>.Fail("客户不存在", ResultCode.Error);
                     }
 
-                    // 3. 更新客户的可用余额
+                    // 3. 更新客户的可用余额：增加充值金额
                     customer.AvailableBalance += balanceDto.Rechargeamount;
+                    // 更新客户备注信息
                     customer.CustomerDesc = balanceDto.CustomerDesc;
 
-                    // 4. 更新数据库
+                    // 4. 更新数据库：保存客户信息变更
                     await _customerRepository.UpdateAsync(customer);
 
-                    // 5. 记录日志到 Balancerecord
+                    // 5. 记录充值日志：创建余额变动记录
                     var balanceRecord = new Balancerecord
                     {
-                        Id = customer.Id,
-                        Phone = customer.PhoneNumber,
-                        CustomerNockName = customer.CustomerNickName,
-                        CustomerName = customer.CustomerName,
-                        SlidingPrice = balanceDto.Rechargeamount,
-                        ChangePrice = customer.AvailableBalance += balanceDto.Rechargeamount,
-
-                        Ordernumber = "C" + Guid.NewGuid().ToString("N").Substring(0, 19),
-                        Operator = CurrentUser.UserName,
-
-                        OperatorId = CurrentUser.Id
-
-
+                        Id = customer.Id,                      // 客户ID
+                        Phone = customer.PhoneNumber,          // 客户手机号
+                        CustomerNockName = customer.CustomerNickName, // 客户昵称
+                        CustomerName = customer.CustomerName,  // 客户姓名
+                        SlidingPrice = balanceDto.Rechargeamount, // 变动金额（充值金额）
+                        ChangePrice = customer.AvailableBalance += balanceDto.Rechargeamount, // 变动后余额
+                        Ordernumber = "C" + Guid.NewGuid().ToString("N").Substring(0, 19), // 生成唯一的订单号，C开头表示充值
+                        Operator = "如家酒店"  // 操作人
                     };
+                    // 保存余额变动记录到数据库
                     await _balancerecordRepository.InsertAsync(balanceRecord);
 
-                    // 提交事务
+                    // 提交事务：所有操作成功才会真正写入数据库
                     tran.Complete();
                 }
 
+                // 操作成功，返回成功结果
                 return ApiResult<bool>.Success(true, ResultCode.Success);
             }
             catch (Exception ex)
             {
+                // 6. 捕获异常并返回失败信息：记录异常信息并返回给调用方
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
@@ -373,12 +425,13 @@ namespace HotelABP.Customer
                     return ApiResult<bool>.Fail("客户不存在", ResultCode.Error);
                 }
 
-                // 3. 判断余额是否足够
-                decimal availableBalance = customer.AvailableBalance ?? 0;
-                decimal availableGiftBalance = customer.AvailableGiftBalance ?? 0;
-                decimal totalAvailable = availableBalance + availableGiftBalance;
-                decimal consume = sumofconsumptionDto.Sumofconsumption.Value;
+                // 3. 判断余额是否足够：计算可用充值余额和可用赠送余额的总和
+                decimal availableBalance = customer.AvailableBalance ?? 0;      // 可用充值余额，如果为空则默认为0
+                decimal availableGiftBalance = customer.AvailableGiftBalance ?? 0;  // 可用赠送余额，如果为空则默认为0
+                decimal totalAvailable = availableBalance + availableGiftBalance;   // 计算总可用余额
+                decimal consume = sumofconsumptionDto.Sumofconsumption.Value;   // 本次消费金额
 
+                // 检查总余额是否足够支付本次消费
                 if (totalAvailable < consume)
                 {
                     return ApiResult<bool>.Fail("余额不足", ResultCode.Error);
@@ -387,42 +440,47 @@ namespace HotelABP.Customer
                 // 优先扣减可用余额
                 if (availableBalance >= consume)
                 {
+                    // 充值余额足够，直接扣减
                     customer.AvailableBalance = availableBalance - consume;
                 }
                 else
                 {
                     // 可用余额不足，先扣完可用余额，再扣赠送余额
-                    decimal left = consume - availableBalance;
-                    customer.AvailableBalance = 0;
-                    customer.AvailableGiftBalance = availableGiftBalance - left;
+                    decimal left = consume - availableBalance;  // 计算还需要从赠送余额中扣除的金额
+                    customer.AvailableBalance = 0;  // 充值余额清零
+                    customer.AvailableGiftBalance = availableGiftBalance - left;  // 从赠送余额中扣除剩余金额
                 }
 
                 // 4. 增加累计消费金额和消费次数
-                customer.Accumulativeconsumption = (customer.Accumulativeconsumption ?? 0) + consume;
-                customer.ComsumerNumber = (customer.ComsumerNumber ?? 0) + 1;
-                customer.ConsumerDesc = sumofconsumptionDto.ConsumerDesc;
+                customer.Accumulativeconsumption = (customer.Accumulativeconsumption ?? 0) + consume;  // 累加消费总金额
+                customer.ComsumerNumber = (customer.ComsumerNumber ?? 0) + 1;  // 消费次数加1
+                customer.ConsumerDesc = sumofconsumptionDto.ConsumerDesc;  // 更新消费备注
 
-                // 5. 更新数据库
+                // 5. 更新数据库：保存客户信息的变更
                 await _customerRepository.UpdateAsync(customer);
-                // 5. 记录日志到 Balancerecord
+                
+                // 6. 记录消费日志：创建余额变动记录
                 var balanceRecord = new Balancerecord
                 {
-                    Id = customer.Id,
-                    Phone = customer.PhoneNumber,
-                    CustomerNockName = customer.CustomerNickName,
-                    CustomerName = customer.CustomerName,
-                    SlidingPrice = sumofconsumptionDto.Sumofconsumption,
-                    ChangePrice = sumofconsumptionDto.AvailableGiftBalance += sumofconsumptionDto.AvailableGiftBalance,
+                    Id = customer.Id,  // 客户ID
+                    Phone = customer.PhoneNumber,  // 客户手机号
+                    CustomerNockName = customer.CustomerNickName,  // 客户昵称
+                    CustomerName = customer.CustomerName,  // 客户姓名
+                    SlidingPrice = sumofconsumptionDto.Sumofconsumption,  // 变动金额（消费金额）
+                    ChangePrice = sumofconsumptionDto.AvailableGiftBalance += sumofconsumptionDto.AvailableGiftBalance,  // 变动后金额
 
-                    Ordernumber = "C" + Guid.NewGuid().ToString("N").Substring(0, 19),
-                    Operator = "如家酒店"
+                    Ordernumber = "X" + Guid.NewGuid().ToString("N").Substring(0, 19),  // 生成唯一的订单号，X开头表示消费
+                    Operator = "如家酒店"  // 操作人
                 };
+                // 保存余额变动记录到数据库
                 await _balancerecordRepository.InsertAsync(balanceRecord);
 
+                // 操作成功，返回成功结果
                 return ApiResult<bool>.Success(true, ResultCode.Success);
             }
             catch (Exception ex)
             {
+                // 7. 捕获异常并返回失败信息：记录异常信息并返回给调用方
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
@@ -519,26 +577,27 @@ namespace HotelABP.Customer
                 // 7. 更新数据库：将修改后的客户实体保存到数据库
                 await _customerRepository.UpdateAsync(customer);
 
-                // 5. 记录日志到 Balancerecord
+                // 8. 记录积分变动日志：创建余额记录
                 var balanceRecord = new Balancerecord
                 {
-                    Id = customer.Id,
-                    Phone = customer.PhoneNumber,
-                    CustomerNockName = customer.CustomerNickName,
-                    CustomerName = customer.CustomerName,
-                    SlidingPrice = upAvailable.Accumulativeintegral,
-                    ChangePrice = upAvailable.AvailablePoints,
+                    Id = customer.Id,                         // 客户ID
+                    Phone = customer.PhoneNumber,             // 客户手机号
+                    CustomerNockName = customer.CustomerNickName, // 客户昵称
+                    CustomerName = customer.CustomerName,     // 客户姓名
+                    SlidingPrice = upAvailable.Accumulativeintegral, // 变动积分值
+                    ChangePrice = upAvailable.AvailablePoints,      // 变动后积分
 
-                    Ordernumber = "J" + Guid.NewGuid().ToString("N").Substring(0, 19),
-                    Operator = "如家酒店"
+                    Ordernumber = "J" + Guid.NewGuid().ToString("N").Substring(0, 19), // 生成唯一的订单号，J开头表示积分变动
+                    Operator = "如家酒店"                     // 操作人
                 };
                 await _balancerecordRepository.InsertAsync(balanceRecord);
+                
                 // 操作成功，返回成功结果
                 return ApiResult<bool>.Success(true, ResultCode.Success);
             }
             catch (Exception ex)
             {
-                // 8. 捕获异常并返回失败信息：记录异常信息并返回给调用方
+                // 9. 捕获异常并返回失败信息：记录异常信息并返回给调用方
                 return ApiResult<bool>.Fail(ex.Message, ResultCode.Error);
             }
         }
@@ -763,7 +822,7 @@ namespace HotelABP.Customer
             return ApiResult<FanCustomerDto>.Success(customerDto, ResultCode.Success);
         }
         /// <summary>
-        /// 获取余额列表,查询
+        /// 获取余额列表查询
         /// </summary>
         /// <param name="seach"></param>
         /// <param name="listDto"></param>
