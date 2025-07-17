@@ -21,10 +21,12 @@ namespace HotelABP.Services
             var client = new OssClient(_options.Endpoint, _options.AccessKeyId, _options.AccessKeySecret);
 
             // 构建唯一文件名
-            var fileExt = Path.GetExtension(originalFileName);
+
+            // 过滤文件名中的非ASCII字符
+            var safeFileName = System.Text.RegularExpressions.Regex.Replace(originalFileName, @"[^\u0000-\u007F]", "_");
+            var fileExt = Path.GetExtension(safeFileName);
             var uniqueName = $"{Guid.NewGuid():N}{fileExt}";
             var objectKey = $"{_options.VideoFolder}{uniqueName}";
-
             // 上传
             client.PutObject(_options.BucketName, objectKey, videoStream);
             // 设置过期时间

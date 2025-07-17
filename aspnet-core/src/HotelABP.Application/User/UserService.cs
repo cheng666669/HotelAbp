@@ -49,8 +49,11 @@ namespace HotelABP.User
         [HttpGet]
         public IActionResult Captcha(string id)
         {
-            var info = captcha.Generate(id); // 生成验证码图片和字节流
-            return new FileContentResult(info.Bytes, "image/gif"); // 返回图片内容
+
+                var info = captcha.Generate(id); // 生成验证码图片和字节流
+                return new FileContentResult(info.Bytes, "image/gif"); // 返回图片内容
+            
+
         }
         /// <summary>
         /// 演示时使用HttpGet传参方便，这里仅做返回处理
@@ -98,7 +101,43 @@ namespace HotelABP.User
                 else
                 {
                     // 3. 校验密码
-                    if(user.Password != dto.Password)
+                    if (user.Password != dto.Password)
+                    {
+                        return ApiResult<LoginResultDto>.Fail("密码错误", ResultCode.ValidationError);
+                    }
+                    else
+                    {
+                        // 4. 生成Token并返回
+                        return ApiResult<LoginResultDto>.Success(GenerateToken(user), ResultCode.Success);
+                    }
+                }
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+        /// <summary>
+        /// 登录
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ApiResult<LoginResultDto>> Login(string Username,string Password)
+        {
+            try
+            {
+                
+                var user = await userRep.FindAsync(x => x.UserName == Username);
+                if (user == null)
+                {
+                    return ApiResult<LoginResultDto>.Fail("用户不存在", ResultCode.NotFound);
+                }
+                else
+                {
+                    // 3. 校验密码
+                    if (user.Password != Password)
                     {
                         return ApiResult<LoginResultDto>.Fail("密码错误", ResultCode.ValidationError);
                     }
